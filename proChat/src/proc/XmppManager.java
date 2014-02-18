@@ -85,6 +85,14 @@ public class XmppManager {
 		}
 	}
 	
+	public XMPPConnection getConnection() {
+		return connection;
+	}
+	
+	public ChatManager getChatManager() {
+		return chatManager;
+	}
+	
 	public void sendMessage(String message, String buddyJID) throws XMPPException {
 		System.out.println(String.format("Sending mesage '%1$s' to user %2$s", message, buddyJID));
 		Chat chat = chatManager.createChat(buddyJID, messageListener);

@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="C:/Users/Cody/My Programs/Dev Resources/smack-3.4.1-0cec571.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Cody/My Programs/Dev Resources/smackx-3.4.1-0cec571.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Cody/Programming/Dev Resources/API&apos;s/smack_3_4_1/smack-3.4.1-0cec571.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Cody/Programming/Dev Resources/API&apos;s/smack_3_4_1/smackx-3.4.1-0cec571.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
