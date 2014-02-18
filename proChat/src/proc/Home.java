@@ -2,6 +2,8 @@ package proc;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -15,12 +17,13 @@ import org.jivesoftware.smack.XMPPException;
  * @author Cody Swendrowski
  * 
  */
-public class Home {
+public class Home implements ActionListener{
 
 	JFrame frame;
 	XmppManager connection;
 
 	public Home() throws XMPPException {
+		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
 		frame.setSize(400,600);
 		frame.setTitle("ProChat");
@@ -34,6 +37,7 @@ public class Home {
 		//chat.setBackground(Color.LIGHT_GRAY);
 		
 		JButton send = new JButton("Send");
+		send.addActionListener(this);
 		
 		JPanel entryPanel = new JPanel(new GridLayout(1,0));
 		
@@ -45,11 +49,12 @@ public class Home {
 		
 		frame.add(masterPanel);
 		
+		/*
 		connection = new XmppManager("127.0.0.1",5222);
 		connection.init();
 		connection.performLogin("Toon", "test");
 		connection.setStatus(true, "Hello everyone");
-		
+		*/
 		
 	}
 
@@ -58,6 +63,12 @@ public class Home {
 	 */
 	public void show() {
 		frame.setVisible(true);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
