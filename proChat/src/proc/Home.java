@@ -28,6 +28,8 @@ public class Home implements ActionListener, KeyListener{
 	JTextField entry;
 	XmppManager connection;
 	User user;
+	String serverIP;
+	int port;
 
 	public Home() throws XMPPException {
 		JFrame.setDefaultLookAndFeelDecorated(true);
@@ -43,7 +45,7 @@ public class Home implements ActionListener, KeyListener{
 		chat.addKeyListener(this);
 		entry.addKeyListener(this);
 		
-		user = new User("Toon324", "test");
+		user = new User("Toon", "test");
 		
 		chat.setEditable(false);
 		chat.setBackground(new Color(245,245,245));
@@ -61,12 +63,19 @@ public class Home implements ActionListener, KeyListener{
 		
 		frame.add(masterPanel);
 		
-		/*
-		connection = new XmppManager("127.0.0.1",5222);
+		serverIP = "127.0.0.1";
+		port = 5222;
+		
+		try {
+		connection = new XmppManager(serverIP,port);
 		connection.init();
-		connection.performLogin("Toon", "test");
+		connection.performLogin(user.getName(), user.getPass());
 		connection.setStatus(true, "Hello everyone");
-		*/
+		}
+		catch (Exception e) {
+			System.out.println("Could not connect to server");
+			chat.setText("Could not connect to server " + serverIP + ":" + port);
+		}
 		
 	}
 
