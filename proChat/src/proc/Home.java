@@ -1,6 +1,7 @@
 package proc;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,12 +40,13 @@ public class Home implements ActionListener, KeyListener{
 		chat = new JTextArea("");
 		entry = new JTextField("");
 		
+		chat.addKeyListener(this);
 		entry.addKeyListener(this);
 		
 		user = new User("Toon324", "test");
 		
 		chat.setEditable(false);
-		//chat.setBackground(Color.LIGHT_GRAY);
+		chat.setBackground(new Color(245,245,245));
 		
 		JButton send = new JButton("Send");
 		send.addActionListener(this);
