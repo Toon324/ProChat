@@ -1,7 +1,6 @@
 package proc;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridLayout;
 
 import javax.swing.BoxLayout;
@@ -10,6 +9,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.jivesoftware.smack.XMPPException;
+
 /**
  * @author Cody Swendrowski
  * 
@@ -17,8 +18,9 @@ import javax.swing.JTextField;
 public class Home {
 
 	JFrame frame;
+	XmppManager connection;
 
-	public Home() {
+	public Home() throws XMPPException {
 		frame = new JFrame();
 		frame.setSize(400,600);
 		frame.setTitle("ProChat");
@@ -42,6 +44,13 @@ public class Home {
 		masterPanel.add(entryPanel,BorderLayout.SOUTH);
 		
 		frame.add(masterPanel);
+		
+		connection = new XmppManager("127.0.0.1",5222);
+		connection.init();
+		connection.performLogin("Toon", "test");
+		connection.setStatus(true, "Hello everyone");
+		
+		
 	}
 
 	/**
