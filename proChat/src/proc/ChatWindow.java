@@ -30,13 +30,11 @@ public class ChatWindow implements ActionListener, KeyListener {
 	JFrame frame;
 	JTextArea chatArea;
 	JTextField entry;
-	XmppManager connection;
 	User user;
-	String serverIP, sendTo;
-	int port;
+	String sendTo;
 	Chat chat;
 
-	public ChatWindow(String userName, String pass, String to) throws XMPPException {
+	public ChatWindow(String userName, String pass, String to, XmppManager connection, String serverName) throws XMPPException {
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
 		frame.setSize(400, 600);
@@ -70,15 +68,10 @@ public class ChatWindow implements ActionListener, KeyListener {
 
 		frame.add(masterPanel);
 
-		serverIP = "129.89.185.120";
-		String serverName = "127.0.0.1";
-		port = 5222;
+		
 
 		try {
-			connection = new XmppManager(serverIP, port);
-			connection.init();
-			connection.performLogin(user.getName(), user.getPass());
-			connection.setStatus(true, "Hello everyone");
+			
 			/*
 			 * connection.sendMessage("Hi", "Toon324@" + serverIP);
 			 */
@@ -106,11 +99,10 @@ public class ChatWindow implements ActionListener, KeyListener {
 
 			// chat.sendMessage("Hi");
 			// connection.getChatManager().addChatListener(this);
-			// connection.printRoster();
+			connection.printRoster();
 		} catch (Exception e) {
 			e.printStackTrace();
-			chatArea.setText("Could not connect to server " + serverIP + ":"
-					+ port);
+			chatArea.setText("Could not connect to server " + serverName);
 		}
 
 	}

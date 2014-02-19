@@ -11,8 +11,7 @@ public class ProChat {
 	 */
 	public static void main(String[] args) {
 		try {
-		Home home = new Home();
-		home.show();
+		LoginWindow lw = new LoginWindow();
 		}
 		catch (Exception e) {
 			e.printStackTrace();

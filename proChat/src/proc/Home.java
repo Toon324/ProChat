@@ -11,8 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import org.jivesoftware.smack.XMPPException;
 
@@ -23,32 +23,34 @@ import org.jivesoftware.smack.XMPPException;
 public class Home implements ActionListener, KeyListener {
 
 	JFrame frame;
-	JPasswordField loginPass;
-	JTextField loginName, to;
+	User user;
+	String serverName, serverIP;
+	JTextField to;
 	ChatWindow chat;
+	XmppManager connection;
+	int port;
 
-	public Home() throws XMPPException {
+	public Home(String username, String pass) throws XMPPException {
+
+		user = new User(username,pass);
+
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
 		frame.setSize(400, 600);
 		frame.setTitle("ProChat");
 		JPanel masterPanel = new JPanel();
-		//masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
+		// masterPanel.setLayout(new BoxLayout(masterPanel,
+		// BoxLayout.PAGE_AXIS));
 
-		masterPanel.setLayout(new GridLayout(5,1));
-		
-		JLabel userLabel = new JLabel("Username");
-		JLabel passLabel = new JLabel("Password");
+		masterPanel.setLayout(new GridLayout(5, 1));
+
 		JLabel toLabel = new JLabel("Who would you like to chat with?");
-		
-		loginName = new JTextField("");
-		loginPass = new JPasswordField();
+
 		to = new JTextField("");
-		
+
 		/*
-		loginName.setBounds(70,30,150,20);
-		loginPass.setBounds(70,65,150,20);
-		*/
+		 * loginName.setBounds(70,30,150,20); loginPass.setBounds(70,65,150,20);
+		 */
 
 		to.addKeyListener(this);
 
@@ -61,14 +63,23 @@ public class Home implements ActionListener, KeyListener {
 		sendPanel.add(to);
 		sendPanel.add(send, BorderLayout.SOUTH);
 
-		masterPanel.add(userLabel);
-		masterPanel.add(loginName);
-		masterPanel.add(passLabel);
-		masterPanel.add(loginPass);
 		masterPanel.add(sendPanel, BorderLayout.SOUTH);
 
 		frame.add(masterPanel);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+		serverIP = "129.89.185.120";
+		serverName = "127.0.0.1";
+		port = 5222;
+		
+		try {
+			connection = new XmppManager(serverIP, port);
+			connection.init();
+			connection.performLogin(user.getName(), user.getPass());
+			connection.setStatus(true, "Hello everyone");
+		} catch (Exception e) {
+
+		}
 	}
 
 	public void show() {
@@ -97,10 +108,9 @@ public class Home implements ActionListener, KeyListener {
 	 */
 	private void openChat() {
 		try {
-			chat = new ChatWindow(loginName.getText(), new String(
-					loginPass.getPassword()), to.getText());
-			System.out.println("User: " + loginName.getText() + " Pass: "
-					+ chat.user.getPass() + " To: " + to.getText());
+			chat = new ChatWindow(user.getName(), user.getPass(), to.getText(), connection, serverName);
+			System.out.println("User: " + user.getName() + " Pass: " + user.getPass()
+					+ " To: " + to.getText());
 			chat.show();
 		} catch (Exception e) {
 			e.printStackTrace();
