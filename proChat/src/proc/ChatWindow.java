@@ -53,6 +53,8 @@ public class ChatWindow implements ActionListener, KeyListener {
 
 		chatArea.addKeyListener(this);
 		entry.addKeyListener(this);
+		
+		
 
 		user = new User(userName, pass);
 
@@ -119,6 +121,7 @@ public class ChatWindow implements ActionListener, KeyListener {
 
 	public void show() {
 		frame.setVisible(true);
+		entry.requestFocusInWindow();
 	}
 
 	private void sendMessage() throws XMPPException {
