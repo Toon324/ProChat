@@ -72,7 +72,8 @@ public class ChatWindow implements ActionListener, KeyListener {
 
 		frame.add(masterPanel);
 
-		serverIP = "127.0.0.1";
+		serverIP = "129.89.185.120";
+		String serverName = "127.0.0.1";
 		port = 5222;
 
 		try {
@@ -84,7 +85,7 @@ public class ChatWindow implements ActionListener, KeyListener {
 			 * connection.sendMessage("Hi", "Toon324@" + serverIP);
 			 */
 			chat = connection.getChatManager().createChat(
-					to + "@" + serverIP, null);
+					to + "@" + serverName, null);
 			// chat.addMessageListener(this);
 
 			PacketListener myListener = new PacketListener() {
