@@ -1,7 +1,6 @@
 package proc;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,167 +10,107 @@ import java.awt.event.KeyListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.FromContainsFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 
 /**
  * @author Cody Swendrowski
  * 
  */
-public class Home implements ActionListener, KeyListener{
+public class Home implements ActionListener, KeyListener {
 
 	JFrame frame;
-	JTextArea chatArea;
-	JTextField entry;
-	XmppManager connection;
-	User user;
-	String serverIP;
-	int port;
-	Chat chat;
+	JPasswordField loginPass;
+	JTextField loginName, to;
+	ChatWindow chat;
 
 	public Home() throws XMPPException {
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
-		frame.setSize(400,600);
+		frame.setSize(400, 600);
 		frame.setTitle("ProChat");
 		JPanel masterPanel = new JPanel();
-		masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
-		
-		chatArea = new JTextArea("");
-		entry = new JTextField("");
-		
-		chatArea.addKeyListener(this);
-		entry.addKeyListener(this);
-		
-		user = new User("Toon", "test");
-		
-		chatArea.setEditable(false);
-		chatArea.setBackground(new Color(245,245,245));
-		
-		JButton send = new JButton("Send");
-		send.addActionListener(this);
-		
-		JPanel entryPanel = new JPanel(new GridLayout(1,2));
-		
-		entryPanel.add(entry);
-		entryPanel.add(send,BorderLayout.EAST);
-		
-		masterPanel.add(chatArea);
-		masterPanel.add(entryPanel,BorderLayout.SOUTH);
-		
-		frame.add(masterPanel);
-		
-		serverIP = "127.0.0.1";
-		port = 5222;
-		
-		try {
-		connection = new XmppManager(serverIP,port);
-		connection.init();
-		connection.performLogin(user.getName(), user.getPass());
-		connection.setStatus(true, "Hello everyone");
-		/*
-		connection.sendMessage("Hi", "Toon324@" + serverIP);
-		*/
-		chat = connection.getChatManager().createChat("Toon324@" + serverIP, null);
-		//chat.addMessageListener(this);
-		
-		PacketListener myListener = new PacketListener() {         
-			
-			public void processPacket(Packet packet) {             
-				if (packet instanceof Message) {               
-					Message msg = (Message) packet;                
-					// Process message                 
-					recieveMessage(msg);
-					} 
-			}
+		//masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
 
-			private void recieveMessage(Message msg) {
-				addToChatArea(msg.getFrom() + ": " + msg.getBody());
-				
-			}
-			};     
-			// Register the listener.    
-		PacketFilter filter = new AndFilter(new PacketTypeFilter(Message.class),
-				new FromContainsFilter("headquaters@mycompany.com"));
-		connection.getConnection().addPacketListener(myListener, null);
+		masterPanel.setLayout(new GridLayout(5,1));
 		
-		//chat.sendMessage("Hi");
-		//connection.getChatManager().addChatListener(this);
-		//connection.printRoster();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			chatArea.setText("Could not connect to server " + serverIP + ":" + port);
-		}
+		JLabel userLabel = new JLabel("Username");
+		JLabel passLabel = new JLabel("Password");
+		JLabel toLabel = new JLabel("Who would you like to chat with?");
 		
+		loginName = new JTextField("");
+		loginPass = new JPasswordField();
+		to = new JTextField("");
+		
+		/*
+		loginName.setBounds(70,30,150,20);
+		loginPass.setBounds(70,65,150,20);
+		*/
+
+		to.addKeyListener(this);
+
+		JButton send = new JButton("Chat");
+		send.addActionListener(this);
+
+		JPanel sendPanel = new JPanel(new GridLayout(3, 1));
+
+		sendPanel.add(toLabel, BorderLayout.NORTH);
+		sendPanel.add(to);
+		sendPanel.add(send, BorderLayout.SOUTH);
+
+		masterPanel.add(userLabel);
+		masterPanel.add(loginName);
+		masterPanel.add(passLabel);
+		masterPanel.add(loginPass);
+		masterPanel.add(sendPanel, BorderLayout.SOUTH);
+
+		frame.add(masterPanel);
+
 	}
 
-	/**
-	 * 
-	 */
 	public void show() {
 		frame.setVisible(true);
-	}
-	
-	private void sendMessage() throws XMPPException {
-		if (entry.getText().equals(""))
-			return;
-		else if (entry.getText().equals("/me")) {
-			chatArea.setText(chatArea.getText() + "\n" + user.getName());
-			chat.sendMessage(user.getName());
-			return;
-		}
-		addToChatArea(user.getName() + ": " + entry.getText());
-		chat.sendMessage(entry.getText());
-		entry.setText("");
-	}
-	
-	private void addToChatArea(String toAdd) {
-		chatArea.setText(chatArea.getText() + "\n" + toAdd);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Send"))
-			try {
-				sendMessage();
-			} catch (XMPPException e1) {
-				e1.printStackTrace();
-			}
+			openChat();
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER)
-			try {
-				sendMessage();
-			} catch (XMPPException e1) {
-				e1.printStackTrace();
-			}
+			openChat();
+	}
+
+	/**
+	 * 
+	 */
+	private void openChat() {
+		try {
+			chat = new ChatWindow(loginName.getText(), new String(
+					loginPass.getPassword()), to.getText());
+			System.out.println("User: " + loginName.getText() + " Pass: "
+					+ chat.user.getPass() + " To: " + to.getText());
+			chat.show();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		
-		
+
 	}
 
 }
