@@ -88,7 +88,8 @@ public class Home implements ActionListener, KeyListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Send"))
+		System.out.println("Action: " + e.getActionCommand());
+		if (e.getActionCommand().equals("Chat"))
 			openChat();
 	}
 
