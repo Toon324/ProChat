@@ -135,6 +135,8 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 
 		chatArea.setEditable(false);
 		chatArea.setBackground(new Color(255, 255, 255, 200));
+		chatArea.setWrapStyleWord(true);
+		chatArea.setLineWrap(true);
 
 		JButton send = new JButton("Send");
 		send.addActionListener(this);
