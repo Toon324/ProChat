@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,7 +15,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManagerListener;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 
 /**
  * @author Cody Swendrowski
@@ -26,13 +32,15 @@ public class Home implements ActionListener, KeyListener {
 	User user;
 	String serverName, serverIP;
 	JTextField to;
-	ChatWindow chat;
 	XmppManager connection;
 	int port;
+	ArrayList<ChatWindow> currentChats;
 
 	public Home(String username, String pass) throws XMPPException {
 
 		user = new User(username,pass);
+		
+		currentChats = new ArrayList<ChatWindow>();
 
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
@@ -76,10 +84,46 @@ public class Home implements ActionListener, KeyListener {
 			connection = new XmppManager(serverIP, port);
 			connection.init();
 			connection.performLogin(user.getName(), user.getPass());
-			connection.setStatus(true, "Hello everyone");
+			connection.setStatus(true, "");
+			
+			PacketListener myListener = new PacketListener() {
+
+				public void processPacket(Packet packet) {
+					if (packet instanceof Message) {
+						Message msg = (Message) packet;
+						// Process message
+						recieveMessage(msg);
+					}
+				}
+
+			};
+			// Register the listener.
+			connection.getConnection().addPacketListener(myListener, null);
 		} catch (Exception e) {
 
 		}
+	}
+	
+	private void recieveMessage(Message msg) {
+		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
+		ChatWindow activeChat = null;
+		
+		System.out.println("Message from: " + from);
+		
+		for (ChatWindow c : currentChats) {
+			System.out.println("Found Chat with " + c.getFrom());
+			if (c.getFrom().equals(from)) {
+				activeChat = c;
+				break;
+			}
+		}
+		
+		if (activeChat == null) {
+			ChatWindow c = openChat(from);
+			c.addToChatArea(from + ": " + msg.getBody());
+		} else
+			activeChat.addToChatArea(msg.getFrom().substring(0, msg.getFrom().indexOf("@")) + ": " + msg.getBody());
+
 	}
 
 	public void show() {
@@ -88,9 +132,8 @@ public class Home implements ActionListener, KeyListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println("Action: " + e.getActionCommand());
 		if (e.getActionCommand().equals("Chat"))
-			openChat();
+			openChat(to.getText());
 	}
 
 	@Override
@@ -101,21 +144,30 @@ public class Home implements ActionListener, KeyListener {
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER)
-			openChat();
+			openChat(to.getText());
 	}
 
 	/**
 	 * 
 	 */
-	private void openChat() {
+	private ChatWindow openChat(String connectTo) {
+		if (connectTo.equals(""))
+			return null;
 		try {
-			chat = new ChatWindow(user.getName(), user.getPass(), to.getText(), connection, serverName);
-			System.out.println("User: " + user.getName() + " Pass: " + user.getPass()
-					+ " To: " + to.getText());
+			System.out.println("Creating connection to " + connectTo);
+			Chat c = connection.getChatManager().createChat(
+				connectTo + "@" + serverName, null);
+			ChatWindow chat = new ChatWindow(user, c);
+			currentChats.add(chat);
+			
+			chat.addToChatArea("Now chatting with " + connectTo);
+			
 			chat.show();
+			return chat;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	@Override

@@ -35,10 +35,15 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 	JTextArea chatArea;
 	JTextField entry;
 	User user;
-	String sendTo;
+	String sendTo, serverName;
 	Chat chat;
+	XmppManager connection;
 
-	public ChatWindow(String userName, String pass, String to, XmppManager connection, String serverName) throws XMPPException {
+	public ChatWindow(String userName, String pass, String to, XmppManager con, String sn) throws XMPPException {
+		connection = con;
+		serverName = sn;
+		sendTo = to;
+		
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
 		frame.setSize(400, 600);
@@ -52,12 +57,10 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 		chatArea.addKeyListener(this);
 		entry.addKeyListener(this);
 		
-		
-
 		user = new User(userName, pass);
 
 		chatArea.setEditable(false);
-		chatArea.setBackground(new Color(245, 245, 245));
+		chatArea.setBackground(new Color(255, 255, 255, 200));
 
 		JButton send = new JButton("Send");
 		send.addActionListener(this);
@@ -81,6 +84,7 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 			 */
 			chat = connection.getChatManager().createChat(
 					to + "@" + serverName, null);
+			
 			// chat.addMessageListener(this);
 			
 			PacketListener myListener = new PacketListener() {
@@ -93,10 +97,6 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 					}
 				}
 
-				private void recieveMessage(Message msg) {
-					addToChatArea(msg.getFrom().substring(0, msg.getFrom().indexOf("@")) + ": " + msg.getBody());
-
-				}
 			};
 			// Register the listener.
 			connection.getConnection().addPacketListener(myListener, null);
@@ -111,6 +111,64 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 
 	}
 
+	
+	/**
+	 * @param c
+	 */
+	public ChatWindow(User u, Chat c) {
+		chat = c;
+		user = u;
+		
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		frame = new JFrame();
+		frame.setSize(400, 600);
+		frame.setTitle("ProChat");
+		JPanel masterPanel = new JPanel();
+		masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
+
+		chatArea = new JTextArea("");
+		entry = new JTextField("");
+
+		chatArea.addKeyListener(this);
+		entry.addKeyListener(this);
+
+		chatArea.setEditable(false);
+		chatArea.setBackground(new Color(255, 255, 255, 200));
+
+		JButton send = new JButton("Send");
+		send.addActionListener(this);
+
+		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
+
+		entryPanel.add(entry);
+		entryPanel.add(send, BorderLayout.EAST);
+
+		masterPanel.add(chatArea);
+		masterPanel.add(entryPanel, BorderLayout.SOUTH);
+
+		frame.add(masterPanel);
+		//frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		//frame.addWindowListener(this);
+
+	}
+
+
+	private void recieveMessage(Message msg) {
+		if (!msg.getFrom().equals(sendTo))
+			try {
+				System.out.println("Creating new chat to talk to " + msg.getFrom() + ". Previous was " + sendTo);
+				ChatWindow c = new ChatWindow(user.userName, user.userPass, msg.getFrom(), connection, serverName);
+				c.addToChatArea("Now chatting with " + msg.getFrom());
+				c.recieveMessage(msg);
+				c.show();
+			} catch (XMPPException e) {
+				e.printStackTrace();
+			}
+		else
+			addToChatArea(msg.getFrom().substring(0, msg.getFrom().indexOf("@")) + ": " + msg.getBody());
+
+	}
+	
 	public void show() {
 		frame.setVisible(true);
 		entry.requestFocusInWindow();
@@ -129,7 +187,7 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 		entry.setText("");
 	}
 
-	private void addToChatArea(String toAdd) {
+	public void addToChatArea(String toAdd) {
 		chatArea.setText(chatArea.getText() + "\n" + toAdd);
 	}
 
@@ -223,6 +281,22 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 	public void windowOpened(WindowEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	/**
+	 * @return
+	 */
+	public Chat getChat() {
+		return chat;
+	}
+
+
+	/**
+	 * @return
+	 */
+	public String getFrom() {
+		return chat.getParticipant().substring(0, chat.getParticipant().indexOf("@"));
 	}
 
 }

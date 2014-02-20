@@ -12,11 +12,10 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-
-import org.jivesoftware.smack.XMPPException;
 
 /**
  * @author Cody
@@ -111,7 +110,12 @@ public class LoginWindow implements ActionListener {
 				Home home = new Home(loginName.getText(), new String(
 						loginPass.getPassword()));
 				home.show();
+				JOptionPane.showMessageDialog(frame,
+					    "Successfully logged in as " + loginName.getText());
 			} catch (Exception e1) {
+				JOptionPane.showMessageDialog(frame,
+					    "Could not login as " + loginName.getText() + "\nError: " + e1.getMessage());
+				
 				e1.printStackTrace();
 			}
 			frame.dispose();
