@@ -1,7 +1,6 @@
 package proc;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,14 +9,18 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
@@ -41,12 +44,14 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	User user;
 	String serverName, serverIP;
 	JTextField to;
-	JTable contacts;
+	//JTable contacts;
+	JList<User> contacts;
 	XmppManager connection;
 	int port;
 	ArrayList<ChatWindow> currentChats;
 	String[] names = { "Name", "Online" };
-	Object[][] data = new Object[16][2];
+	//Object[][] data = new Object[16][2];
+	User[] data = {new User("test1", ""), new User("test2","")};
 	Roster roster;
 
 	public Home(String username, String pass) throws XMPPException {
@@ -68,15 +73,22 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		JLabel toLabel = new JLabel("Who would you like to chat with?");
 		JLabel direct = new JLabel("Directly contact this person:");
 
+		/*
 		DefaultTableModel defTableModel = new DefaultTableModel(data, names);
 		contacts = new JTable(defTableModel);
 		//contacts.setShowGrid(false);
 		contacts.setIntercellSpacing(new Dimension(0, 0));
 		contacts.setAutoCreateRowSorter(true);
+		*/
+		
+		contacts = new JList<User>(data);
+		ContactsCellRenderer cellRender = new ContactsCellRenderer();
+		contacts.setCellRenderer(cellRender);
+		//contacts.setCellRenderer(new DefaultListCellRenderer());
 		
 		JScrollPane scrollPane = new JScrollPane(contacts);
 		
-		contacts.setFillsViewportHeight(true);
+		//contacts.setFillsViewportHeight(true);
 		
 		to = new JTextField("");
 
@@ -132,7 +144,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			connection.getConnection().addPacketListener(myListener, null);
 			roster = connection.getConnection().getRoster();
 			roster.addRosterListener(this);
-			loadContacts();
+			//loadContacts();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -143,20 +155,28 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	 */
 	private void loadContacts() {
 		roster.reload();
-		data = new Object[15][2];
+		//data = new Object[15][2];
+		data = new User[16];
 		ensureCapacity(roster.getEntryCount());
 		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
 			System.out.println("Found contact: " + contact);
 			String userContact = contact.getUser();
 			if (userContact.indexOf("@") != -1)
-				userContact = userContact.substring(0, userContact.indexOf("@")); 
-			data[x][0] = userContact;
-			data[x][1] = roster.getPresence(contact.getUser());
+				userContact = userContact.substring(0, userContact.indexOf("@"));
+			User toAdd = new User(userContact,"");
+			toAdd.setPresence(roster.getPresence(contact.getUser()));
+			data[x] = toAdd;
 			x++;
 		}
 		//Reload table
-		contacts.setModel(new DefaultTableModel(data,names));
+		//contacts.setModel(new DefaultTableModel(data,names));
+		DefaultListModel<User> lm = new DefaultListModel<User>();
+		
+		for (int y=0; y<data.length; y++)
+			lm.add(y, data[y]);
+		
+		contacts.setModel(lm);
 	}
 
 	private void recieveMessage(Message msg) {
@@ -218,10 +238,15 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	 */
 	private ChatWindow openChat(String connectTo) {
 		if (connectTo.equals("")) {
+			/*
 			if (contacts.getSelectedRow() == -1)
 				return null;
+				*/
+			if (contacts.getSelectedIndex() == -1)
+				return null;
 			
-			connectTo = (String) contacts.getValueAt(contacts.getSelectedRow(), 0);
+			//connectTo = (String) contacts.getValueAt(contacts.getSelectedRow(), 0);
+			connectTo = ((User) contacts.getSelectedValue()).getName();
 			if (connectTo == null)
 				return null;
 			System.out.println("Found contact to chat with: " + connectTo);
@@ -262,11 +287,16 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 		// else
 		// Copies data over to new array
-		Object[][] temp = new Object[data.length * 2][2];
+		//Object[][] temp = new Object[data.length * 2][2];
+		User[] temp = new User[data.length * 2];
+		/*
 		for (int x = 0; x < data.length; x++)
 			for (int y = 0; y < data[x].length; y++)
 				temp[x][y] = data[x][y];
-
+		*/
+		for (int x = 0; x < data.length; x++)
+			temp[x] = data[x];
+		
 		data = temp;
 
 	}
