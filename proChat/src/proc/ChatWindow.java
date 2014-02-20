@@ -34,6 +34,7 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 	JFrame frame;
 	JTextArea chatArea;
 	JTextField entry;
+	JButton send;
 	User user;
 	String sendTo, serverName;
 	Chat chat;
@@ -62,7 +63,7 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 		chatArea.setEditable(false);
 		chatArea.setBackground(new Color(255, 255, 255, 200));
 
-		JButton send = new JButton("Send");
+		send = new JButton("Send");
 		send.addActionListener(this);
 
 		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
@@ -297,6 +298,14 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 	 */
 	public String getFrom() {
 		return chat.getParticipant().substring(0, chat.getParticipant().indexOf("@"));
+	}
+
+
+	/**
+	 * 
+	 */
+	public void disableInput() {
+		entry.setEditable(false);
 	}
 
 }

@@ -16,11 +16,12 @@ import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
 import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Presence;
 
 /**
  * @author Cody Swendrowski
@@ -160,7 +161,19 @@ public class Home implements ActionListener, KeyListener {
 			ChatWindow chat = new ChatWindow(user, c);
 			currentChats.add(chat);
 			
-			chat.addToChatArea("Now chatting with " + connectTo);
+			Roster roster = connection.getConnection().getRoster();
+			Presence presence = roster.getPresence(connectTo + "@" + serverName);    
+			//System.out.println("Presence of " + connectTo + ": " + presence.getType());
+			if (presence.getType() == Presence.Type.available) {
+				chat.addToChatArea("Now chatting with " + connectTo);
+			}
+			else if (presence.getType() == Presence.Type.unavailable) {
+				chat.addToChatArea(connectTo + " is not Online, or does not exist.");
+				chat.disableInput();
+			}
+			else {
+				chat.addToChatArea("Could not find a reference to " + connectTo + " on the server.");
+			}
 			
 			chat.show();
 			return chat;
