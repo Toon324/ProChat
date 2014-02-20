@@ -1,23 +1,31 @@
 package proc;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
@@ -27,15 +35,19 @@ import org.jivesoftware.smack.packet.Presence;
  * @author Cody Swendrowski
  * 
  */
-public class Home implements ActionListener, KeyListener {
+public class Home implements ActionListener, KeyListener, RosterListener {
 
 	JFrame frame;
 	User user;
 	String serverName, serverIP;
 	JTextField to;
+	JTable contacts;
 	XmppManager connection;
 	int port;
 	ArrayList<ChatWindow> currentChats;
+	String[] names = { "Name", "Online" };
+	Object[][] data = new Object[16][2];
+	Roster roster;
 
 	public Home(String username, String pass) throws XMPPException {
 
@@ -45,16 +57,27 @@ public class Home implements ActionListener, KeyListener {
 
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
-		frame.setSize(400, 600);
+		frame.setSize(400, 608);
 		frame.setTitle("ProChat");
 		JPanel masterPanel = new JPanel();
 		// masterPanel.setLayout(new BoxLayout(masterPanel,
 		// BoxLayout.PAGE_AXIS));
 
-		masterPanel.setLayout(new GridLayout(5, 1));
+		masterPanel.setLayout(new GridLayout(3, 1));
 
 		JLabel toLabel = new JLabel("Who would you like to chat with?");
+		JLabel direct = new JLabel("Directly contact this person:");
 
+		DefaultTableModel defTableModel = new DefaultTableModel(data, names);
+		contacts = new JTable(defTableModel);
+		//contacts.setShowGrid(false);
+		contacts.setIntercellSpacing(new Dimension(0, 0));
+		contacts.setAutoCreateRowSorter(true);
+		
+		JScrollPane scrollPane = new JScrollPane(contacts);
+		
+		contacts.setFillsViewportHeight(true);
+		
 		to = new JTextField("");
 
 		/*
@@ -68,12 +91,19 @@ public class Home implements ActionListener, KeyListener {
 
 		JPanel sendPanel = new JPanel(new GridLayout(3, 1));
 
-		sendPanel.add(toLabel, BorderLayout.NORTH);
+		sendPanel.add(direct, BorderLayout.NORTH);
 		sendPanel.add(to);
 		sendPanel.add(send, BorderLayout.SOUTH);
+		
+		JButton addContact = new JButton("Add new Contact");
+		addContact.setActionCommand("add");
+		addContact.addActionListener(this);
 
+		masterPanel.add(scrollPane);
+		masterPanel.add(addContact);
 		masterPanel.add(sendPanel, BorderLayout.SOUTH);
 
+		frame.add(toLabel,BorderLayout.NORTH);
 		frame.add(masterPanel);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -100,11 +130,35 @@ public class Home implements ActionListener, KeyListener {
 			};
 			// Register the listener.
 			connection.getConnection().addPacketListener(myListener, null);
+			roster = connection.getConnection().getRoster();
+			roster.addRosterListener(this);
+			loadContacts();
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * 
+	 */
+	private void loadContacts() {
+		roster.reload();
+		data = new Object[15][2];
+		ensureCapacity(roster.getEntryCount());
+		int x = 0;
+		for (RosterEntry contact : roster.getEntries()) {
+			System.out.println("Found contact: " + contact);
+			String userContact = contact.getUser();
+			if (userContact.indexOf("@") != -1)
+				userContact = userContact.substring(0, userContact.indexOf("@")); 
+			data[x][0] = userContact;
+			data[x][1] = roster.getPresence(contact.getUser());
+			x++;
+		}
+		//Reload table
+		contacts.setModel(new DefaultTableModel(data,names));
+	}
+
 	private void recieveMessage(Message msg) {
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
 		ChatWindow activeChat = null;
@@ -135,6 +189,17 @@ public class Home implements ActionListener, KeyListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Chat"))
 			openChat(to.getText());
+		else if (e.getActionCommand().equals("add")) {
+			String toAdd = JOptionPane.showInputDialog("User to add?", "");
+			if (toAdd.equals(""))
+				return;
+			
+			try {
+				connection.createEntry(toAdd + "@" + serverName, toAdd);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -152,8 +217,15 @@ public class Home implements ActionListener, KeyListener {
 	 * 
 	 */
 	private ChatWindow openChat(String connectTo) {
-		if (connectTo.equals(""))
-			return null;
+		if (connectTo.equals("")) {
+			if (contacts.getSelectedRow() == -1)
+				return null;
+			
+			connectTo = (String) contacts.getValueAt(contacts.getSelectedRow(), 0);
+			if (connectTo == null)
+				return null;
+			System.out.println("Found contact to chat with: " + connectTo);
+		}
 		try {
 			System.out.println("Creating connection to " + connectTo);
 			Chat c = connection.getChatManager().createChat(
@@ -176,16 +248,70 @@ public class Home implements ActionListener, KeyListener {
 			}
 			
 			chat.show();
+			to.setText("");
 			return chat;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
+	
+	private void ensureCapacity(int i) {
+		if (data.length+1 > i)
+			return;
+
+		// else
+		// Copies data over to new array
+		Object[][] temp = new Object[data.length * 2][2];
+		for (int x = 0; x < data.length; x++)
+			for (int y = 0; y < data[x].length; y++)
+				temp[x][y] = data[x][y];
+
+		data = temp;
+
+	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jivesoftware.smack.RosterListener#entriesAdded(java.util.Collection)
+	 */
+	@Override
+	public void entriesAdded(Collection<String> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jivesoftware.smack.RosterListener#entriesDeleted(java.util.Collection)
+	 */
+	@Override
+	public void entriesDeleted(Collection<String> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jivesoftware.smack.RosterListener#entriesUpdated(java.util.Collection)
+	 */
+	@Override
+	public void entriesUpdated(Collection<String> e) {
+		System.out.println("Entries changed.");
+		loadContacts();
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.jivesoftware.smack.RosterListener#presenceChanged(org.jivesoftware.smack.packet.Presence)
+	 */
+	@Override
+	public void presenceChanged(Presence e) {
+		System.out.println("Presence changed.");
+		loadContacts();
+		
 	}
 
 }

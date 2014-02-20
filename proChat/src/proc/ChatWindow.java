@@ -305,7 +305,7 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 	 * 
 	 */
 	public void disableInput() {
-		entry.setEditable(false);
+		//entry.setEditable(false);
 	}
 
 }
