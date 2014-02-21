@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,13 +19,17 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.XMPPException;
+
 /**
  * @author Cody
  * 
  */
-public class LoginWindow implements ActionListener {
+public class LoginWindow implements ActionListener, KeyListener {
 	JFrame frame;
 	File saved;
+	XmppManager connection;
 
 	public LoginWindow() {
 		frame = new JFrame();
@@ -40,6 +46,7 @@ public class LoginWindow implements ActionListener {
 			}
 		else {
 			try {
+				// Load in the saved login info
 				Scanner reader = new Scanner(saved);
 				reader.useDelimiter("\t");
 				while (reader.hasNext()) {
@@ -57,7 +64,20 @@ public class LoginWindow implements ActionListener {
 			}
 		}
 
-		DisplayInputWindow(user,pass);
+		frame.addKeyListener(this);
+		
+		String serverIP = "129.89.185.120";
+		int port = 5222;
+		
+		try {
+			connection = new XmppManager(serverIP, port);
+			connection.init();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		DisplayInputWindow(user, pass);
 	}
 
 	JTextField loginName;
@@ -85,9 +105,17 @@ public class LoginWindow implements ActionListener {
 		JButton submit = new JButton("Login");
 		submit.addActionListener(this);
 
-		masterPanel.add(submit, BorderLayout.SOUTH);
+		JButton register = new JButton("Register");
+		register.addActionListener(this);
+
+		JPanel buttons = new JPanel(new GridLayout(0, 2));
+
+		buttons.add(submit);
+		buttons.add(register);
 
 		frame.add(masterPanel);
+		frame.add(buttons, BorderLayout.SOUTH);
+
 		frame.setVisible(true);
 	}
 
@@ -99,27 +127,93 @@ public class LoginWindow implements ActionListener {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Login")) {
-			// Write info to .txt
-			try {
-				PrintWriter writer = new PrintWriter(saved);
-				writer.write(loginName.getText() + "\t"
-						+ new String(loginPass.getPassword()));
-				writer.close();
+		if (e.getActionCommand().equals("Login"))
+			login();
+		else if (e.getActionCommand().equals("Register"))
+			register();
 
-				Home home = new Home(loginName.getText(), new String(
-						loginPass.getPassword()));
-				home.show();
-				JOptionPane.showMessageDialog(frame,
-					    "Successfully logged in as " + loginName.getText());
-			} catch (Exception e1) {
-				JOptionPane.showMessageDialog(frame,
-					    "Could not login as " + loginName.getText() + "\nError: " + e1.getMessage());
-				
-				e1.printStackTrace();
-			}
-			frame.dispose();
+	}
+
+	/**
+	 * 
+	 */
+	private void register() {
+		int i = JOptionPane.showConfirmDialog(frame,
+				"Are you sure you want to register as " + loginName.getText()
+						+ " with the given password?");
+
+		if (i == JOptionPane.NO_OPTION)
+			return;
+
+		AccountManager am = new AccountManager(connection.getConnection());
+		try {
+			am.createAccount(loginName.getText(), new String(loginPass.getPassword()));
+			System.out.println("Registered " + loginName.getText());
+		} catch (XMPPException e) {
+			e.printStackTrace();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER)
+			login();
+
+	}
+
+	/**
+	 * 
+	 */
+	private void login() {
+		// Write info to .txt
+		try {
+			PrintWriter writer = new PrintWriter(saved);
+			writer.write(loginName.getText() + "\t"
+					+ new String(loginPass.getPassword()));
+			writer.close();
+			
+			User user = new User(loginName.getText(), new String(loginPass.getPassword()));
+
+			connection.getConnection().login(user.getName(), user.getPass());
+			
+			Home home = new Home(user, connection);
+			home.show();
+			JOptionPane.showMessageDialog(frame, "Successfully logged in as "
+					+ loginName.getText());
+		} catch (Exception e1) {
+			JOptionPane.showMessageDialog(frame, "Could not login as "
+					+ loginName.getText() + "\nError: " + e1.getMessage());
+
+			e1.printStackTrace();
+		}
+		frame.dispose();
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
 
 	}
 }
