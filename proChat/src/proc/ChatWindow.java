@@ -108,8 +108,7 @@ public class ChatWindow implements ActionListener, KeyListener {
 			try {
 				Clip clip = AudioSystem.getClip();
 				AudioInputStream inputStream = AudioSystem
-						.getAudioInputStream(Home.class
-								.getResourceAsStream("alert.wav"));
+						.getAudioInputStream(getClass().getResourceAsStream("alert.wav"));
 				clip.open(inputStream);
 				clip.start();
 			} catch (Exception e) {

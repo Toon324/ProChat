@@ -3,6 +3,7 @@ package proc;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -23,9 +24,14 @@ public class ContactsCellRenderer extends JLabel implements ListCellRenderer<Use
 	{
 		setOpaque(true);
 		images = new ImageIcon[3];
-		images[0] = new ImageIcon( "available.png" );
-		images[1] = new ImageIcon( "busy.png" );
-		images[2] = new ImageIcon( "offline.png" );
+		try {
+		images[0] = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("available.png")));
+		images[1] = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("busy.png")));
+		images[2] = new ImageIcon(ImageIO.read(getClass().getResourceAsStream("offline.png")));
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	/* (non-Javadoc)
