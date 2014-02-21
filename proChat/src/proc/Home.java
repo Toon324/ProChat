@@ -175,10 +175,8 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
 		ChatWindow activeChat = null;
 
-		System.out.println("Message from: " + from);
-
 		for (ChatWindow c : currentChats) {
-			System.out.println("Found Chat with " + c.getFrom());
+			//System.out.println("Found Chat with " + c.getFrom());
 			if (c.getFrom().equals(from)) {
 				activeChat = c;
 				break;
@@ -187,9 +185,9 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 		if (activeChat == null) {
 			ChatWindow c = openChat(from);
-			c.addToChatArea(from + ": " + msg.getBody(), null);
+			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 		} else
-			activeChat.addToChatArea(from + ": " + msg.getBody(), null);
+			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 
 	}
 

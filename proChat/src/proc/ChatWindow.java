@@ -108,11 +108,11 @@ public class ChatWindow implements ActionListener, KeyListener {
 		if (entry.getText().equals(""))
 			return;
 		else if (entry.getText().equals("/me")) {
-			chatArea.setText(chatArea.getText() + "\n" + user.getName());
+			chatArea.setText(chatArea.getText() + "\n" + "<strong>" + user.getName() + "</strong>");
 			chat.sendMessage(user.getName());
 			return;
 		}
-		addToChatArea(user.getName() + ": " + entry.getText(), null);
+		addToChatArea("<b>" + user.getName() + "</b>: " + entry.getText(), null);
 		chat.sendMessage(entry.getText());
 		entry.setText("");
 	}
