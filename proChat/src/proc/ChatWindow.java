@@ -1,35 +1,28 @@
 package proc;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.sql.Connection;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 
 import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 
 /**
  * @author Cody Swendrowski
  * 
  */
-public class ChatWindow implements ActionListener, KeyListener, WindowListener {
+public class ChatWindow implements ActionListener, KeyListener {
 
 	JFrame frame;
 	JTextArea chatArea;
@@ -40,79 +33,6 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 	Chat chat;
 	XmppManager connection;
 
-	public ChatWindow(String userName, String pass, String to, XmppManager con, String sn) throws XMPPException {
-		connection = con;
-		serverName = sn;
-		sendTo = to;
-		
-		JFrame.setDefaultLookAndFeelDecorated(true);
-		frame = new JFrame();
-		frame.setSize(400, 600);
-		frame.setTitle("ProChat");
-		JPanel masterPanel = new JPanel();
-		masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
-
-		chatArea = new JTextArea("");
-		entry = new JTextField("");
-
-		chatArea.addKeyListener(this);
-		entry.addKeyListener(this);
-		
-		user = new User(userName, pass);
-
-		chatArea.setEditable(false);
-		chatArea.setBackground(new Color(255, 255, 255, 200));
-
-		send = new JButton("Send");
-		send.addActionListener(this);
-
-		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
-
-		entryPanel.add(entry);
-		entryPanel.add(send, BorderLayout.EAST);
-
-		masterPanel.add(chatArea);
-		masterPanel.add(entryPanel, BorderLayout.SOUTH);
-
-		frame.add(masterPanel);
-		//frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		//frame.addWindowListener(this);
-
-		try {
-			
-			/*
-			 * connection.sendMessage("Hi", "Toon324@" + serverIP);
-			 */
-			chat = connection.getChatManager().createChat(
-					to + "@" + serverName, null);
-			
-			// chat.addMessageListener(this);
-			
-			PacketListener myListener = new PacketListener() {
-
-				public void processPacket(Packet packet) {
-					if (packet instanceof Message) {
-						Message msg = (Message) packet;
-						// Process message
-						recieveMessage(msg);
-					}
-				}
-
-			};
-			// Register the listener.
-			connection.getConnection().addPacketListener(myListener, null);
-
-			// chat.sendMessage("Hi");
-			// connection.getChatManager().addChatListener(this);
-			connection.printRoster();
-		} catch (Exception e) {
-			e.printStackTrace();
-			chatArea.setText("Could not connect to server " + serverName);
-		}
-
-	}
-
-	
 	/**
 	 * @param c
 	 */
@@ -123,9 +43,7 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
 		frame.setSize(400, 600);
-		frame.setTitle("ProChat");
-		JPanel masterPanel = new JPanel();
-		masterPanel.setLayout(new BoxLayout(masterPanel, BoxLayout.PAGE_AXIS));
+		frame.setTitle("ProChat: Chatting with " + c.getParticipant());
 
 		chatArea = new JTextArea("");
 		entry = new JTextField("");
@@ -134,9 +52,12 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 		entry.addKeyListener(this);
 
 		chatArea.setEditable(false);
-		chatArea.setBackground(new Color(255, 255, 255, 200));
+		//chatArea.setBackground(new Color(255, 255, 255, 200));
 		chatArea.setWrapStyleWord(true);
 		chatArea.setLineWrap(true);
+		
+		JScrollPane scroller = new JScrollPane(chatArea);
+		scroller.setAutoscrolls(true);
 
 		JButton send = new JButton("Send");
 		send.addActionListener(this);
@@ -146,29 +67,10 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 		entryPanel.add(entry);
 		entryPanel.add(send, BorderLayout.EAST);
 
-		masterPanel.add(chatArea);
-		masterPanel.add(entryPanel, BorderLayout.SOUTH);
-
-		frame.add(masterPanel);
+		frame.add(scroller);
+		frame.add(entryPanel, BorderLayout.SOUTH);
 		//frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		//frame.addWindowListener(this);
-
-	}
-
-
-	private void recieveMessage(Message msg) {
-		if (!msg.getFrom().equals(sendTo))
-			try {
-				System.out.println("Creating new chat to talk to " + msg.getFrom() + ". Previous was " + sendTo);
-				ChatWindow c = new ChatWindow(user.userName, user.userPass, msg.getFrom(), connection, serverName);
-				c.addToChatArea("Now chatting with " + msg.getFrom());
-				c.recieveMessage(msg);
-				c.show();
-			} catch (XMPPException e) {
-				e.printStackTrace();
-			}
-		else
-			addToChatArea(msg.getFrom().substring(0, msg.getFrom().indexOf("@")) + ": " + msg.getBody());
 
 	}
 	
@@ -223,69 +125,6 @@ public class ChatWindow implements ActionListener, KeyListener, WindowListener {
 	public void keyTyped(KeyEvent e) {
 
 	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
-	 */
-	@Override
-	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
-	 */
-	@Override
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
-	 */
-	@Override
-	public void windowClosing(WindowEvent e) {
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
-	 */
-	@Override
-	public void windowDeactivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
-	 */
-	@Override
-	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
-	 */
-	@Override
-	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
-	 */
-	@Override
-	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 	/**
 	 * @return
