@@ -278,13 +278,14 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	}
 
 	private void ensureCapacity(int i) {
-		if (data.length + 1 > i)
+		System.out.println("Data length: " + data.length + " i: " + i);
+		if (data.length > i)
 			return;
 
 		// else
 		// Copies data over to new array
 		// Object[][] temp = new Object[data.length * 2][2];
-		User[] temp = new User[data.length * 2];
+		User[] temp = new User[i];
 		/*
 		 * for (int x = 0; x < data.length; x++) for (int y = 0; y <
 		 * data[x].length; y++) temp[x][y] = data[x][y];

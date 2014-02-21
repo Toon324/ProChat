@@ -41,6 +41,11 @@ public class ContactsCellRenderer extends JLabel implements ListCellRenderer<Use
 	public Component getListCellRendererComponent(JList<? extends User> list,
 			User u, int index, boolean isSelected, boolean hasFocus) {
 		User user = u;
+		
+		if (user == null) {
+			setText("Null");
+			return this;
+		}
 		setText(user.getName());
 
 		if (user.getPresence() == Presence.Type.available)

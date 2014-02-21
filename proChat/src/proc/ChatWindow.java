@@ -102,7 +102,8 @@ public class ChatWindow implements ActionListener, KeyListener {
 		int hour = c.get(Calendar.HOUR);
 		int minute = c.get(Calendar.MINUTE);
 		
-		chatArea.setText(chatArea.getText() + "\n[" + hour + ":" + minute + "] " + toAdd);
+		chatArea.append("\n[" + hour + ":" + minute + "] " + toAdd);
+		chatArea.setCaretPosition(chatArea.getDocument().getLength());
 		
 		if (!frame.isFocused()) {
 			try {
