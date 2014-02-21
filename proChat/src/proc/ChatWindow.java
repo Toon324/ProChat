@@ -1,14 +1,16 @@
 package proc;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
 import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
 
@@ -21,10 +23,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.ParagraphView;
 import javax.swing.text.html.StyleSheet;
 
 import org.jivesoftware.smack.Chat;
@@ -45,9 +48,9 @@ public class ChatWindow implements ActionListener, KeyListener {
 	Chat chat;
 	XmppManager connection;
 	HTMLEditorKit kit;
-	
-	private static final String ERROR   = "ERROR"; 
-    private static final String MESSAGE = "msg";
+
+	private static final String ERROR = "ERROR";
+	private static final String MESSAGE = "msg";
 
 	/**
 	 * @param c
@@ -64,21 +67,28 @@ public class ChatWindow implements ActionListener, KeyListener {
 		chatArea = new JEditorPane();
 		entry = new JTextField("");
 		chatArea.setContentType("text/html");
-        
+
 		kit = new HTMLEditorKit();
-        chatArea.setEditorKit(kit);
-        
-        StyleSheet styleSheet = kit.getStyleSheet();
-        styleSheet.addRule("."+MESSAGE+" {font: 10px monaco; color: black; }");
-        styleSheet.addRule("."+ERROR+" {font: 10px monaco; color: #ff2222; background-color : #cccccc; }");
-        
-        Document doc = kit.createDefaultDocument();
-        chatArea.setDocument(doc);
+		chatArea.setEditorKit(kit);
+
+		/*
+		StyleSheet styleSheet = kit.getStyleSheet();
+		styleSheet.addRule("." + MESSAGE
+				+ " {font: 10px monaco; color: black; }");
+		styleSheet
+				.addRule("."
+						+ ERROR
+						+ " {font: 10px monaco; color: #ff2222; background-color : #cccccc; }");
+
+		Document doc = kit.createDefaultDocument();
+		chatArea.setDocument(doc);
+		*/
 		
 		chatArea.addKeyListener(this);
 		entry.addKeyListener(this);
 
 		chatArea.setEditable(false);
+		
 		// chatArea.setBackground(new Color(255, 255, 255, 200));
 
 		JScrollPane scroller = new JScrollPane(chatArea);
@@ -108,8 +118,15 @@ public class ChatWindow implements ActionListener, KeyListener {
 		if (entry.getText().equals(""))
 			return;
 		else if (entry.getText().equals("/me")) {
-			chatArea.setText(chatArea.getText() + "\n" + "<strong>" + user.getName() + "</strong>");
-			chat.sendMessage(user.getName());
+			try {
+				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+						.getDocument().getLength(), "<i>" + user.getName()
+						+ "</i>", 0, 0, null);
+				chat.sendMessage("/you");
+				entry.setText("");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return;
 		}
 		addToChatArea("<b>" + user.getName() + "</b>: " + entry.getText(), null);
@@ -118,22 +135,49 @@ public class ChatWindow implements ActionListener, KeyListener {
 	}
 
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
+
+		if (toAdd.equals("/you")) {
+			try {
+				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+						.getDocument().getLength(), "<i>" + user.getName()
+						+ "</i>", 0, 0, null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+
 		Calendar c = Calendar.getInstance();
 		int hour = c.get(Calendar.HOUR);
 		int minute = c.get(Calendar.MINUTE);
-		
+
 		String minuteText = "" + minute;
-		
+
 		if (minute < 10)
 			minuteText = "0" + minute;
 
 		try {
 			/*
-			chatArea.getDocument().insertString(
-					chatArea.getDocument().getLength(),
-					"\n[" + hour + ":" + minuteText + "] " + toAdd, attribute);
-					*/
-			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea.getDocument().getLength(), "\n[" + hour + ":" + minuteText + "] " + toAdd,0,0,null);
+			 * chatArea.getDocument().insertString(
+			 * chatArea.getDocument().getLength(), "\n[" + hour + ":" +
+			 * minuteText + "] " + toAdd, attribute);
+			 */
+			
+			String addition = "\n[" + hour + ":" + minuteText
+					+ "] " + toAdd;
+			
+			/*
+			AffineTransform affinetransform = new AffineTransform();     
+			FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
+			Font font = new Font("Tahoma", Font.PLAIN, 12);
+			int textWidth = (int)(font.getStringBounds(addition, frc).getWidth());
+			
+			ParagraphView pv = new ParagraphView((Element) chatArea);
+			
+			*/
+			
+			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+					.getDocument().getLength(), addition, 0, 0, null);
 
 		} catch (Exception e1) {
 			e1.printStackTrace();
