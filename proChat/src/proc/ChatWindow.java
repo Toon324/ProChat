@@ -2,12 +2,17 @@ package proc;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Calendar;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -98,6 +103,21 @@ public class ChatWindow implements ActionListener, KeyListener {
 		int minute = c.get(Calendar.MINUTE);
 		
 		chatArea.setText(chatArea.getText() + "\n[" + hour + ":" + minute + "] " + toAdd);
+		
+		if (!frame.isFocused()) {
+			try {
+				Clip clip = AudioSystem.getClip();
+				AudioInputStream inputStream = AudioSystem
+						.getAudioInputStream(Home.class
+								.getResourceAsStream("alert.wav"));
+				clip.open(inputStream);
+				clip.start();
+			} catch (Exception e) {
+				Toolkit.getDefaultToolkit().beep();
+				e.printStackTrace();
+			}
+		}
+		
 		frame.toFront();
 	}
 

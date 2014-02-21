@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -65,18 +69,17 @@ public class LoginWindow implements ActionListener, KeyListener {
 		}
 
 		frame.addKeyListener(this);
-		
+
 		String serverIP = "129.89.185.120";
 		int port = 5222;
-		
+
 		try {
 			connection = new XmppManager(serverIP, port);
 			connection.init();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		DisplayInputWindow(user, pass);
 	}
 
@@ -127,9 +130,9 @@ public class LoginWindow implements ActionListener, KeyListener {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Login"))
+		if (e.getActionCommand().equals("Login")) {
 			login();
-		else if (e.getActionCommand().equals("Register"))
+		} else if (e.getActionCommand().equals("Register"))
 			register();
 
 	}
@@ -147,7 +150,8 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 		AccountManager am = new AccountManager(connection.getConnection());
 		try {
-			am.createAccount(loginName.getText(), new String(loginPass.getPassword()));
+			am.createAccount(loginName.getText(),
+					new String(loginPass.getPassword()));
 			System.out.println("Registered " + loginName.getText());
 		} catch (XMPPException e) {
 			e.printStackTrace();
@@ -187,11 +191,12 @@ public class LoginWindow implements ActionListener, KeyListener {
 			writer.write(loginName.getText() + "\t"
 					+ new String(loginPass.getPassword()));
 			writer.close();
-			
-			User user = new User(loginName.getText(), new String(loginPass.getPassword()));
+
+			User user = new User(loginName.getText(), new String(
+					loginPass.getPassword()));
 
 			connection.getConnection().login(user.getName(), user.getPass());
-			
+
 			Home home = new Home(user, connection);
 			home.show();
 			JOptionPane.showMessageDialog(frame, "Successfully logged in as "
