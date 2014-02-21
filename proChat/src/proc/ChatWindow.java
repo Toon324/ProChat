@@ -1,12 +1,12 @@
 package proc;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Calendar;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -93,7 +93,12 @@ public class ChatWindow implements ActionListener, KeyListener {
 	}
 
 	public void addToChatArea(String toAdd) {
-		chatArea.setText(chatArea.getText() + "\n" + toAdd);
+		Calendar c = Calendar.getInstance();
+		int hour = c.get(Calendar.HOUR);
+		int minute = c.get(Calendar.MINUTE);
+		
+		chatArea.setText(chatArea.getText() + "\n[" + hour + ":" + minute + "] " + toAdd);
+		frame.toFront();
 	}
 
 	@Override
