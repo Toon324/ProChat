@@ -187,11 +187,9 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 		if (activeChat == null) {
 			ChatWindow c = openChat(from);
-			c.addToChatArea(from + ": " + msg.getBody());
+			c.addToChatArea(from + ": " + msg.getBody(), null);
 		} else
-			activeChat.addToChatArea(msg.getFrom().substring(0,
-					msg.getFrom().indexOf("@"))
-					+ ": " + msg.getBody());
+			activeChat.addToChatArea(from + ": " + msg.getBody(), null);
 
 	}
 
@@ -258,14 +256,14 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			// System.out.println("Presence of " + connectTo + ": " +
 			// presence.getType());
 			if (presence.getType() == Presence.Type.available) {
-				chat.addToChatArea("Now chatting with " + connectTo);
+				chat.addToChatArea("Now chatting with " + connectTo, null);
 			} else if (presence.getType() == Presence.Type.unavailable) {
 				chat.addToChatArea(connectTo
-						+ " is not Online, or does not exist.");
+						+ " is not Online, or does not exist.", null);
 				chat.disableInput();
 			} else {
 				chat.addToChatArea("Could not find a reference to " + connectTo
-						+ " on the server.");
+						+ " on the server.", null);
 			}
 
 			chat.show();
