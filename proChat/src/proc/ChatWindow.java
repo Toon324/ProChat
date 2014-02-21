@@ -7,12 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.Calendar;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -108,9 +108,9 @@ public class ChatWindow implements ActionListener, KeyListener {
 		if (!frame.isFocused()) {
 			try {
 				Clip clip = AudioSystem.getClip();
-				AudioInputStream inputStream = AudioSystem
-						.getAudioInputStream(getClass().getResourceAsStream("alert.wav"));
-				clip.open(inputStream);
+				InputStream inputStream = getClass().getResourceAsStream("alert.wav");
+				InputStream buffedStream = new BufferedInputStream(inputStream);
+				clip.open(AudioSystem.getAudioInputStream(buffedStream));
 				clip.start();
 			} catch (Exception e) {
 				Toolkit.getDefaultToolkit().beep();
