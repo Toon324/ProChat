@@ -144,7 +144,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			connection.getConnection().addPacketListener(myListener, null);
 			roster = connection.getConnection().getRoster();
 			roster.addRosterListener(this);
-			//loadContacts();
+			loadContacts();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -156,7 +156,6 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	private void loadContacts() {
 		roster.reload();
 		//data = new Object[15][2];
-		data = new User[16];
 		ensureCapacity(roster.getEntryCount());
 		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
