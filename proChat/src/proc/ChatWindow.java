@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
 
@@ -22,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
@@ -42,6 +44,7 @@ public class ChatWindow implements ActionListener, KeyListener {
 	String sendTo, serverName;
 	Chat chat;
 	XmppManager connection;
+	HTMLEditorKit kit;
 	
 	private static final String ERROR   = "ERROR"; 
     private static final String MESSAGE = "msg";
@@ -61,7 +64,8 @@ public class ChatWindow implements ActionListener, KeyListener {
 		chatArea = new JEditorPane();
 		entry = new JTextField("");
 		chatArea.setContentType("text/html");
-        HTMLEditorKit kit = new HTMLEditorKit();
+        
+		kit = new HTMLEditorKit();
         chatArea.setEditorKit(kit);
         
         StyleSheet styleSheet = kit.getStyleSheet();
@@ -70,7 +74,7 @@ public class ChatWindow implements ActionListener, KeyListener {
         
         Document doc = kit.createDefaultDocument();
         chatArea.setDocument(doc);
-
+		
 		chatArea.addKeyListener(this);
 		entry.addKeyListener(this);
 
@@ -124,10 +128,14 @@ public class ChatWindow implements ActionListener, KeyListener {
 			minuteText = "0" + minute;
 
 		try {
+			/*
 			chatArea.getDocument().insertString(
 					chatArea.getDocument().getLength(),
 					"\n[" + hour + ":" + minuteText + "] " + toAdd, attribute);
-		} catch (BadLocationException e1) {
+					*/
+			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea.getDocument().getLength(), "\n[" + hour + ":" + minuteText + "] " + toAdd,0,0,null);
+
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		chatArea.setCaretPosition(chatArea.getDocument().getLength());

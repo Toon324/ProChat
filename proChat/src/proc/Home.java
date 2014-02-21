@@ -256,10 +256,10 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			// System.out.println("Presence of " + connectTo + ": " +
 			// presence.getType());
 			if (presence.getType() == Presence.Type.available) {
-				chat.addToChatArea("Now chatting with " + connectTo, null);
+				chat.addToChatArea("<i>Now chatting with " + connectTo +"</i>", null);
 			} else if (presence.getType() == Presence.Type.unavailable) {
-				chat.addToChatArea(connectTo
-						+ " is not Online, or does not exist.", null);
+				chat.addToChatArea("<i>" + connectTo
+						+ " is not Online, or does not exist.</i>", null);
 				chat.disableInput();
 			} else {
 				chat.addToChatArea("Could not find a reference to " + connectTo
