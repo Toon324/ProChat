@@ -1,20 +1,17 @@
 package proc;
 
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -34,6 +31,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 /**
@@ -230,7 +228,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
 					"Test@conference." + serverName);
 			try {
-				mu.create("TestRoom");
+				mu.create("test");
 				mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
 
 				for (ChatWindow c : currentChats)
@@ -246,7 +244,11 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
 					"test@conference." + serverName);
 			try {
-				mu.join(user.userName);
+				DiscussionHistory historyTime = new DiscussionHistory();
+				Calendar cal = Calendar.getInstance();
+				cal.set(Calendar.HOUR, 24);
+				historyTime.setSince(cal.getTime());
+				mu.join(user.userName, "", historyTime, port);
 				for (ChatWindow c : currentChats)
 					if (c.getChat().getParticipant().equals("test")) {
 						c.clear();
