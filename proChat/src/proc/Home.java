@@ -1,16 +1,20 @@
 package proc;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -108,22 +112,22 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		JButton addContact = new JButton("Add new Contact");
 		addContact.setActionCommand("add");
 		addContact.addActionListener(this);
-		
+
 		JButton createGroup = new JButton("Create Group");
 		createGroup.setActionCommand("group");
 		createGroup.addActionListener(this);
-		
+
 		JButton joinGroup = new JButton("Join Group");
 		joinGroup.setActionCommand("join");
 		joinGroup.addActionListener(this);
 
-		JPanel groupPanel = new JPanel(new GridLayout(1,2));
+		JPanel groupPanel = new JPanel(new GridLayout(1, 2));
 		groupPanel.add(createGroup);
 		groupPanel.add(joinGroup);
 		groupPanel.add(addContact, BorderLayout.NORTH);
-		
+
 		masterPanel.add(scrollPane);
-		//masterPanel.add(addContact);
+		// masterPanel.add(addContact);
 		masterPanel.add(groupPanel);
 		masterPanel.add(sendPanel, BorderLayout.SOUTH);
 
@@ -188,7 +192,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		ChatWindow activeChat = null;
 
 		for (ChatWindow c : currentChats) {
-			//System.out.println("Found Chat with " + c.getFrom());
+			// System.out.println("Found Chat with " + c.getFrom());
 			if (c.getFrom().equals(from)) {
 				activeChat = c;
 				break;
@@ -199,7 +203,8 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			ChatWindow c = openChat(from);
 			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 		} else
-			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
+			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(),
+					null);
 
 	}
 
@@ -221,25 +226,25 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
-		}
-		else if (e.getActionCommand().equals("group")) {
-			MultiUserChat mu = new MultiUserChat(connection.getConnection(), "Test@conference." + serverName);
+		} else if (e.getActionCommand().equals("group")) {
+			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
+					"Test@conference." + serverName);
 			try {
 				mu.create("TestRoom");
 				mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
-				
+
 				for (ChatWindow c : currentChats)
 					if (c.getChat().getParticipant().equals("test")) {
 						c.clear();
 						break;
 					}
-				
+
 			} catch (XMPPException e1) {
 				e1.printStackTrace();
 			}
-		}
-		else if (e.getActionCommand().equals("join")) {
-			MultiUserChat mu = new MultiUserChat(connection.getConnection(), "TestRoom@conference." + serverName);
+		} else if (e.getActionCommand().equals("join")) {
+			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
+					"test@conference." + serverName);
 			try {
 				mu.join(user.userName);
 				for (ChatWindow c : currentChats)
@@ -295,7 +300,8 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			// System.out.println("Presence of " + connectTo + ": " +
 			// presence.getType());
 			if (presence.getType() == Presence.Type.available) {
-				chat.addToChatArea("<i>Now chatting with " + connectTo +"</i>", null);
+				chat.addToChatArea(
+						"<i>Now chatting with " + connectTo + "</i>", null);
 			} else if (presence.getType() == Presence.Type.unavailable) {
 				chat.addToChatArea("<i>" + connectTo
 						+ " is not Online, or does not exist.</i>", null);
