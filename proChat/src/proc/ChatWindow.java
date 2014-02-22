@@ -1,17 +1,16 @@
 package proc;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
+import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Calendar;
 
 import javax.sound.sampled.AudioSystem;
@@ -19,16 +18,15 @@ import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.ParagraphView;
-import javax.swing.text.html.StyleSheet;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
@@ -37,7 +35,8 @@ import org.jivesoftware.smack.XMPPException;
  * @author Cody Swendrowski
  * 
  */
-public class ChatWindow implements ActionListener, KeyListener {
+public class ChatWindow implements ActionListener, KeyListener,
+		HyperlinkListener {
 
 	JFrame frame;
 	JEditorPane chatArea;
@@ -70,25 +69,24 @@ public class ChatWindow implements ActionListener, KeyListener {
 
 		kit = new HTMLEditorKit();
 		chatArea.setEditorKit(kit);
+		chatArea.addHyperlinkListener(this);
 
 		/*
-		StyleSheet styleSheet = kit.getStyleSheet();
-		styleSheet.addRule("." + MESSAGE
-				+ " {font: 10px monaco; color: black; }");
-		styleSheet
-				.addRule("."
-						+ ERROR
-						+ " {font: 10px monaco; color: #ff2222; background-color : #cccccc; }");
+		 * StyleSheet styleSheet = kit.getStyleSheet(); styleSheet.addRule("." +
+		 * MESSAGE + " {font: 10px monaco; color: black; }"); styleSheet
+		 * .addRule("." + ERROR +
+		 * " {font: 10px monaco; color: #ff2222; background-color : #cccccc; }"
+		 * );
+		 * 
+		 * Document doc = kit.createDefaultDocument();
+		 * chatArea.setDocument(doc);
+		 */
 
-		Document doc = kit.createDefaultDocument();
-		chatArea.setDocument(doc);
-		*/
-		
 		chatArea.addKeyListener(this);
 		entry.addKeyListener(this);
 
 		chatArea.setEditable(false);
-		
+
 		// chatArea.setBackground(new Color(255, 255, 255, 200));
 
 		JScrollPane scroller = new JScrollPane(chatArea);
@@ -162,20 +160,19 @@ public class ChatWindow implements ActionListener, KeyListener {
 			 * chatArea.getDocument().getLength(), "\n[" + hour + ":" +
 			 * minuteText + "] " + toAdd, attribute);
 			 */
-			
-			String addition = "\n[" + hour + ":" + minuteText
-					+ "] " + toAdd;
-			
+
+			String addition = "\n[" + hour + ":" + minuteText + "] " + toAdd;
+
 			/*
-			AffineTransform affinetransform = new AffineTransform();     
-			FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
-			Font font = new Font("Tahoma", Font.PLAIN, 12);
-			int textWidth = (int)(font.getStringBounds(addition, frc).getWidth());
-			
-			ParagraphView pv = new ParagraphView((Element) chatArea);
-			
-			*/
-			
+			 * AffineTransform affinetransform = new AffineTransform();
+			 * FontRenderContext frc = new
+			 * FontRenderContext(affinetransform,true,true); Font font = new
+			 * Font("Tahoma", Font.PLAIN, 12); int textWidth =
+			 * (int)(font.getStringBounds(addition, frc).getWidth());
+			 * 
+			 * ParagraphView pv = new ParagraphView((Element) chatArea);
+			 */
+
 			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 					.getDocument().getLength(), addition, 0, 0, null);
 
@@ -251,6 +248,38 @@ public class ChatWindow implements ActionListener, KeyListener {
 	 */
 	public void disableInput() {
 		// entry.setEditable(false);
+	}
+
+	/**
+	 * 
+	 */
+	public void clear() {
+		chatArea.setText("");
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event
+	 * .HyperlinkEvent)
+	 */
+	@Override
+	public void hyperlinkUpdate(HyperlinkEvent e) {
+		if (e.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
+			return;
+		try {
+			System.out.println("URL: " + e.getURL());
+			URI myURI = new URI(e.getURL().toString());
+			Desktop.getDesktop().browse(myURI);
+
+		} catch (Throwable e1) {
+			e1.printStackTrace();
+			JOptionPane
+					.showMessageDialog(null, "Sorry, can't launch a browser. Are you sure the url is valid?");
+		}
+
 	}
 
 }

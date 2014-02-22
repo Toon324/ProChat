@@ -9,7 +9,6 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,11 +17,8 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
 import javax.swing.WindowConstants;
-import javax.swing.table.DefaultTableModel;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.PacketListener;
@@ -33,6 +29,8 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 
 /**
  * @author Cody Swendrowski
@@ -101,7 +99,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		JButton send = new JButton("Chat");
 		send.addActionListener(this);
 
-		JPanel sendPanel = new JPanel(new GridLayout(3, 1));
+		JPanel sendPanel = new JPanel(new GridLayout(5, 1));
 
 		sendPanel.add(direct, BorderLayout.NORTH);
 		sendPanel.add(to);
@@ -110,9 +108,23 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		JButton addContact = new JButton("Add new Contact");
 		addContact.setActionCommand("add");
 		addContact.addActionListener(this);
+		
+		JButton createGroup = new JButton("Create Group");
+		createGroup.setActionCommand("group");
+		createGroup.addActionListener(this);
+		
+		JButton joinGroup = new JButton("Join Group");
+		joinGroup.setActionCommand("join");
+		joinGroup.addActionListener(this);
 
+		JPanel groupPanel = new JPanel(new GridLayout(1,2));
+		groupPanel.add(createGroup);
+		groupPanel.add(joinGroup);
+		groupPanel.add(addContact, BorderLayout.NORTH);
+		
 		masterPanel.add(scrollPane);
-		masterPanel.add(addContact);
+		//masterPanel.add(addContact);
+		masterPanel.add(groupPanel);
 		masterPanel.add(sendPanel, BorderLayout.SOUTH);
 
 		frame.add(toLabel, BorderLayout.NORTH);
@@ -207,6 +219,35 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			try {
 				connection.createEntry(toAdd + "@" + serverName, toAdd);
 			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+		else if (e.getActionCommand().equals("group")) {
+			MultiUserChat mu = new MultiUserChat(connection.getConnection(), "Test@conference." + serverName);
+			try {
+				mu.create("TestRoom");
+				mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
+				
+				for (ChatWindow c : currentChats)
+					if (c.getChat().getParticipant().equals("test")) {
+						c.clear();
+						break;
+					}
+				
+			} catch (XMPPException e1) {
+				e1.printStackTrace();
+			}
+		}
+		else if (e.getActionCommand().equals("join")) {
+			MultiUserChat mu = new MultiUserChat(connection.getConnection(), "TestRoom@conference." + serverName);
+			try {
+				mu.join(user.userName);
+				for (ChatWindow c : currentChats)
+					if (c.getChat().getParticipant().equals("test")) {
+						c.clear();
+						break;
+					}
+			} catch (XMPPException e1) {
 				e1.printStackTrace();
 			}
 		}
