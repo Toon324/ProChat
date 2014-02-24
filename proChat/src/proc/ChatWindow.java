@@ -30,6 +30,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 
 /**
  * @author Cody Swendrowski
@@ -45,11 +46,9 @@ public class ChatWindow implements ActionListener, KeyListener,
 	User user;
 	String sendTo, serverName;
 	Chat chat;
+	MultiUserChat muc;
 	XmppManager connection;
 	HTMLEditorKit kit;
-
-	private static final String ERROR = "ERROR";
-	private static final String MESSAGE = "msg";
 
 	/**
 	 * @param c
@@ -107,6 +106,60 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 	}
 
+	/**
+	 * @param user2
+	 * @param mu
+	 */
+	public ChatWindow(User u, MultiUserChat mu) {
+		muc = mu;
+		user = u;
+
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		frame = new JFrame();
+		frame.setSize(400, 600);
+		frame.setTitle("ProChat: Group chat " + mu.getRoom());
+
+		chatArea = new JEditorPane();
+		entry = new JTextField("");
+		chatArea.setContentType("text/html");
+
+		kit = new HTMLEditorKit();
+		chatArea.setEditorKit(kit);
+		chatArea.addHyperlinkListener(this);
+
+		/*
+		 * StyleSheet styleSheet = kit.getStyleSheet(); styleSheet.addRule("." +
+		 * MESSAGE + " {font: 10px monaco; color: black; }"); styleSheet
+		 * .addRule("." + ERROR +
+		 * " {font: 10px monaco; color: #ff2222; background-color : #cccccc; }"
+		 * );
+		 * 
+		 * Document doc = kit.createDefaultDocument();
+		 * chatArea.setDocument(doc);
+		 */
+
+		chatArea.addKeyListener(this);
+		entry.addKeyListener(this);
+
+		chatArea.setEditable(false);
+
+		// chatArea.setBackground(new Color(255, 255, 255, 200));
+
+		JScrollPane scroller = new JScrollPane(chatArea);
+		scroller.setAutoscrolls(true);
+
+		JButton send = new JButton("Send");
+		send.addActionListener(this);
+
+		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
+
+		entryPanel.add(entry);
+		entryPanel.add(send, BorderLayout.EAST);
+
+		frame.add(scroller);
+		frame.add(entryPanel, BorderLayout.SOUTH);
+	}
+
 	public void show() {
 		frame.setVisible(true);
 		entry.requestFocusInWindow();
@@ -120,15 +173,25 @@ public class ChatWindow implements ActionListener, KeyListener,
 				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 						.getDocument().getLength(), "<i>" + user.getName()
 						+ "</i>", 0, 0, null);
-				chat.sendMessage("/you");
+
+				if (chat != null)
+					chat.sendMessage("/you");
+				else if (muc != null)
+					muc.sendMessage("/you");
 				entry.setText("");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return;
 		}
-		addToChatArea("<b>" + user.getName() + "</b>: " + entry.getText(), null);
-		chat.sendMessage(entry.getText());
+		if (muc == null)
+			addToChatArea("<b>" + user.getName() + "</b>: " + entry.getText(), null);
+
+		if (chat != null)
+			chat.sendMessage(entry.getText());
+		else if (muc != null)
+			muc.sendMessage(entry.getText());
+
 		entry.setText("");
 	}
 
@@ -239,8 +302,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @return
 	 */
 	public String getFrom() {
-		return chat.getParticipant().substring(0,
-				chat.getParticipant().indexOf("@"));
+		if (chat != null)
+			return chat.getParticipant().substring(0,
+					chat.getParticipant().indexOf("@"));
+		else
+			return muc.getRoom().substring(0, muc.getRoom().indexOf("@"));
 	}
 
 	/**
@@ -277,9 +343,28 @@ public class ChatWindow implements ActionListener, KeyListener,
 		} catch (Throwable e1) {
 			e1.printStackTrace();
 			JOptionPane
-					.showMessageDialog(null, "Sorry, can't launch a browser. Are you sure the url is valid?");
+					.showMessageDialog(null,
+							"Sorry, can't launch a browser. Are you sure the url is valid?");
 		}
 
+	}
+
+	/**
+	 * 
+	 */
+	public void hide() {
+		frame.setVisible(false);
+
+	}
+
+	/**
+	 * @return
+	 */
+	public String getFullFrom() {
+		if (chat != null)
+			return chat.getParticipant();
+		else
+			return muc.getRoom();
 	}
 
 }

@@ -142,7 +142,9 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 			public void processPacket(Packet packet) {
 				if (packet instanceof Message) {
+					
 					Message msg = (Message) packet;
+					System.out.println("Msg: " + msg);
 					// Process message
 					recieveMessage(msg);
 				}
@@ -165,7 +167,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		ensureCapacity(roster.getEntryCount());
 		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
-			System.out.println("Found contact: " + contact);
+			//System.out.println("Found contact: " + contact);
 			String userContact = contact.getUser();
 			if (userContact.indexOf("@") != -1)
 				userContact = userContact
@@ -187,11 +189,21 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 	private void recieveMessage(Message msg) {
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
+		String domain = msg.getFrom().substring(msg.getFrom().indexOf("@")+1, msg.getFrom().indexOf("."));
+		//System.out.println("Domain: " + domain);
 		ChatWindow activeChat = null;
+		
+		if (domain.equals("conference")) {
+			if (msg.getFrom().indexOf("/") == -1) //Room message
+					return;
+			
+			from = msg.getFrom().substring(msg.getFrom().indexOf("/")+1, msg.getFrom().length());
+			System.out.println("Conference from: " + from);
+		}
 
 		for (ChatWindow c : currentChats) {
-			// System.out.println("Found Chat with " + c.getFrom());
-			if (c.getFrom().equals(from)) {
+			System.out.println("Found Chat with " + c.getFullFrom());
+			if (c.getFullFrom().equals(msg.getFrom().substring(0, msg.getFrom().indexOf("/")))) {
 				activeChat = c;
 				break;
 			}
@@ -200,6 +212,8 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		if (activeChat == null) {
 			ChatWindow c = openChat(from);
 			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
+			currentChats.add(c);
+			System.out.println("Added chat: " + c.getFrom());
 		} else
 			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(),
 					null);
@@ -226,16 +240,26 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			}
 		} else if (e.getActionCommand().equals("group")) {
 			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
-					"Test@conference." + serverName);
+					"test@conference." + serverName);
 			try {
-				mu.create("test");
+				mu.create(user.getName());
 				mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
 
-				for (ChatWindow c : currentChats)
-					if (c.getChat().getParticipant().equals("test")) {
-						c.clear();
-						break;
+				ChatWindow toRemove = null;
+				System.out.println("CurrentChats: " + currentChats);
+				for (ChatWindow temp : currentChats) {
+					System.out.println("Found: " + temp.getFrom());
+					if (temp.getFrom().equals("test")) {
+						temp.hide();
+						toRemove = temp;
 					}
+				}
+				
+				currentChats.remove(toRemove);
+				
+				ChatWindow cw = new ChatWindow(user, mu);
+				cw.show();
+				currentChats.add(cw);
 
 			} catch (XMPPException e1) {
 				e1.printStackTrace();
@@ -249,11 +273,21 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 				cal.set(Calendar.HOUR, 24);
 				historyTime.setSince(cal.getTime());
 				mu.join(user.userName, "", historyTime, port);
-				for (ChatWindow c : currentChats)
-					if (c.getChat().getParticipant().equals("test")) {
-						c.clear();
-						break;
+				
+				ChatWindow toRemove = null;
+				for (ChatWindow temp : currentChats) {
+					System.out.println("Found: " + temp.getFrom());
+					if (temp.getFrom().equals("test")) {
+						temp.hide();
+						toRemove = temp;
 					}
+				}
+				
+				currentChats.remove(toRemove);
+				
+				ChatWindow cw = new ChatWindow(user, mu);
+				cw.show();
+				currentChats.add(cw);
 			} catch (XMPPException e1) {
 				e1.printStackTrace();
 			}
@@ -287,7 +321,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			connectTo = ((User) contacts.getSelectedValue()).getName();
 			if (connectTo == null)
 				return null;
-			System.out.println("Found contact to chat with: " + connectTo);
+			//System.out.println("Found contact to chat with: " + connectTo);
 		}
 		try {
 			System.out.println("Creating connection to " + connectTo);
