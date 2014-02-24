@@ -203,6 +203,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 			return;
 		
 		toAdd = checkForSubreddit(toAdd);
+		toAdd = checkForHyperlink(toAdd);
 
 		Calendar c = Calendar.getInstance();
 		int hour = c.get(Calendar.HOUR);
@@ -263,20 +264,44 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @param toAdd
 	 * @return
 	 */
+	private String checkForHyperlink(String toAdd) {
+		if (toAdd.contains("http://")) {
+			String sub = toAdd.substring(toAdd.indexOf("http://"));
+			if (sub.contains(" "))
+				sub = sub.substring(0, sub.indexOf(" "));
+			
+			String reddit = new String("<a href" + "=\"" + sub + "\">" + sub + "</a>");
+			
+			toAdd = toAdd.replace(sub, reddit);
+			return toAdd;
+		}
+		else if (toAdd.contains("https://")) {
+			String sub = toAdd.substring(toAdd.indexOf("https://"));
+			if (sub.contains(" "))
+				sub = sub.substring(0, sub.indexOf(" "));
+			
+			String reddit = new String("<a href" + "=\"" + sub + "\">" + sub + "</a>");
+			
+			toAdd = toAdd.replace(sub, reddit);
+			return toAdd;
+		}
+		return toAdd;
+	}
+
+	/**
+	 * @param toAdd
+	 * @return
+	 */
 	private String checkForSubreddit(String toAdd) {
 		if (toAdd.contains("/r/")) {
 			String sub = toAdd.substring(toAdd.indexOf("/r/"));
 			if (sub.contains(" "))
 				sub = sub.substring(0, sub.indexOf(" "));
 			
-			System.out.println("Sub: " + sub);
 			String reddit = new String("<a href" + "=" + "\"http://reddit.com"
 					+ sub + "\">" + sub + "</a>");
-
-			System.out.println("Reddit: " + reddit);
 			
 			toAdd = toAdd.replace(sub, reddit);
-			System.out.println("To add: " + toAdd);
 			return toAdd;
 		}
 		return toAdd;
