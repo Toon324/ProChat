@@ -12,6 +12,7 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -196,17 +197,9 @@ public class ChatWindow implements ActionListener, KeyListener,
 	}
 
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
-
-		if (toAdd.equals("/you")) {
-			try {
-				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-						.getDocument().getLength(), "<i>" + user.getName()
-						+ "</i>", 0, 0, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		
+		if (checkSpecialCases(toAdd))
 			return;
-		}
 
 		Calendar c = Calendar.getInstance();
 		int hour = c.get(Calendar.HOUR);
@@ -259,6 +252,47 @@ public class ChatWindow implements ActionListener, KeyListener,
 		}
 
 		frame.toFront();
+	}
+
+	/**
+	 * @param toAdd
+	 * @return
+	 */
+	private boolean checkSpecialCases(String toAdd) {
+		if (toAdd.equals("/you")) {
+			try {
+				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+						.getDocument().getLength(), "<i>" + user.getName()
+						+ "</i>", 0, 0, null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return true;
+		}
+		else if (toAdd.contains("CST") || toAdd.contains("EST") || toAdd.contains("PST") || toAdd.contains("MST")) {
+			return convertTime(toAdd, "CST");
+		}
+		
+		return false;
+	}
+
+	/**
+	 * @param toAdd
+	 * @param string
+	 */
+	private boolean convertTime(String toAdd, String zone) {
+		String toConvert = toAdd.substring(toAdd.indexOf("zone")-2, toAdd.indexOf("zone"));
+		System.out.println("Found time: " + toConvert + " zone.");
+		TimeZone tz = TimeZone.getDefault();
+		System.out.println("Converting to " + tz.getDisplayName());
+		try {
+			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+					.getDocument().getLength(), "<b>" + user.getName() + ": </b>" + (Integer.valueOf(toConvert) + 1) + " EST", 0, 0, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
 	}
 
 	@Override
