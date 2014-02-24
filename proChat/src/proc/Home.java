@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 
 import javax.swing.DefaultListModel;
@@ -26,11 +25,13 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -142,7 +143,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 			public void processPacket(Packet packet) {
 				if (packet instanceof Message) {
-					
+
 					Message msg = (Message) packet;
 					System.out.println("Msg: " + msg);
 					// Process message
@@ -167,7 +168,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		ensureCapacity(roster.getEntryCount());
 		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
-			//System.out.println("Found contact: " + contact);
+			// System.out.println("Found contact: " + contact);
 			String userContact = contact.getUser();
 			if (userContact.indexOf("@") != -1)
 				userContact = userContact
@@ -189,27 +190,30 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 	private void recieveMessage(Message msg) {
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
-		String domain = msg.getFrom().substring(msg.getFrom().indexOf("@")+1, msg.getFrom().indexOf("."));
-		//System.out.println("Domain: " + domain);
+		String domain = msg.getFrom().substring(msg.getFrom().indexOf("@") + 1,
+				msg.getFrom().indexOf("."));
+		// System.out.println("Domain: " + domain);
 		ChatWindow activeChat = null;
-		
+
 		if (domain.equals("conference")) {
-			if (msg.getFrom().indexOf("/") == -1) //Room message
-					return;
-			
-			from = msg.getFrom().substring(msg.getFrom().indexOf("/")+1, msg.getFrom().length());
+			if (msg.getFrom().indexOf("/") == -1) // Room message
+				return;
+
+			from = msg.getFrom().substring(msg.getFrom().indexOf("/") + 1,
+					msg.getFrom().length());
 			System.out.println("Conference from: " + from);
 		}
 
 		for (ChatWindow c : currentChats) {
 			System.out.println("Found Chat with " + c.getFullFrom());
-			if (c.getFullFrom().equals(msg.getFrom().substring(0, msg.getFrom().indexOf("/")))) {
+			if (c.getFullFrom().equals(
+					msg.getFrom().substring(0, msg.getFrom().indexOf("/")))) {
 				activeChat = c;
 				break;
 			}
 		}
 
-		if (activeChat == null) {
+		if (activeChat == null && !domain.equals("conference")) {
 			ChatWindow c = openChat(from);
 			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 			currentChats.add(c);
@@ -243,20 +247,19 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 					"test@conference." + serverName);
 			try {
 				mu.create(user.getName());
-				mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
 
-				ChatWindow toRemove = null;
-				System.out.println("CurrentChats: " + currentChats);
-				for (ChatWindow temp : currentChats) {
-					System.out.println("Found: " + temp.getFrom());
-					if (temp.getFrom().equals("test")) {
-						temp.hide();
-						toRemove = temp;
-					}
-				}
-				
-				currentChats.remove(toRemove);
-				
+				Form f = new Form(Form.TYPE_SUBMIT);
+				FormField ff = new FormField("muc#roomconfig_persistentroom");
+				ff.setType(FormField.TYPE_BOOLEAN);
+				ff.addValue("0");
+				ff.setRequired(true);
+				ff.setLabel("Make Room Persistent?");
+				System.out.println(ff.toXML()); // - output values seems good.
+				f.addField(ff);
+
+				//mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
+				mu.sendConfigurationForm(f);
+
 				ChatWindow cw = new ChatWindow(user, mu);
 				cw.show();
 				currentChats.add(cw);
@@ -268,26 +271,18 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
 					"test@conference." + serverName);
 			try {
-				DiscussionHistory historyTime = new DiscussionHistory();
-				Calendar cal = Calendar.getInstance();
-				cal.set(Calendar.HOUR, 24);
-				historyTime.setSince(cal.getTime());
-				mu.join(user.userName, "", historyTime, port);
-				
-				ChatWindow toRemove = null;
-				for (ChatWindow temp : currentChats) {
-					System.out.println("Found: " + temp.getFrom());
-					if (temp.getFrom().equals("test")) {
-						temp.hide();
-						toRemove = temp;
-					}
-				}
-				
-				currentChats.remove(toRemove);
+
+				DiscussionHistory history = new DiscussionHistory();
+				history.setMaxStanzas(100);
 				
 				ChatWindow cw = new ChatWindow(user, mu);
 				cw.show();
 				currentChats.add(cw);
+
+				mu.join(user.userName, "", history,
+						SmackConfiguration.getPacketReplyTimeout());
+
+				
 			} catch (XMPPException e1) {
 				e1.printStackTrace();
 			}
@@ -321,7 +316,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			connectTo = ((User) contacts.getSelectedValue()).getName();
 			if (connectTo == null)
 				return null;
-			//System.out.println("Found contact to chat with: " + connectTo);
+			// System.out.println("Found contact to chat with: " + connectTo);
 		}
 		try {
 			System.out.println("Creating connection to " + connectTo);
