@@ -186,7 +186,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 			return;
 		}
 		if (muc == null)
-			addToChatArea("<b>" + user.getName() + "</b>: " + entry.getText(), null);
+			addToChatArea("<b>" + user.getName() + "</b>: " + entry.getText(),
+					null);
 
 		if (chat != null)
 			chat.sendMessage(entry.getText());
@@ -197,9 +198,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 	}
 
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
-		
+
 		if (checkSpecialCases(toAdd))
 			return;
+		
+		toAdd = checkForSubreddit(toAdd);
 
 		Calendar c = Calendar.getInstance();
 		int hour = c.get(Calendar.HOUR);
@@ -229,6 +232,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 			 * ParagraphView pv = new ParagraphView((Element) chatArea);
 			 */
 
+			System.out.println("Adding: " + addition);
+			
 			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 					.getDocument().getLength(), addition, 0, 0, null);
 
@@ -258,6 +263,29 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @param toAdd
 	 * @return
 	 */
+	private String checkForSubreddit(String toAdd) {
+		if (toAdd.contains("/r/")) {
+			String sub = toAdd.substring(toAdd.indexOf("/r/"));
+			if (sub.contains(" "))
+				sub = sub.substring(0, sub.indexOf(" "));
+			
+			System.out.println("Sub: " + sub);
+			String reddit = new String("<a href" + "=" + "\"http://reddit.com"
+					+ sub + "\">" + sub + "</a>");
+
+			System.out.println("Reddit: " + reddit);
+			
+			toAdd = toAdd.replace(sub, reddit);
+			System.out.println("To add: " + toAdd);
+			return toAdd;
+		}
+		return toAdd;
+	}
+
+	/**
+	 * @param toAdd
+	 * @return
+	 */
 	private boolean checkSpecialCases(String toAdd) {
 		if (toAdd.equals("/you")) {
 			try {
@@ -269,10 +297,12 @@ public class ChatWindow implements ActionListener, KeyListener,
 			}
 			return true;
 		}
-		else if (toAdd.contains("CST") || toAdd.contains("EST") || toAdd.contains("PST") || toAdd.contains("MST")) {
-			return convertTime(toAdd, "CST");
-		}
-		
+		/*
+		 * else if (toAdd.contains("CST") || toAdd.contains("EST") ||
+		 * toAdd.contains("PST") || toAdd.contains("MST")) { return
+		 * convertTime(toAdd, "CST"); }
+		 */
+
 		return false;
 	}
 
@@ -281,13 +311,16 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @param string
 	 */
 	private boolean convertTime(String toAdd, String zone) {
-		String toConvert = toAdd.substring(toAdd.indexOf("zone")-2, toAdd.indexOf("zone"));
+		String toConvert = toAdd.substring(toAdd.indexOf("zone") - 2,
+				toAdd.indexOf("zone"));
 		System.out.println("Found time: " + toConvert + " zone.");
 		TimeZone tz = TimeZone.getDefault();
 		System.out.println("Converting to " + tz.getDisplayName());
 		try {
 			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-					.getDocument().getLength(), "<b>" + user.getName() + ": </b>" + (Integer.valueOf(toConvert) + 1) + " EST", 0, 0, null);
+					.getDocument().getLength(), "<b>" + user.getName()
+					+ ": </b>" + (Integer.valueOf(toConvert) + 1) + " EST", 0,
+					0, null);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
