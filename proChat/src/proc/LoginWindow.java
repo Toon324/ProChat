@@ -200,14 +200,13 @@ public class LoginWindow implements ActionListener, KeyListener {
 			home.show();
 			JOptionPane.showMessageDialog(frame, "Successfully logged in as "
 					+ loginName.getText());
+			frame.dispose();
 		} catch (Exception e1) {
 			JOptionPane.showMessageDialog(frame, "Could not login as "
 					+ loginName.getText() + "\nError: " + e1.getMessage());
 
 			e1.printStackTrace();
 		}
-		frame.dispose();
-
 	}
 
 	/*
