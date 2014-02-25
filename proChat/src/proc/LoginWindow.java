@@ -95,6 +95,9 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 		loginName = new JTextField(user);
 		loginPass = new JPasswordField(pass);
+		
+		loginName.addKeyListener(this);
+		loginPass.addKeyListener(this);
 
 		masterPanel.add(userLabel);
 		masterPanel.add(loginName);
