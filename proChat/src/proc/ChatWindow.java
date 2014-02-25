@@ -12,6 +12,7 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import javax.sound.sampled.AudioSystem;
@@ -199,11 +200,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
 
-		if (checkSpecialCases(toAdd))
-			return;
-		
-		toAdd = checkForSubreddit(toAdd);
-		toAdd = checkForHyperlink(toAdd);
+		toAdd = checkSpecialCases(toAdd);
 
 		Calendar c = Calendar.getInstance();
 		int hour = c.get(Calendar.HOUR);
@@ -233,8 +230,6 @@ public class ChatWindow implements ActionListener, KeyListener,
 			 * ParagraphView pv = new ParagraphView((Element) chatArea);
 			 */
 
-			System.out.println("Adding: " + addition);
-			
 			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 					.getDocument().getLength(), addition, 0, 0, null);
 
@@ -269,20 +264,21 @@ public class ChatWindow implements ActionListener, KeyListener,
 			String sub = toAdd.substring(toAdd.indexOf("http://"));
 			if (sub.contains(" "))
 				sub = sub.substring(0, sub.indexOf(" "));
-			
-			String reddit = new String("<a href" + "=\"" + sub + "\">" + sub + "</a>");
-			
-			toAdd = toAdd.replace(sub, reddit);
+
+			String replacement = new String("<a href" + "=\"" + sub + "\">"
+					+ sub + "</a>");
+
+			toAdd = toAdd.replace(sub, replacement);
 			return toAdd;
-		}
-		else if (toAdd.contains("https://")) {
+		} else if (toAdd.contains("https://")) {
 			String sub = toAdd.substring(toAdd.indexOf("https://"));
 			if (sub.contains(" "))
 				sub = sub.substring(0, sub.indexOf(" "));
-			
-			String reddit = new String("<a href" + "=\"" + sub + "\">" + sub + "</a>");
-			
-			toAdd = toAdd.replace(sub, reddit);
+
+			String replacement = new String("<a href" + "=\"" + sub + "\">"
+					+ sub + "</a>");
+
+			toAdd = toAdd.replace(sub, replacement);
 			return toAdd;
 		}
 		return toAdd;
@@ -297,10 +293,10 @@ public class ChatWindow implements ActionListener, KeyListener,
 			String sub = toAdd.substring(toAdd.indexOf("/r/"));
 			if (sub.contains(" "))
 				sub = sub.substring(0, sub.indexOf(" "));
-			
+
 			String reddit = new String("<a href" + "=" + "\"http://reddit.com"
 					+ sub + "\">" + sub + "</a>");
-			
+
 			toAdd = toAdd.replace(sub, reddit);
 			return toAdd;
 		}
@@ -311,46 +307,56 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @param toAdd
 	 * @return
 	 */
-	private boolean checkSpecialCases(String toAdd) {
-		if (toAdd.equals("/you")) {
-			try {
-				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-						.getDocument().getLength(), "<i>" + user.getName()
-						+ "</i>", 0, 0, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return true;
+	private String checkSpecialCases(String toAdd) {
+		if (toAdd.contains("/you")) {
+			toAdd = toAdd.replace("/you", "<i>" + user.getName() + "</i>");
 		}
-		/*
-		 * else if (toAdd.contains("CST") || toAdd.contains("EST") ||
-		 * toAdd.contains("PST") || toAdd.contains("MST")) { return
-		 * convertTime(toAdd, "CST"); }
-		 */
+		// Convert timezones
+		else if (toAdd.contains("CST"))
+			toAdd = convertTime(toAdd, "CST");
 
-		return false;
+		else if (toAdd.contains("EST"))
+			toAdd = convertTime(toAdd, "EST");
+
+		else if (toAdd.contains("PST"))
+			toAdd = convertTime(toAdd, "PST");
+
+		else if (toAdd.contains("MST"))
+			toAdd = convertTime(toAdd, "MST");
+
+		toAdd = checkForSubreddit(toAdd);
+		toAdd = checkForHyperlink(toAdd);
+
+		return toAdd;
 	}
 
 	/**
 	 * @param toAdd
 	 * @param string
 	 */
-	private boolean convertTime(String toAdd, String zone) {
-		String toConvert = toAdd.substring(toAdd.indexOf("zone") - 2,
-				toAdd.indexOf("zone"));
-		System.out.println("Found time: " + toConvert + " zone.");
-		TimeZone tz = TimeZone.getDefault();
-		System.out.println("Converting to " + tz.getDisplayName());
+	private String convertTime(String toAdd, String zone) {
+		String original = toAdd;
 		try {
-			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-					.getDocument().getLength(), "<b>" + user.getName()
-					+ ": </b>" + (Integer.valueOf(toConvert) + 1) + " EST", 0,
-					0, null);
+			String toConvert = toAdd.substring(toAdd.indexOf(zone) - 2,
+					toAdd.indexOf(zone));
+
+			Calendar theirTime = new GregorianCalendar(
+					TimeZone.getTimeZone(zone));
+			theirTime.set(Calendar.HOUR, Integer.valueOf(toConvert));
+
+			Calendar localTime = Calendar.getInstance();
+			localTime.setTimeInMillis(theirTime.getTimeInMillis());
+
+			TimeZone tz = TimeZone.getDefault();
+
+			toAdd = toAdd.replace(toConvert, localTime.get(Calendar.HOUR) + "");
+			toAdd = toAdd.replace(zone, tz.getDisplayName());
+
+			return toAdd;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return original;
 		}
-		return true;
 	}
 
 	@Override

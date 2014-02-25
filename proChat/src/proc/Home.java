@@ -424,7 +424,19 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	 */
 	@Override
 	public void presenceChanged(Presence e) {
-		System.out.println("Presence changed.");
+		String fullFrom = e.getFrom().substring(0, e.getFrom().indexOf("/Smack"));
+		//Send message of presence change to any chatwindows with that person
+		for (ChatWindow c: currentChats)
+			if (c.getFullFrom().equals(fullFrom)) {
+				String from = fullFrom.substring(0, fullFrom.indexOf("@"));
+				if (e.isAway())
+					c.addToChatArea("<i>" + from + " is now away.</i>", null);
+				else if (e.isAvailable())
+					c.addToChatArea("<i>" + from + " is now available.</i>", null);
+				else
+					c.addToChatArea("<i>" + from + " is now unavailable.</i>", null);
+			}
+		
 		loadContacts();
 
 	}
