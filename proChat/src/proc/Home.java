@@ -14,6 +14,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -42,6 +45,8 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 public class Home implements ActionListener, KeyListener, RosterListener {
 
 	JFrame frame;
+	JMenuBar menuBar;
+	JMenu menu;
 	User user;
 	String serverName, serverIP;
 	JTextField to;
@@ -72,7 +77,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 		masterPanel.setLayout(new GridLayout(3, 1));
 
-		JLabel toLabel = new JLabel("Who would you like to chat with?");
+		//JLabel toLabel = new JLabel("Who would you like to chat with?");
 		JLabel direct = new JLabel("Directly contact this person:");
 
 		/*
@@ -129,8 +134,30 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		// masterPanel.add(addContact);
 		masterPanel.add(groupPanel);
 		masterPanel.add(sendPanel, BorderLayout.SOUTH);
+		//masterPanel.add(toLabel, BorderLayout.NORTH);
 
-		frame.add(toLabel, BorderLayout.NORTH);
+		//Menu
+		menuBar = new JMenuBar();
+
+		//Build the first menu.
+		menu = new JMenu("ProChat");
+		menu.setMnemonic(KeyEvent.VK_P);
+		menu.getAccessibleContext().setAccessibleDescription(
+		        "Menu that allows signing out or exitting the program.");
+		menuBar.add(menu);
+		
+		JMenuItem signOutItem = new JMenuItem("Sign Out",
+                KeyEvent.VK_S);
+		menu.add(signOutItem);
+		
+		JMenuItem exitItem = new JMenuItem("Exit Program",
+                KeyEvent.VK_E);
+		menu.add(exitItem);
+		
+		
+		
+		
+		frame.setJMenuBar(menuBar);
 		frame.add(masterPanel);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -352,7 +379,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	}
 
 	private void ensureCapacity(int i) {
-		System.out.println("Data length: " + data.length + " i: " + i);
+		//System.out.println("Data length: " + data.length + " i: " + i);
 		if (data.length > i)
 			return;
 

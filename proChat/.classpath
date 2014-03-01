@@ -12,5 +12,6 @@
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/Cody/Programming/Dev Resources/API&apos;s/smack_3_4_1.zip!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Cody/Programming/Dev Resources/API&apos;s/JOpenId-1.08.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
