@@ -6,11 +6,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -75,6 +84,26 @@ public class LoginWindow implements ActionListener, KeyListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids=76561197998100303";
+		try {
+			URL surl = new URL(turl);
+			URLConnection connection = surl.openConnection();
+			InputStream info = connection.getInputStream();
+			Scanner scan = new Scanner(info);
+			while (scan.hasNext()) {
+				String found = scan.next();
+				if (found.equals("(") || found.equals(")") || found.equals("{")
+						|| found.equals("}") || found.equals("[")
+						|| found.equals("]"))
+					found = "";
+
+				if (!found.equals(""))
+					System.out.println("Read: " + found);
+			}
+			scan.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		DisplayInputWindow(user, pass);
 	}
@@ -95,7 +124,7 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 		loginName = new JTextField(user);
 		loginPass = new JPasswordField(pass);
-		
+
 		loginName.addKeyListener(this);
 		loginPass.addKeyListener(this);
 
@@ -219,4 +248,10 @@ public class LoginWindow implements ActionListener, KeyListener {
 		// TODO Auto-generated method stub
 
 	}
+
+	private String readLine() throws IOException {
+		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+		return r.readLine();
+	}
+
 }
