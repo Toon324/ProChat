@@ -130,32 +130,6 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		sendPanel.add(to);
 		sendPanel.add(send, BorderLayout.SOUTH);
 
-		/*
-		 * 
-		 * JButton addContact = new JButton("Add new Contact");
-		 * addContact.setActionCommand("add");
-		 * addContact.addActionListener(this);
-		 * 
-		 * JButton createGroup = new JButton("Create Group");
-		 * createGroup.setActionCommand("group");
-		 * createGroup.addActionListener(this);
-		 * 
-		 * JButton joinGroup = new JButton("Join Group");
-		 * joinGroup.setActionCommand("join");
-		 * joinGroup.addActionListener(this);
-		 */
-
-		/*
-		 * JPanel groupPanel = new JPanel(new GridLayout(1, 2));
-		 * groupPanel.add(createGroup); groupPanel.add(joinGroup);
-		 * groupPanel.add(addContact, BorderLayout.NORTH);
-		 */
-		// masterPanel.add(scrollPane);
-		// masterPanel.add(addContact);
-		// masterPanel.add(groupPanel);
-		// masterPanel.add(sendPanel, BorderLayout.SOUTH);
-		// masterPanel.add(toLabel, BorderLayout.NORTH);
-
 		// Menu
 		menuBar = new JMenuBar();
 

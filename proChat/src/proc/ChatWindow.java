@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Calendar;
@@ -20,6 +21,9 @@ import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -101,6 +106,18 @@ public class ChatWindow implements ActionListener, KeyListener,
 		entryPanel.add(entry);
 		entryPanel.add(send, BorderLayout.EAST);
 
+		// Menu
+		JMenuBar menuBar = new JMenuBar();
+
+		// Build the first menu.
+		JMenu menu = new JMenu("Insert");
+		menuBar.add(menu);
+
+		JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
+		menu.add(addImage);
+		addImage.addActionListener(this);
+
+		frame.setJMenuBar(menuBar);
 		frame.add(scroller);
 		frame.add(entryPanel, BorderLayout.SOUTH);
 		// frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -367,6 +384,31 @@ public class ChatWindow implements ActionListener, KeyListener,
 			} catch (XMPPException e1) {
 				e1.printStackTrace();
 			}
+		else if (e.getActionCommand().equals("Image"))
+			addImage();
+	}
+
+	/**
+	 * 
+	 */
+	private void addImage() {
+		String toAdd = JOptionPane.showInputDialog(
+				"What is the full URL for the image you want to add?",
+				"http://");
+		if (toAdd == null || toAdd.equals(""))
+			return;
+
+		String imageTag = "<b>" + user.getName() + ":  </b><a href=\"" + toAdd + "\"><img src=\"" + toAdd
+				+ "\" width=\"150\" height=\"150\"></a>";
+
+		try {
+			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+					.getDocument().getLength(), imageTag, 0, 0, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override
