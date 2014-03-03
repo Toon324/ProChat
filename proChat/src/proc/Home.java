@@ -81,7 +81,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 		masterPanel.setLayout(new GridLayout(3, 1));
 
-		//JLabel toLabel = new JLabel("Who would you like to chat with?");
+		// JLabel toLabel = new JLabel("Who would you like to chat with?");
 		JLabel direct = new JLabel("Directly contact this person:");
 
 		/*
@@ -116,6 +116,8 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		sendPanel.add(direct, BorderLayout.NORTH);
 		sendPanel.add(to);
 		sendPanel.add(send, BorderLayout.SOUTH);
+		
+		/*
 
 		JButton addContact = new JButton("Add new Contact");
 		addContact.setActionCommand("add");
@@ -128,41 +130,87 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		JButton joinGroup = new JButton("Join Group");
 		joinGroup.setActionCommand("join");
 		joinGroup.addActionListener(this);
+		
+		*/
 
+		/*
 		JPanel groupPanel = new JPanel(new GridLayout(1, 2));
 		groupPanel.add(createGroup);
 		groupPanel.add(joinGroup);
 		groupPanel.add(addContact, BorderLayout.NORTH);
 
-		masterPanel.add(scrollPane);
+		 */
+		//masterPanel.add(scrollPane);
 		// masterPanel.add(addContact);
-		masterPanel.add(groupPanel);
-		masterPanel.add(sendPanel, BorderLayout.SOUTH);
-		//masterPanel.add(toLabel, BorderLayout.NORTH);
+		//masterPanel.add(groupPanel);
+		//masterPanel.add(sendPanel, BorderLayout.SOUTH);
+		// masterPanel.add(toLabel, BorderLayout.NORTH);
 
-		//Menu
+		// Menu
 		menuBar = new JMenuBar();
 
-		//Build the first menu.
+		// Build the first menu.
 		menu = new JMenu("ProChat");
-		menu.setMnemonic(KeyEvent.VK_P);
 		menu.getAccessibleContext().setAccessibleDescription(
-		        "Menu that allows signing out or exitting the program.");
+				"Menu that allows signing out or exitting the program.");
 		menuBar.add(menu);
-		
-		JMenuItem signOutItem = new JMenuItem("Sign Out",
-                KeyEvent.VK_S);
+
+		JMenuItem linkSteam = new JMenuItem("Link Steam x64 ID", KeyEvent.VK_L);
+		menu.add(linkSteam);
+		linkSteam.addActionListener(this);
+
+		JMenuItem signOutItem = new JMenuItem("Sign Out", KeyEvent.VK_S);
 		menu.add(signOutItem);
-		
-		JMenuItem exitItem = new JMenuItem("Exit Program",
-                KeyEvent.VK_E);
+		signOutItem.addActionListener(this);
+
+		JMenuItem exitItem = new JMenuItem("Exit Program", KeyEvent.VK_E);
 		menu.add(exitItem);
+		exitItem.addActionListener(this);
+
+		// Profile menu
+		JMenu profileMenu = new JMenu("Profile");
+		profileMenu.setMnemonic(KeyEvent.VK_P);
+		menuBar.add(profileMenu);
+
+		JMenuItem viewProfile = new JMenuItem("View Profile");
+		profileMenu.add(viewProfile);
+		viewProfile.addActionListener(this);
+
+		JMenuItem editProfile = new JMenuItem("Edit Profile");
+		profileMenu.add(editProfile);
+		editProfile.addActionListener(this);
+
+		// Contacts menu
+		JMenu contactMenu = new JMenu("Contacts");
+		contactMenu.setMnemonic(KeyEvent.VK_C);
+		menuBar.add(contactMenu);
+		contactMenu.addActionListener(this);
 		
+		JMenuItem addContactItem = new JMenuItem("Add Contact");
+		contactMenu.add(addContactItem);
+		addContactItem.addActionListener(this);
+
+		JMenuItem removeContactItem = new JMenuItem("Remove Contact");
+		contactMenu.add(removeContactItem);
+		removeContactItem.addActionListener(this);
+
+		// Group menu
+		JMenu groupMenu = new JMenu("Groups");
+		contactMenu.setMnemonic(KeyEvent.VK_G);
+		menuBar.add(groupMenu);
 		
+		JMenuItem joinGroup = new JMenuItem("Join Group");
+		groupMenu.add(joinGroup);
+		joinGroup.addActionListener(this);
 		
-		
+		JMenuItem createGroup = new JMenuItem("Create Group");
+		groupMenu.add(createGroup);
+		createGroup.addActionListener(this);
+
 		frame.setJMenuBar(menuBar);
-		frame.add(masterPanel);
+		//frame.add(masterPanel);
+		frame.add(scrollPane);
+		frame.add(sendPanel, BorderLayout.SOUTH);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		serverIP = "129.89.185.120";
@@ -188,7 +236,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		roster = connection.getConnection().getRoster();
 		roster.addRosterListener(this);
 		loadContacts();
-		//readSteamInfo("76561197998100303");
+		// readSteamInfo("76561197998100303");
 		readSteamInfo(user.getEmail());
 	}
 
@@ -263,9 +311,10 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		System.out.println(e);
 		if (e.getActionCommand().equals("Chat"))
 			openChat(to.getText());
-		else if (e.getActionCommand().equals("add")) {
+		else if (e.getActionCommand().equals("Add Contact")) {
 			String toAdd = JOptionPane.showInputDialog("User to add?", "");
 			if (toAdd.equals(""))
 				return;
@@ -275,7 +324,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
-		} else if (e.getActionCommand().equals("group")) {
+		} else if (e.getActionCommand().equals("Create Group")) {
 			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
 					"test@conference." + serverName);
 			try {
@@ -290,7 +339,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 				System.out.println(ff.toXML()); // - output values seems good.
 				f.addField(ff);
 
-				//mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
+				// mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
 				mu.sendConfigurationForm(f);
 
 				ChatWindow cw = new ChatWindow(user, mu);
@@ -300,14 +349,14 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			} catch (XMPPException e1) {
 				e1.printStackTrace();
 			}
-		} else if (e.getActionCommand().equals("join")) {
+		} else if (e.getActionCommand().equals("Join Group")) {
 			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
 					"test@conference." + serverName);
 			try {
 
 				DiscussionHistory history = new DiscussionHistory();
 				history.setMaxStanzas(100);
-				
+
 				ChatWindow cw = new ChatWindow(user, mu);
 				cw.show();
 				currentChats.add(cw);
@@ -315,7 +364,6 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 				mu.join(user.userName, "", history,
 						SmackConfiguration.getPacketReplyTimeout());
 
-				
 			} catch (XMPPException e1) {
 				e1.printStackTrace();
 			}
@@ -385,7 +433,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	}
 
 	private void ensureCapacity(int i) {
-		//System.out.println("Data length: " + data.length + " i: " + i);
+		// System.out.println("Data length: " + data.length + " i: " + i);
 		if (data.length > i)
 			return;
 
@@ -457,25 +505,29 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	 */
 	@Override
 	public void presenceChanged(Presence e) {
-		String fullFrom = e.getFrom().substring(0, e.getFrom().indexOf("/Smack"));
-		//Send message of presence change to any chatwindows with that person
-		for (ChatWindow c: currentChats)
+		String fullFrom = e.getFrom().substring(0,
+				e.getFrom().indexOf("/Smack"));
+		// Send message of presence change to any chatwindows with that person
+		for (ChatWindow c : currentChats)
 			if (c.getFullFrom().equals(fullFrom)) {
 				String from = fullFrom.substring(0, fullFrom.indexOf("@"));
 				if (e.isAway())
 					c.addToChatArea("<i>" + from + " is now away.</i>", null);
 				else if (e.isAvailable())
-					c.addToChatArea("<i>" + from + " is now available.</i>", null);
+					c.addToChatArea("<i>" + from + " is now available.</i>",
+							null);
 				else
-					c.addToChatArea("<i>" + from + " is now unavailable.</i>", null);
+					c.addToChatArea("<i>" + from + " is now unavailable.</i>",
+							null);
 			}
-		
+
 		loadContacts();
 
 	}
-	
+
 	public void readSteamInfo(String steamid) {
-		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids=" + steamid;
+		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids="
+				+ steamid;
 		try {
 			URL surl = new URL(turl);
 			URLConnection connection = surl.openConnection();
