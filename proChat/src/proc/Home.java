@@ -158,10 +158,6 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 				"Menu that allows signing out or exitting the program.");
 		menuBar.add(menu);
 
-		JMenuItem linkSteam = new JMenuItem("Link Steam x64 ID", KeyEvent.VK_L);
-		menu.add(linkSteam);
-		linkSteam.addActionListener(this);
-
 		JMenuItem signOutItem = new JMenuItem("Sign Out", KeyEvent.VK_S);
 		menu.add(signOutItem);
 		signOutItem.addActionListener(this);
@@ -179,9 +175,9 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		profileMenu.add(viewProfile);
 		viewProfile.addActionListener(this);
 
-		JMenuItem editProfile = new JMenuItem("Edit Profile");
-		profileMenu.add(editProfile);
-		editProfile.addActionListener(this);
+		JMenuItem linkSteam = new JMenuItem("Link Steam x64 ID", KeyEvent.VK_L);
+		profileMenu.add(linkSteam);
+		linkSteam.addActionListener(this);
 
 		// Contacts menu
 		JMenu contactMenu = new JMenu("Contacts");
