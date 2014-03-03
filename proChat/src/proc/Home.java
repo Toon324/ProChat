@@ -6,14 +6,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -368,6 +372,17 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 				e1.printStackTrace();
 			}
 		}
+		else if (e.getActionCommand().equals("View Profile")) {
+			JFrame disp = new JFrame();
+			try {
+				disp.add(new JLabel(new ImageIcon(ImageIO.read(new URL(user.getAvatarURL())))));
+				disp.setSize(400,400);
+				disp.setVisible(true);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -539,6 +554,9 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 						|| found.equals("}") || found.equals("[")
 						|| found.equals("]"))
 					found = "";
+				
+				if (found.equals("\"avatarfull\":"))
+					user.setAvatarURL(scan.next());
 
 				if (!found.equals(""))
 					System.out.println("Read: " + found);
