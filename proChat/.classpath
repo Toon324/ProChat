@@ -2,16 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="C:/Users/Cody/Programming/Dev Resources/API&apos;s/smack_3_4_1/smack-3.4.1-0cec571.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/Cody/Programming/Dev Resources/API&apos;s/smack_3_4_1.zip!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Cody/Programming/Dev Resources/API&apos;s/smack_3_4_1/smackx-3.4.1-0cec571.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/Cody/Programming/Dev Resources/API&apos;s/smack_3_4_1.zip!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Cody/Programming/Dev Resources/API&apos;s/JOpenId-1.08.jar"/>
+	<classpathentry kind="lib" path="smack-3.4.1-0cec571.jar"/>
+	<classpathentry kind="lib" path="smackx-3.4.1-0cec571.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
