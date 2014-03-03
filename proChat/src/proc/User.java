@@ -48,7 +48,9 @@ public class User {
 	}
 
 	public void setEmail(String toSet) {
-		System.out.println("Email set to: " + toSet);
+		//System.out.println("Email set to: " + toSet);
+		if (toSet == null)
+			return;
 		email = toSet;
 	}
 

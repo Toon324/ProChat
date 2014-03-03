@@ -22,9 +22,10 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import org.jivesoftware.smack.AccountManager;
-import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.VCard;
+import org.jivesoftware.smackx.provider.VCardProvider;
 
 /**
  * @author Cody
@@ -80,6 +81,8 @@ public class LoginWindow implements ActionListener, KeyListener {
 			e.printStackTrace();
 		}
 
+		ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new VCardProvider());
+		
 		DisplayInputWindow(user, pass);
 	}
 
@@ -200,18 +203,6 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 			connection.getConnection().login(user.getName(), user.getPass());
 			
-			/*
-			VCard vCard = new VCard();
-			
-			vCard.load(connection.getConnection(), user.getName()); // load someone's VCard;
-			
-			user.setEmail(vCard.getEmailHome());
-			*/
-			
-			AccountManager am = new AccountManager(connection.getConnection());
-			//System.out.println("Attribs: " + am.getAccountAttributes());
-			user.setEmail(am.getAccountAttribute("email"));
-
 			Home home = new Home(user, connection);
 			home.show();
 			JOptionPane.showMessageDialog(frame, "Successfully logged in as "

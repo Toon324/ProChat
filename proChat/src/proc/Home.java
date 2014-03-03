@@ -11,6 +11,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -30,16 +32,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketIDFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
@@ -119,34 +129,31 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		sendPanel.add(direct, BorderLayout.NORTH);
 		sendPanel.add(to);
 		sendPanel.add(send, BorderLayout.SOUTH);
-		
-		/*
-
-		JButton addContact = new JButton("Add new Contact");
-		addContact.setActionCommand("add");
-		addContact.addActionListener(this);
-
-		JButton createGroup = new JButton("Create Group");
-		createGroup.setActionCommand("group");
-		createGroup.addActionListener(this);
-
-		JButton joinGroup = new JButton("Join Group");
-		joinGroup.setActionCommand("join");
-		joinGroup.addActionListener(this);
-		
-		*/
 
 		/*
-		JPanel groupPanel = new JPanel(new GridLayout(1, 2));
-		groupPanel.add(createGroup);
-		groupPanel.add(joinGroup);
-		groupPanel.add(addContact, BorderLayout.NORTH);
-
+		 * 
+		 * JButton addContact = new JButton("Add new Contact");
+		 * addContact.setActionCommand("add");
+		 * addContact.addActionListener(this);
+		 * 
+		 * JButton createGroup = new JButton("Create Group");
+		 * createGroup.setActionCommand("group");
+		 * createGroup.addActionListener(this);
+		 * 
+		 * JButton joinGroup = new JButton("Join Group");
+		 * joinGroup.setActionCommand("join");
+		 * joinGroup.addActionListener(this);
 		 */
-		//masterPanel.add(scrollPane);
+
+		/*
+		 * JPanel groupPanel = new JPanel(new GridLayout(1, 2));
+		 * groupPanel.add(createGroup); groupPanel.add(joinGroup);
+		 * groupPanel.add(addContact, BorderLayout.NORTH);
+		 */
+		// masterPanel.add(scrollPane);
 		// masterPanel.add(addContact);
-		//masterPanel.add(groupPanel);
-		//masterPanel.add(sendPanel, BorderLayout.SOUTH);
+		// masterPanel.add(groupPanel);
+		// masterPanel.add(sendPanel, BorderLayout.SOUTH);
 		// masterPanel.add(toLabel, BorderLayout.NORTH);
 
 		// Menu
@@ -176,6 +183,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		viewProfile.addActionListener(this);
 
 		JMenuItem linkSteam = new JMenuItem("Link Steam x64 ID", KeyEvent.VK_L);
+		linkSteam.setActionCommand("Link");
 		profileMenu.add(linkSteam);
 		linkSteam.addActionListener(this);
 
@@ -184,7 +192,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		contactMenu.setMnemonic(KeyEvent.VK_C);
 		menuBar.add(contactMenu);
 		contactMenu.addActionListener(this);
-		
+
 		JMenuItem addContactItem = new JMenuItem("Add Contact");
 		contactMenu.add(addContactItem);
 		addContactItem.addActionListener(this);
@@ -197,17 +205,17 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		JMenu groupMenu = new JMenu("Groups");
 		contactMenu.setMnemonic(KeyEvent.VK_G);
 		menuBar.add(groupMenu);
-		
+
 		JMenuItem joinGroup = new JMenuItem("Join Group");
 		groupMenu.add(joinGroup);
 		joinGroup.addActionListener(this);
-		
+
 		JMenuItem createGroup = new JMenuItem("Create Group");
 		groupMenu.add(createGroup);
 		createGroup.addActionListener(this);
 
 		frame.setJMenuBar(menuBar);
-		//frame.add(masterPanel);
+		// frame.add(masterPanel);
 		frame.add(scrollPane);
 		frame.add(sendPanel, BorderLayout.SOUTH);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -313,17 +321,9 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		System.out.println(e);
 		if (e.getActionCommand().equals("Chat"))
 			openChat(to.getText());
-		else if (e.getActionCommand().equals("Add Contact")) {
-			String toAdd = JOptionPane.showInputDialog("User to add?", "");
-			if (toAdd.equals(""))
-				return;
-
-			try {
-				connection.createEntry(toAdd + "@" + serverName, toAdd);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		} else if (e.getActionCommand().equals("Create Group")) {
+		else if (e.getActionCommand().equals("Add Contact"))
+			addContact();
+		else if (e.getActionCommand().equals("Create Group")) {
 			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
 					"test@conference." + serverName);
 			try {
@@ -366,40 +366,110 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			} catch (XMPPException e1) {
 				e1.printStackTrace();
 			}
-		}
-		else if (e.getActionCommand().equals("View Profile"))
+		} else if (e.getActionCommand().equals("View Profile"))
 			viewProfile();
+		else if (e.getActionCommand().equals("Link"))
+			linkID();
+	}
+
+	/**
+	 * 
+	 */
+	private void addContact() {
+		String toAdd = JOptionPane.showInputDialog("User to add?", "");
+		if (toAdd.equals(""))
+			return;
+
+		try {
+			connection.createEntry(toAdd + "@" + serverName, toAdd);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void linkID() {
+		String toAdd = JOptionPane
+				.showInputDialog(
+						"What is your SteamID (64 bit)? This info can be found at http://steamidfinder.ru",
+						"");
+		if (toAdd == null || toAdd.equals(""))
+			return;
+
+		Map<String, String> attributes = new HashMap<String, String>();
+		attributes.put("username", user.getName());
+		attributes.put("password", user.getPass());
+		attributes.put("email", toAdd);
+
+		Registration r = new Registration();
+
+		r.setType(IQ.Type.SET);
+		r.setTo(connection.getConnection().getServiceName());
+
+		r.setAttributes(attributes);
+
+		PacketFilter filter = new AndFilter(
+				new PacketIDFilter(r.getPacketID()), new PacketTypeFilter(
+						IQ.class));
+		PacketCollector collector = connection.getConnection()
+				.createPacketCollector(filter);
+		connection.getConnection().sendPacket(r);
+
+		user.setEmail(toAdd);
 	}
 
 	/**
 	 * 
 	 */
 	private void viewProfile() {
+		if (user == null) {
+			System.out.println("Null user!");
+			return;
+		}
+
 		JFrame disp = new JFrame("Profile of " + user.getName());
 		try {
 			JPanel panel = new JPanel();
-			panel.setLayout(new BoxLayout(panel,
-					 BoxLayout.PAGE_AXIS));
-			
-			JLabel avatar = new JLabel(new ImageIcon(ImageIO.read(new URL(user.getAvatarURL()))));
-			
+			panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+			JLabel avatar = new JLabel(new ImageIcon(ImageIO.read(new URL(user
+					.getAvatarURL()))));
+
 			JLabel status = new JLabel(user.getSteamStatus());
-			
+
 			JLabel game = new JLabel("Currently playing: " + user.getGame());
-			
+
 			panel.add(avatar);
 			panel.add(status);
 			panel.add(game);
-			
+
 			disp.add(panel);
-			
-			disp.setSize(400,400);
+
+			disp.setSize(400, 400);
 			disp.setVisible(true);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+			JLabel info1 = new JLabel(
+					"Could not fetch Steam profile info.");
+			panel.add(info1);
+
+			JLabel info2 = new JLabel("Are you sure that you linked the 64 bit Steam ID?");
+			panel.add(info2);
+			
+			JLabel info3 = new JLabel("It should look similiar to this: 76561197998100405");
+			panel.add(info3);
+			
+			disp.add(panel);
+			disp.setSize(400, 400);
+			disp.setVisible(true);
 		}
-		
+
 	}
 
 	@Override
@@ -567,22 +637,24 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			Scanner scan = new Scanner(info);
 			while (scan.hasNext()) {
 				String found = scan.next();
-				if (found.equals("(") || found.equals(")") || found.equals("{")
-						|| found.equals("}") || found.equals("[")
-						|| found.equals("]"))
-					found = "";
-				
+				/*
+				 * if (found.equals("(") || found.equals(")") ||
+				 * found.equals("{") || found.equals("}") || found.equals("[")
+				 * || found.equals("]")) found = "";
+				 */
+
 				if (found.equals("\"avatarfull\":"))
 					user.setAvatarURL(scan.next());
-				
+
 				else if (found.equals("\"profilestate\":"))
 					user.setSteamStatus(scan.next());
-				
+
 				else if (found.equals("\"gameextrainfo\":"))
 					user.setGame(scan.next());
 
-				if (!found.equals(""))
-					System.out.println("Read: " + found);
+				/*
+				 * if (!found.equals("")) System.out.println("Read: " + found);
+				 */
 			}
 			scan.close();
 		} catch (Exception e) {
