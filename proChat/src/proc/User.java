@@ -11,12 +11,13 @@ import org.jivesoftware.smack.packet.Presence.Type;
  *
  */
 public class User {
-	String userName, userPass;
+	String userName, userPass, email;
 	Type presence;
 	
 	public User (String name, String pass) {
 		userName = name;
 		userPass = pass;
+		email="";
 		presence = Presence.Type.unavailable;
 	}
 	
@@ -34,5 +35,17 @@ public class User {
 	
 	public void setPresence(Presence p) {
 		presence = p.getType();
+	}
+	
+	public void setEmail(String toSet) {
+		System.out.println("Email set to: " + toSet);
+		email = toSet;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getEmail() {
+		return email;
 	}
 }

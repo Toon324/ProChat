@@ -6,8 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Scanner;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -184,6 +188,8 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		roster = connection.getConnection().getRoster();
 		roster.addRosterListener(this);
 		loadContacts();
+		//readSteamInfo("76561197998100303");
+		readSteamInfo(user.getEmail());
 	}
 
 	/**
@@ -466,6 +472,29 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		
 		loadContacts();
 
+	}
+	
+	public void readSteamInfo(String steamid) {
+		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids=" + steamid;
+		try {
+			URL surl = new URL(turl);
+			URLConnection connection = surl.openConnection();
+			InputStream info = connection.getInputStream();
+			Scanner scan = new Scanner(info);
+			while (scan.hasNext()) {
+				String found = scan.next();
+				if (found.equals("(") || found.equals(")") || found.equals("{")
+						|| found.equals("}") || found.equals("[")
+						|| found.equals("]"))
+					found = "";
+
+				if (!found.equals(""))
+					System.out.println("Read: " + found);
+			}
+			scan.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
