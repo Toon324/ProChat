@@ -439,6 +439,9 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			JLabel info3 = new JLabel("It should look similiar to this: 76561197998100405");
 			panel.add(info3);
 			
+			JLabel info4 = new JLabel("Yours was " + user.getEmail());
+			panel.add(info4);
+			
 			disp.add(panel);
 			disp.setSize(400, 400);
 			disp.setVisible(true);

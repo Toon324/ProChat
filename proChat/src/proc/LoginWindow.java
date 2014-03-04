@@ -203,6 +203,8 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 			connection.getConnection().login(user.getName(), user.getPass());
 			
+			user.setEmail(connection.getConnection().getAccountManager().getAccountAttribute("email"));
+			
 			Home home = new Home(user, connection);
 			home.show();
 			JOptionPane.showMessageDialog(frame, "Successfully logged in as "
