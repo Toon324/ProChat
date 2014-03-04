@@ -142,6 +142,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		frame.setJMenuBar(menuBar);
 		frame.add(scroller);
 		frame.add(holder, BorderLayout.SOUTH);
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
 		// frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		// frame.addWindowListener(this);
 
@@ -196,6 +197,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		entryPanel.add(entry);
 		entryPanel.add(send, BorderLayout.EAST);
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
 
 		frame.add(scroller);
 		frame.add(entryPanel, BorderLayout.SOUTH);
@@ -228,7 +230,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		
 		checkForGreenText(entry.getText());
 		
-		if (muc == null)
+		if (muc == null) //In muc chats, user messages are fed back to them, so we don't need to add them ourselves.
 			addToChatArea("<b>" + user.getName() + "</b>: " + "<font color=\"" + color + "\">" + entry.getText() + "</font>",
 					null);
 

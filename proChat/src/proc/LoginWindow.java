@@ -79,9 +79,6 @@ public class LoginWindow implements ActionListener, KeyListener {
 			e.printStackTrace();
 		}
 
-		ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp",
-				new VCardProvider());
-
 		DisplayInputWindow(user, pass);
 	}
 

@@ -2,6 +2,7 @@ package proc;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -190,6 +191,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		// frame.add(masterPanel);
 		frame.add(scrollPane);
 		frame.add(sendPanel, BorderLayout.SOUTH);
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		serverIP = "129.89.185.120";
