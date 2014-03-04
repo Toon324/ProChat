@@ -6,10 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -24,7 +22,6 @@ import javax.swing.JTextField;
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smackx.packet.VCard;
 import org.jivesoftware.smackx.provider.VCardProvider;
 
 /**
@@ -227,11 +224,6 @@ public class LoginWindow implements ActionListener, KeyListener {
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 
-	}
-
-	private String readLine() throws IOException {
-		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
-		return r.readLine();
 	}
 
 }

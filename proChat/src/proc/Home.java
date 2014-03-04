@@ -32,9 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
-import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -387,8 +385,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		PacketFilter filter = new AndFilter(
 				new PacketIDFilter(r.getPacketID()), new PacketTypeFilter(
 						IQ.class));
-		PacketCollector collector = connection.getConnection()
-				.createPacketCollector(filter);
+		connection.getConnection().createPacketCollector(filter);
 		connection.getConnection().sendPacket(r);
 
 		user.setEmail(toAdd);
@@ -431,19 +428,20 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-			JLabel info1 = new JLabel(
-					"Could not fetch Steam profile info.");
+			JLabel info1 = new JLabel("Could not fetch Steam profile info.");
 			panel.add(info1);
 
-			JLabel info2 = new JLabel("Are you sure that you linked the 64 bit Steam ID?");
+			JLabel info2 = new JLabel(
+					"Are you sure that you linked the 64 bit Steam ID?");
 			panel.add(info2);
-			
-			JLabel info3 = new JLabel("It should look similiar to this: 76561197998100405");
+
+			JLabel info3 = new JLabel(
+					"It should look similiar to this: 76561197998100405");
 			panel.add(info3);
-			
+
 			JLabel info4 = new JLabel("Yours was " + user.getEmail());
 			panel.add(info4);
-			
+
 			disp.add(panel);
 			disp.setSize(400, 400);
 			disp.setVisible(true);
