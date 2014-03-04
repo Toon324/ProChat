@@ -290,7 +290,6 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		System.out.println(e);
 		if (e.getActionCommand().equals("Chat"))
 			openChat(to.getText());
 		else if (e.getActionCommand().equals("Add Contact"))
@@ -342,6 +341,13 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			viewProfile();
 		else if (e.getActionCommand().equals("Link"))
 			linkID();
+		else if (e.getActionCommand().equals("Exit Program"))
+			System.exit(0);
+		else if (e.getActionCommand().equals("Sign Out")) {
+			connection.getConnection().disconnect();
+			new LoginWindow();
+			frame.dispose();
+		}
 	}
 
 	/**
@@ -406,7 +412,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-			System.out.println("Avatar: " + user.getAvatarURL());
+			//System.out.println("Avatar: " + user.getAvatarURL());
 			JLabel avatar = new JLabel(new ImageIcon(ImageIO.read(new URL(user
 					.getAvatarURL()))));
 
@@ -479,7 +485,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			// System.out.println("Found contact to chat with: " + connectTo);
 		}
 		try {
-			System.out.println("Creating connection to " + connectTo);
+			//System.out.println("Creating connection to " + connectTo);
 			Chat c = connection.getChatManager().createChat(
 					connectTo + "@" + serverName, null);
 			ChatWindow chat = new ChatWindow(user, c);
