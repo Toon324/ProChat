@@ -23,6 +23,7 @@ import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -38,6 +39,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 /**
@@ -51,6 +53,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	JEditorPane chatArea;
 	JTextField entry;
 	JButton send;
+	JLabel status;
 	User user;
 	String sendTo, serverName;
 	Chat chat;
@@ -104,8 +107,15 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
 
+		status = new JLabel("");
+		
+		JPanel holder = new JPanel(new GridLayout(2,1));
+		holder.add(status, BorderLayout.NORTH);
+		
 		entryPanel.add(entry);
 		entryPanel.add(send, BorderLayout.EAST);
+		
+		holder.add(entryPanel);
 
 		// Menu
 		JMenuBar menuBar = new JMenuBar();
@@ -120,7 +130,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		frame.setJMenuBar(menuBar);
 		frame.add(scroller);
-		frame.add(entryPanel, BorderLayout.SOUTH);
+		frame.add(holder, BorderLayout.SOUTH);
 		// frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		// frame.addWindowListener(this);
 
@@ -329,6 +339,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @return
 	 */
 	private String checkSpecialCases(String toAdd) {
+		toAdd = checkForGreenText(toAdd);
+		
 		if (toAdd.contains("{img}")) {
 			toAdd = convertImageURL(toAdd);
 			return ""; // This should always be a single line message, so
@@ -352,8 +364,26 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		toAdd = checkForHyperlink(toAdd);
 		toAdd = checkForSubreddit(toAdd);
+		
+		
 
 		return toAdd;
+	}
+
+	/**
+	 * @param toAdd
+	 * @return
+	 */
+	private String checkForGreenText(String toAdd) {
+		//System.out.println("Toad: " + toAdd);
+		String temp = toAdd.substring(toAdd.indexOf("</b>") + 4, toAdd.length());
+		if (temp.contains("</i>"))
+			temp = temp.replace("</i>", "");
+		//System.out.println("temp: " + temp);
+		if (temp.contains(">"))
+			return toAdd.substring(0, toAdd.indexOf("</b>") + 4) + "<font color=\"1AFF00\">" + temp + "</font>";
+		else
+			return toAdd;
 	}
 
 	/**
@@ -563,6 +593,17 @@ public class ChatWindow implements ActionListener, KeyListener,
 			return chat.getParticipant();
 		else
 			return muc.getRoom();
+	}
+
+	/**
+	 * @param state
+	 */
+	public void passState(ChatState state) {
+		if (state.equals(ChatState.composing))
+			status.setText(getFrom() + " is typing...");
+		else
+			status.setText("");
+		
 	}
 
 }

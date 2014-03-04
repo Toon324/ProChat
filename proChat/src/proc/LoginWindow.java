@@ -54,7 +54,7 @@ public class LoginWindow implements ActionListener, KeyListener {
 				reader.useDelimiter("\t");
 				while (reader.hasNext()) {
 					String found = reader.next();
-					//System.out.println("Found: " + found);
+					// System.out.println("Found: " + found);
 					if (user.equals(""))
 						user = found;
 					else if (pass.equals(""))
@@ -79,8 +79,9 @@ public class LoginWindow implements ActionListener, KeyListener {
 			e.printStackTrace();
 		}
 
-		ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new VCardProvider());
-		
+		ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp",
+				new VCardProvider());
+
 		DisplayInputWindow(user, pass);
 	}
 
@@ -122,7 +123,7 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 		frame.add(masterPanel);
 		frame.add(buttons, BorderLayout.SOUTH);
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));  
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
 
 		frame.setVisible(true);
 	}
@@ -155,8 +156,10 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 		AccountManager am = new AccountManager(connection.getConnection());
 		try {
+			String pass = new String(loginPass.getPassword());
+			System.out.println("Reg: " + loginName.getText() + "  " + pass);
 			am.createAccount(loginName.getText(),
-					new String(loginPass.getPassword()));
+					pass);
 			//System.out.println("Registered " + loginName.getText());
 		} catch (XMPPException e) {
 			e.printStackTrace();
@@ -201,9 +204,10 @@ public class LoginWindow implements ActionListener, KeyListener {
 					loginPass.getPassword()));
 
 			connection.getConnection().login(user.getName(), user.getPass());
-			
-			user.setEmail(connection.getConnection().getAccountManager().getAccountAttribute("email"));
-			
+
+			user.setEmail(connection.getConnection().getAccountManager()
+					.getAccountAttribute("email"));
+
 			Home home = new Home(user, connection);
 			home.show();
 			JOptionPane.showMessageDialog(frame, "Successfully logged in as "
