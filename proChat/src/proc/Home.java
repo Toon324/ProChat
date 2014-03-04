@@ -224,11 +224,11 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	 */
 	private void loadContacts() {
 		roster.reload();
-		// data = new Object[15][2];
-		ensureCapacity(roster.getEntryCount());
+		data = new User[roster.getEntryCount()];
+		//ensureCapacity(roster.getEntryCount());
 		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
-			// System.out.println("Found contact: " + contact);
+			 System.out.println("Found contact: " + contact);
 			String userContact = contact.getUser();
 			if (userContact.indexOf("@") != -1)
 				userContact = userContact
@@ -294,59 +294,102 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			openChat(to.getText());
 		else if (e.getActionCommand().equals("Add Contact"))
 			addContact();
-		else if (e.getActionCommand().equals("Create Group")) {
-			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
-					"test@conference." + serverName);
-			try {
-				mu.create(user.getName());
-
-				Form f = new Form(Form.TYPE_SUBMIT);
-				FormField ff = new FormField("muc#roomconfig_persistentroom");
-				ff.setType(FormField.TYPE_BOOLEAN);
-				ff.addValue("0");
-				ff.setRequired(true);
-				ff.setLabel("Make Room Persistent?");
-				System.out.println(ff.toXML()); // - output values seems good.
-				f.addField(ff);
-
-				// mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
-				mu.sendConfigurationForm(f);
-
-				ChatWindow cw = new ChatWindow(user, mu);
-				cw.show();
-				currentChats.add(cw);
-
-			} catch (XMPPException e1) {
-				e1.printStackTrace();
-			}
-		} else if (e.getActionCommand().equals("Join Group")) {
-			MultiUserChat mu = new MultiUserChat(connection.getConnection(),
-					"test@conference." + serverName);
-			try {
-
-				DiscussionHistory history = new DiscussionHistory();
-				history.setMaxStanzas(100);
-
-				ChatWindow cw = new ChatWindow(user, mu);
-				cw.show();
-				currentChats.add(cw);
-
-				mu.join(user.userName, "", history,
-						SmackConfiguration.getPacketReplyTimeout());
-
-			} catch (XMPPException e1) {
-				e1.printStackTrace();
-			}
-		} else if (e.getActionCommand().equals("View Profile"))
+		else if (e.getActionCommand().equals("Create Group"))
+			createGroup();
+		else if (e.getActionCommand().equals("Join Group"))
+			joinGroup();
+		else if (e.getActionCommand().equals("View Profile"))
 			viewProfile();
 		else if (e.getActionCommand().equals("Link"))
 			linkID();
+		else if (e.getActionCommand().equals("Remove Contact"))
+			removeContact();
 		else if (e.getActionCommand().equals("Exit Program"))
 			System.exit(0);
 		else if (e.getActionCommand().equals("Sign Out")) {
 			connection.getConnection().disconnect();
 			new LoginWindow();
 			frame.dispose();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void removeContact() {
+		if (contacts.getSelectedIndex() == -1)
+			return;
+		
+		String remove = ((User) contacts.getSelectedValue()).getName();
+		if (remove == null)
+			return;
+		
+		int i = JOptionPane.showConfirmDialog(frame,
+				"Are you sure you want to remove " + remove + " as a contact?");
+
+		if (i == JOptionPane.NO_OPTION)
+			return;
+		
+		//System.out.println("Removing " + remove);
+		
+		try {
+			connection.getConnection().getRoster().removeEntry(roster.getEntry(remove + "@" + serverName));
+			loadContacts();
+		} catch (XMPPException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void createGroup() {
+		MultiUserChat mu = new MultiUserChat(connection.getConnection(),
+				"test@conference." + serverName);
+		try {
+			mu.create(user.getName());
+
+			Form f = new Form(Form.TYPE_SUBMIT);
+			FormField ff = new FormField("muc#roomconfig_persistentroom");
+			ff.setType(FormField.TYPE_BOOLEAN);
+			ff.addValue("0");
+			ff.setRequired(true);
+			ff.setLabel("Make Room Persistent?");
+			System.out.println(ff.toXML()); // - output values seems good.
+			f.addField(ff);
+
+			// mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
+			mu.sendConfigurationForm(f);
+
+			ChatWindow cw = new ChatWindow(user, mu);
+			cw.show();
+			currentChats.add(cw);
+
+		} catch (XMPPException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void joinGroup() {
+		MultiUserChat mu = new MultiUserChat(connection.getConnection(),
+				"test@conference." + serverName);
+		try {
+
+			DiscussionHistory history = new DiscussionHistory();
+			history.setMaxStanzas(100);
+
+			ChatWindow cw = new ChatWindow(user, mu);
+			cw.show();
+			currentChats.add(cw);
+
+			mu.join(user.userName, "", history,
+					SmackConfiguration.getPacketReplyTimeout());
+
+		} catch (XMPPException e1) {
+			e1.printStackTrace();
 		}
 	}
 
@@ -412,7 +455,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-			//System.out.println("Avatar: " + user.getAvatarURL());
+			// System.out.println("Avatar: " + user.getAvatarURL());
 			JLabel avatar = new JLabel(new ImageIcon(ImageIO.read(new URL(user
 					.getAvatarURL()))));
 
@@ -471,21 +514,15 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	 */
 	private ChatWindow openChat(String connectTo) {
 		if (connectTo.equals("")) {
-			/*
-			 * if (contacts.getSelectedRow() == -1) return null;
-			 */
+
 			if (contacts.getSelectedIndex() == -1)
 				return null;
-
-			// connectTo = (String)
-			// contacts.getValueAt(contacts.getSelectedRow(), 0);
 			connectTo = ((User) contacts.getSelectedValue()).getName();
 			if (connectTo == null)
 				return null;
-			// System.out.println("Found contact to chat with: " + connectTo);
 		}
 		try {
-			//System.out.println("Creating connection to " + connectTo);
+			// System.out.println("Creating connection to " + connectTo);
 			Chat c = connection.getChatManager().createChat(
 					connectTo + "@" + serverName, null);
 			ChatWindow chat = new ChatWindow(user, c);
@@ -515,26 +552,6 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	private void ensureCapacity(int i) {
-		// System.out.println("Data length: " + data.length + " i: " + i);
-		if (data.length > i)
-			return;
-
-		// else
-		// Copies data over to new array
-		// Object[][] temp = new Object[data.length * 2][2];
-		User[] temp = new User[i];
-		/*
-		 * for (int x = 0; x < data.length; x++) for (int y = 0; y <
-		 * data[x].length; y++) temp[x][y] = data[x][y];
-		 */
-		for (int x = 0; x < data.length; x++)
-			temp[x] = data[x];
-
-		data = temp;
-
 	}
 
 	@Override
