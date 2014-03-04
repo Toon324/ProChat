@@ -392,6 +392,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		connection.getConnection().sendPacket(r);
 
 		user.setEmail(toAdd);
+		readSteamInfo(toAdd);
 	}
 
 	/**
@@ -408,6 +409,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
+			System.out.println("Avatar: " + user.getAvatarURL());
 			JLabel avatar = new JLabel(new ImageIcon(ImageIO.read(new URL(user
 					.getAvatarURL()))));
 
@@ -605,6 +607,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	}
 
 	public void readSteamInfo(String steamid) {
+		System.out.println("Loading info for steamID: " + steamid);
 		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids="
 				+ steamid;
 		try {
