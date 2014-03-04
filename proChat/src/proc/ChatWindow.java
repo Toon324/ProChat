@@ -218,6 +218,9 @@ public class ChatWindow implements ActionListener, KeyListener,
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
 
 		toAdd = checkSpecialCases(toAdd);
+		
+		if (toAdd.equals(""))
+			return;
 
 		Calendar c = Calendar.getInstance();
 		int hour = c.get(Calendar.HOUR);
@@ -325,6 +328,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @return
 	 */
 	private String checkSpecialCases(String toAdd) {
+		if (toAdd.contains("{img}")) {
+			toAdd = convertImageURL(toAdd);
+			return ""; // This should always be a single line message, so
+							// don't check other cases.
+		}
 		if (toAdd.contains("/you")) {
 			toAdd = toAdd.replace("/you", "<i>" + user.getName() + "</i>");
 		}
@@ -342,8 +350,31 @@ public class ChatWindow implements ActionListener, KeyListener,
 			toAdd = convertTime(toAdd, "MST");
 
 		toAdd = checkForSubreddit(toAdd);
+
 		toAdd = checkForHyperlink(toAdd);
 
+		return toAdd;
+	}
+
+	/**
+	 * @param toAdd
+	 * @return
+	 */
+	private String convertImageURL(String toAdd) {
+		System.out.println("Input: " + toAdd);
+		toAdd = toAdd.substring(toAdd.indexOf("{img}")+5, toAdd.length());
+		System.out.println("URL: " + toAdd);
+
+		String imageTag = "<b>" + getFrom() + ":  </b><a href=\"" + toAdd
+				+ "\"><img src=\"" + toAdd
+				+ "\" width=\"150\" height=\"150\"></a>";
+
+		try {
+			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+					.getDocument().getLength(), imageTag, 0, 0, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return toAdd;
 	}
 
@@ -398,12 +429,19 @@ public class ChatWindow implements ActionListener, KeyListener,
 		if (toAdd == null || toAdd.equals(""))
 			return;
 
-		String imageTag = "<b>" + user.getName() + ":  </b><a href=\"" + toAdd + "\"><img src=\"" + toAdd
+		String imageTag = "<b>" + user.getName() + ":  </b><a href=\"" + toAdd
+				+ "\"><img src=\"" + toAdd
 				+ "\" width=\"150\" height=\"150\"></a>";
 
 		try {
 			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 					.getDocument().getLength(), imageTag, 0, 0, null);
+
+			if (chat != null)
+				chat.sendMessage("{img}" + toAdd);
+			else if (muc != null)
+				muc.sendMessage("{img}" + toAdd);
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
