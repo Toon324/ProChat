@@ -8,13 +8,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.JButton;
@@ -216,7 +219,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
 
 		toAdd = checkSpecialCases(toAdd);
-		
+
 		if (toAdd.equals(""))
 			return;
 
@@ -329,7 +332,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		if (toAdd.contains("{img}")) {
 			toAdd = convertImageURL(toAdd);
 			return ""; // This should always be a single line message, so
-							// don't check other cases.
+						// don't check other cases.
 		}
 		if (toAdd.contains("/you")) {
 			toAdd = toAdd.replace("/you", "<i>" + user.getName() + "</i>");
@@ -359,14 +362,24 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 */
 	private String convertImageURL(String toAdd) {
 		System.out.println("Input: " + toAdd);
-		toAdd = toAdd.substring(toAdd.indexOf("{img}")+5, toAdd.length());
+		toAdd = toAdd.substring(toAdd.indexOf("{img}") + 5, toAdd.length());
 		System.out.println("URL: " + toAdd);
 
-		String imageTag = "<b>" + getFrom() + ":  </b><a href=\"" + toAdd
-				+ "\"><img src=\"" + toAdd
-				+ "\" width=\"150\" height=\"150\"></a>";
-
 		try {
+			BufferedImage i = ImageIO.read(new URL(toAdd));
+
+			System.out.println("Image size: " + i.getWidth() + ","
+					+ i.getHeight());
+
+			int x = 180 * i.getWidth() / i.getHeight();
+			int y = 170 * i.getHeight() / i.getWidth();
+
+			System.out.println("Scaled size: " + x + "," + y);
+
+			String imageTag = "<b>" + getFrom() + ":  </b><a href=\"" + toAdd
+					+ "\"><img src=\"" + toAdd + "\" width=\"" + x
+					+ "\" height=\"" + y + "\"></a>";
+
 			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 					.getDocument().getLength(), imageTag, 0, 0, null);
 		} catch (Exception e) {
@@ -426,11 +439,21 @@ public class ChatWindow implements ActionListener, KeyListener,
 		if (toAdd == null || toAdd.equals(""))
 			return;
 
-		String imageTag = "<b>" + user.getName() + ":  </b><a href=\"" + toAdd
-				+ "\"><img src=\"" + toAdd
-				+ "\" width=\"150\" height=\"150\"></a>";
-
 		try {
+			BufferedImage i = ImageIO.read(new URL(toAdd));
+
+			System.out.println("Image size: " + i.getWidth() + ","
+					+ i.getHeight());
+
+			int x = 170 * i.getWidth() / i.getHeight();
+			int y = 170 * i.getHeight() / i.getWidth();
+
+			System.out.println("Scaled size: " + x + "," + y);
+
+			String imageTag = "<b>" + user.getName() + ":  </b><a href=\""
+					+ toAdd + "\"><img src=\"" + toAdd + "\" width=\"" + x
+					+ "\" height=\"" + y + "\"></a>";
+
 			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 					.getDocument().getLength(), imageTag, 0, 0, null);
 

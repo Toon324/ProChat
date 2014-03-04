@@ -203,7 +203,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 				if (packet instanceof Message) {
 
 					Message msg = (Message) packet;
-					System.out.println("Msg: " + msg);
+					//System.out.println("Msg: " + msg);
 					// Process message
 					recieveMessage(msg);
 				}
@@ -228,7 +228,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		//ensureCapacity(roster.getEntryCount());
 		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
-			 System.out.println("Found contact: " + contact);
+			 //System.out.println("Found contact: " + contact);
 			String userContact = contact.getUser();
 			if (userContact.indexOf("@") != -1)
 				userContact = userContact
@@ -265,7 +265,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		}
 
 		for (ChatWindow c : currentChats) {
-			System.out.println("Found Chat with " + c.getFullFrom());
+			//System.out.println("Found Chat with " + c.getFullFrom());
 			if (c.getFullFrom().equals(
 					msg.getFrom().substring(0, msg.getFrom().indexOf("/")))) {
 				activeChat = c;
