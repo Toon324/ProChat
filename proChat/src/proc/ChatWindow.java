@@ -349,9 +349,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 		else if (toAdd.contains("MST"))
 			toAdd = convertTime(toAdd, "MST");
 
-		toAdd = checkForSubreddit(toAdd);
-
 		toAdd = checkForHyperlink(toAdd);
+		toAdd = checkForSubreddit(toAdd);
 
 		return toAdd;
 	}
