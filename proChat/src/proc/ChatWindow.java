@@ -299,7 +299,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 			}
 		}
 
-		frame.toFront();
+		if (!frame.isVisible())
+			frame.toFront();
 	}
 
 	/**
