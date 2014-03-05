@@ -11,7 +11,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Calendar;
@@ -35,6 +37,7 @@ import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -130,6 +133,21 @@ public class ChatWindow implements ActionListener, KeyListener,
 		JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
 		menu.add(addImage);
 		addImage.addActionListener(this);
+
+		JMenu memes = new JMenu("Meme");
+		menu.add(memes);
+
+		JMenuItem uMad = new JMenuItem("You Mad?");
+		memes.add(uMad);
+		uMad.addActionListener(this);
+
+		JMenuItem gay = new JMenuItem("Ultra Gay");
+		memes.add(gay);
+		gay.addActionListener(this);
+
+		JMenuItem noRead = new JMenuItem("Didn't Read");
+		memes.add(noRead);
+		noRead.addActionListener(this);
 
 		// HTML menu
 		JMenu html = new JMenu("HTML");
@@ -313,11 +331,10 @@ public class ChatWindow implements ActionListener, KeyListener,
 	private String checkForHyperlink(String toAdd) {
 		if (toAdd.contains("http://")) {
 
-			
 			String sub = toAdd.substring(toAdd.indexOf("http://"));
 			if (sub.contains(" "))
 				sub = sub.substring(0, sub.indexOf(" "));
-			
+
 			sub = sub.replace("</font>", "");
 
 			String replacement = new String("<a href" + "=\"" + sub + "\">"
@@ -480,6 +497,12 @@ public class ChatWindow implements ActionListener, KeyListener,
 			addImage();
 		else if (e.getActionCommand().equals("Text Color"))
 			setColor();
+		else if (e.getActionCommand().equals("You Mad?"))
+			addImage("http://www.memes.at/faces/u_mad_troll_low.gif");
+		else if (e.getActionCommand().equals("Ultra Gay"))
+			addImage("http://www.memes.at/faces/ultra_gay_low.jpg");
+		else if (e.getActionCommand().equals("Didn't Read"))
+			addImage("http://www.memes.at/faces/didnt_read_lol_low.gif");
 	}
 
 	/**
@@ -505,6 +528,19 @@ public class ChatWindow implements ActionListener, KeyListener,
 		if (toAdd == null || toAdd.equals(""))
 			return;
 
+		addImage(toAdd);
+
+
+	}
+
+	/**
+	 * @param toAdd
+	 * @throws IOException
+	 * @throws MalformedURLException
+	 * @throws BadLocationException
+	 * @throws XMPPException
+	 */
+	private void addImage(String toAdd) {
 		try {
 			BufferedImage i = ImageIO.read(new URL(toAdd));
 
@@ -527,9 +563,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 				chat.sendMessage("{img}" + toAdd);
 			else if (muc != null)
 				muc.sendMessage("{img}" + toAdd);
-
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
