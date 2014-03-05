@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -58,7 +60,8 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
  * @author Cody Swendrowski
  * 
  */
-public class Home implements ActionListener, KeyListener, RosterListener {
+public class Home implements ActionListener, MouseListener, KeyListener,
+		RosterListener {
 
 	JFrame frame;
 	JMenuBar menuBar;
@@ -119,6 +122,8 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		 */
 
 		to.addKeyListener(this);
+
+		contacts.addMouseListener(this);
 
 		JButton send = new JButton("Chat");
 		send.addActionListener(this);
@@ -205,7 +210,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 				if (packet instanceof Message) {
 
 					Message msg = (Message) packet;
-					//System.out.println("Msg: " + msg);
+					System.out.println("Msg: " + msg);
 					// Process message
 					recieveMessage(msg);
 				}
@@ -218,7 +223,8 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		roster.addRosterListener(this);
 		loadContacts();
 		// readSteamInfo("76561197998100303");
-		readSteamInfo(user.getEmail());
+		User u = readSteamInfo(user.getEmail());
+		user.copySteamDataFrom(u);
 	}
 
 	/**
@@ -227,10 +233,10 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	private void loadContacts() {
 		roster.reload();
 		data = new User[roster.getEntryCount()];
-		//ensureCapacity(roster.getEntryCount());
+		// ensureCapacity(roster.getEntryCount());
 		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
-			 //System.out.println("Found contact: " + contact);
+			// System.out.println("Found contact: " + contact);
 			String userContact = contact.getUser();
 			if (userContact.indexOf("@") != -1)
 				userContact = userContact
@@ -251,6 +257,21 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	}
 
 	private void recieveMessage(Message msg) {
+
+		if (msg.getSubject().equals("ID request")) {
+			Message message = new Message();
+			message.setTo(msg.getFrom());
+			message.setSubject("ID");
+			message.setBody(user.getEmail());
+			message.setType(Message.Type.headline);
+			System.out.println("Sent id: " + message.getBody());
+			connection.getConnection().sendPacket(message);
+			return;
+		} else if (msg.getSubject().equals("ID")) {
+			viewOtherProfile(msg.getBody());
+			return;
+		}
+
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
 		String domain = msg.getFrom().substring(msg.getFrom().indexOf("@") + 1,
 				msg.getFrom().indexOf("."));
@@ -263,11 +284,11 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 			from = msg.getFrom().substring(msg.getFrom().indexOf("/") + 1,
 					msg.getFrom().length());
-			System.out.println("Conference from: " + from);
+			// System.out.println("Conference from: " + from);
 		}
 
 		for (ChatWindow c : currentChats) {
-			//System.out.println("Found Chat with " + c.getFullFrom());
+			// System.out.println("Found Chat with " + c.getFullFrom());
 			if (c.getFullFrom().equals(
 					msg.getFrom().substring(0, msg.getFrom().indexOf("/")))) {
 				activeChat = c;
@@ -280,9 +301,12 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 			currentChats.add(c);
 			System.out.println("Added chat: " + c.getFrom());
-		} else
+		} else {
 			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(),
 					null);
+			if (!activeChat.frame.isVisible())
+				activeChat.frame.setVisible(true);
+		}
 
 	}
 
@@ -301,7 +325,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 		else if (e.getActionCommand().equals("Join Group"))
 			joinGroup();
 		else if (e.getActionCommand().equals("View Profile"))
-			viewProfile();
+			viewProfile(user);
 		else if (e.getActionCommand().equals("Link"))
 			linkID();
 		else if (e.getActionCommand().equals("Remove Contact"))
@@ -321,21 +345,22 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	private void removeContact() {
 		if (contacts.getSelectedIndex() == -1)
 			return;
-		
+
 		String remove = ((User) contacts.getSelectedValue()).getName();
 		if (remove == null)
 			return;
-		
+
 		int i = JOptionPane.showConfirmDialog(frame,
 				"Are you sure you want to remove " + remove + " as a contact?");
 
 		if (i == JOptionPane.NO_OPTION)
 			return;
-		
-		//System.out.println("Removing " + remove);
-		
+
+		// System.out.println("Removing " + remove);
+
 		try {
-			connection.getConnection().getRoster().removeEntry(roster.getEntry(remove + "@" + serverName));
+			connection.getConnection().getRoster()
+					.removeEntry(roster.getEntry(remove + "@" + serverName));
 			loadContacts();
 		} catch (XMPPException e) {
 			e.printStackTrace();
@@ -357,7 +382,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 			ff.addValue("0");
 			ff.setRequired(true);
 			ff.setLabel("Make Room Persistent?");
-			System.out.println(ff.toXML()); // - output values seems good.
+			System.out.println(ff.toXML()); // - output values seem good.
 			f.addField(ff);
 
 			// mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
@@ -446,24 +471,24 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 	/**
 	 * 
 	 */
-	private void viewProfile() {
-		if (user == null) {
+	private void viewProfile(User u) {
+		if (u == null) {
 			System.out.println("Null user!");
 			return;
 		}
 
-		JFrame disp = new JFrame("Profile of " + user.getName());
+		JFrame disp = new JFrame("Profile of " + u.getName());
 		try {
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
 			// System.out.println("Avatar: " + user.getAvatarURL());
-			JLabel avatar = new JLabel(new ImageIcon(ImageIO.read(new URL(user
+			JLabel avatar = new JLabel(new ImageIcon(ImageIO.read(new URL(u
 					.getAvatarURL()))));
 
 			JLabel status = new JLabel(user.getSteamStatus());
 
-			JLabel game = new JLabel("Currently playing: " + user.getGame());
+			JLabel game = new JLabel("Currently playing: " + u.getGame());
 
 			panel.add(avatar);
 			panel.add(status);
@@ -490,7 +515,7 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 					"It should look similiar to this: 76561197998100405");
 			panel.add(info3);
 
-			JLabel info4 = new JLabel("Yours was " + user.getEmail());
+			JLabel info4 = new JLabel("Yours was " + u.getEmail());
 			panel.add(info4);
 
 			disp.add(panel);
@@ -629,8 +654,10 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 
 	}
 
-	public void readSteamInfo(String steamid) {
-		System.out.println("Loading info for steamID: " + steamid);
+	private User readSteamInfo(String steamid) {
+		User u = new User("", "");
+		u.setEmail(steamid);
+		//System.out.println("Loading info for steamID: " + steamid);
 		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids="
 				+ steamid;
 		try {
@@ -647,22 +674,107 @@ public class Home implements ActionListener, KeyListener, RosterListener {
 				 */
 
 				if (found.equals("\"avatarfull\":"))
-					user.setAvatarURL(scan.next());
+					u.setAvatarURL(scan.next());
 
 				else if (found.equals("\"profilestate\":"))
-					user.setSteamStatus(scan.next());
+					u.setSteamStatus(scan.next());
 
 				else if (found.equals("\"gameextrainfo\":"))
-					user.setGame(scan.next());
+					u.setGame(scan.next());
 
-				/*
-				 * if (!found.equals("")) System.out.println("Read: " + found);
-				 */
+				//if (!found.equals(""))
+					//System.out.println("Read: " + found);
+
 			}
 			scan.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return u;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (e.getClickCount() == 2) {
+			requestOtherProfile();
+		}
+
+	}
+
+	/**
+	 * 
+	 */
+	private void requestOtherProfile() {
+		String other = ((User) contacts.getSelectedValue()).getName();
+
+		Message message = new Message();
+		message.setTo(other + "@" + serverName);
+		System.out.println("Requesting id from " + message.getTo());
+		message.setSubject("ID request");
+		message.setType(Message.Type.headline);
+		connection.getConnection().sendPacket(message);
+
+	}
+
+	private void viewOtherProfile(String id) {
+		String other = ((User) contacts.getSelectedValue()).getName();
+
+		
+		System.out.println("id recieved: " + id);
+		User u = readSteamInfo(id);
+		u.setName(other);
+
+		viewProfile(u);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

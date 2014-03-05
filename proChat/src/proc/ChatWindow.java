@@ -62,7 +62,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	XmppManager connection;
 	HTMLEditorKit kit;
 	private String color = "000000";
-	private String previousColor;
+	private String previousColor = color;
 
 	/**
 	 * @param c
@@ -111,13 +111,13 @@ public class ChatWindow implements ActionListener, KeyListener,
 		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
 
 		status = new JLabel("");
-		
-		JPanel holder = new JPanel(new GridLayout(2,1));
+
+		JPanel holder = new JPanel(new GridLayout(2, 1));
 		holder.add(status, BorderLayout.NORTH);
-		
+
 		entryPanel.add(entry);
 		entryPanel.add(send, BorderLayout.EAST);
-		
+
 		holder.add(entryPanel);
 
 		// Menu
@@ -130,11 +130,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 		JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
 		menu.add(addImage);
 		addImage.addActionListener(this);
-		
-		//HTML menu
+
+		// HTML menu
 		JMenu html = new JMenu("HTML");
 		menuBar.add(html);
-		
+
 		JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
 		html.add(setColor);
 		setColor.addActionListener(this);
@@ -227,17 +227,20 @@ public class ChatWindow implements ActionListener, KeyListener,
 			}
 			return;
 		}
-		
+
 		checkForGreenText(entry.getText());
-		
-		if (muc == null) //In muc chats, user messages are fed back to them, so we don't need to add them ourselves.
-			addToChatArea("<b>" + user.getName() + "</b>: " + "<font color=\"" + color + "\">" + entry.getText() + "</font>",
-					null);
+
+		if (muc == null) // In muc chats, user messages are fed back to them, so
+							// we don't need to add them ourselves.
+			addToChatArea("<b>" + user.getName() + "</b>: " + "<font color=\""
+					+ color + "\">" + entry.getText() + "</font>", null);
 
 		if (chat != null)
-			chat.sendMessage("<font color=\"" + color + "\">" + entry.getText() + "</font>");
+			chat.sendMessage("<font color=\"" + color + "\">" + entry.getText()
+					+ "</font>");
 		else if (muc != null)
-			muc.sendMessage("<font color=\"" + color + "\">" + entry.getText() + "</font>");
+			muc.sendMessage("<font color=\"" + color + "\">" + entry.getText()
+					+ "</font>");
 
 		entry.setText("");
 	}
@@ -309,9 +312,13 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 */
 	private String checkForHyperlink(String toAdd) {
 		if (toAdd.contains("http://")) {
+
+			
 			String sub = toAdd.substring(toAdd.indexOf("http://"));
 			if (sub.contains(" "))
 				sub = sub.substring(0, sub.indexOf(" "));
+			
+			sub = sub.replace("</font>", "");
 
 			String replacement = new String("<a href" + "=\"" + sub + "\">"
 					+ sub + "</a>");
@@ -356,7 +363,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @return
 	 */
 	private String checkSpecialCases(String toAdd) {
-		
+
 		if (toAdd.contains("{img}")) {
 			toAdd = convertImageURL(toAdd);
 			return ""; // This should always be a single line message, so
@@ -380,8 +387,6 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		toAdd = checkForHyperlink(toAdd);
 		toAdd = checkForSubreddit(toAdd);
-		
-		
 
 		return toAdd;
 	}
@@ -391,14 +396,13 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @return
 	 */
 	private void checkForGreenText(String toAdd) {
-		//System.out.println("Toad: " + toAdd);
+		// System.out.println("Toad: " + toAdd);
 		String temp = toAdd;
-		//System.out.println("temp: " + temp);
+		// System.out.println("temp: " + temp);
 		if (temp.contains(">>")) {
 			previousColor = color;
 			color = "1AFF00";
-		}
-		else
+		} else
 			color = previousColor;
 
 	}
@@ -408,20 +412,20 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @return
 	 */
 	private String convertImageURL(String toAdd) {
-		//System.out.println("Input: " + toAdd);
+		// System.out.println("Input: " + toAdd);
 		toAdd = toAdd.substring(toAdd.indexOf("{img}") + 5, toAdd.length());
-		//System.out.println("URL: " + toAdd);
+		// System.out.println("URL: " + toAdd);
 
 		try {
 			BufferedImage i = ImageIO.read(new URL(toAdd));
 
-			//System.out.println("Image size: " + i.getWidth() + ","
-			//		+ i.getHeight());
+			// System.out.println("Image size: " + i.getWidth() + ","
+			// + i.getHeight());
 
 			int x = 180 * i.getWidth() / i.getHeight();
 			int y = 170 * i.getHeight() / i.getWidth();
 
-			//System.out.println("Scaled size: " + x + "," + y);
+			// System.out.println("Scaled size: " + x + "," + y);
 
 			String imageTag = "<b>" + getFrom() + ":  </b><a href=\"" + toAdd
 					+ "\"><img src=\"" + toAdd + "\" width=\"" + x
@@ -483,12 +487,12 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 */
 	private void setColor() {
 		String toAdd = JOptionPane.showInputDialog(
-				"What HEX color would you like your text to be?",
-				color);
+				"What HEX color would you like your text to be?", color);
 		if (toAdd == null)
 			return;
 		System.out.println("Color hex: " + toAdd);
 		color = toAdd;
+		previousColor = toAdd;
 	}
 
 	/**
@@ -635,7 +639,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 			status.setText(getFrom() + " is typing...");
 		else
 			status.setText("");
-		
+
 	}
 
 }

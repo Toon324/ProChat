@@ -48,7 +48,7 @@ public class User {
 	}
 
 	public void setEmail(String toSet) {
-		//System.out.println("Email set to: " + toSet);
+		// System.out.println("Email set to: " + toSet);
 		if (toSet == null)
 			return;
 		email = toSet;
@@ -83,19 +83,33 @@ public class User {
 		try {
 			int id = Integer.valueOf(stat);
 			switch (id) {
-			case 0: status = "Offline"; return;
-			case 1: status = "Online"; return;
-			case 2: status = "Busy"; return;
-			case 3: status = "Away"; return;
-			case 4: status = "Snooze"; return;
-			case 5: status = "Looking to Trade"; return;
-			case 6: status = "Looking to Play"; return;
+			case 0:
+				status = "Offline";
+				return;
+			case 1:
+				status = "Online";
+				return;
+			case 2:
+				status = "Busy";
+				return;
+			case 3:
+				status = "Away";
+				return;
+			case 4:
+				status = "Snooze";
+				return;
+			case 5:
+				status = "Looking to Trade";
+				return;
+			case 6:
+				status = "Looking to Play";
+				return;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getSteamStatus() {
 		return status;
 	}
@@ -113,8 +127,31 @@ public class User {
 	 */
 	public void setGame(String input) {
 		input = removeSteamFormatting(input);
-		
+
 		game = input;
+	}
+
+	/**
+	 * @param u
+	 */
+	public void copySteamDataFrom(User u) {
+		//System.out.println("u: " + u);
+		avatarURL = u.getAvatarURL();
+		game = u.getGame();
+		email = u.getEmail();
+	}
+
+	/**
+	 * @param other
+	 */
+	public void setName(String other) {
+		userName = other;
+
+	}
+
+	public String toString() {
+		return "User: " + userName + " ID: " + email + " avatar: " + avatarURL
+				+ " game: " + game;
 	}
 
 }
