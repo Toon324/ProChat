@@ -1,6 +1,7 @@
 package proc;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -33,6 +34,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import org.jivesoftware.smack.Chat;
@@ -78,6 +81,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	// Object[][] data = new Object[16][2];
 	User[] data = { new User("Jon Carlos", ""), new User("Rob Stark", "") };
 	Roster roster;
+	private String color = "#E02424";
 
 	public Home(User uu, XmppManager xmpp) throws XMPPException {
 
@@ -86,25 +90,18 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		currentChats = new ArrayList<ChatWindow>();
 
-		JFrame.setDefaultLookAndFeelDecorated(true);
+		/*
+		 * try {
+		 * UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+		 * } catch (Exception e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); }
+		 */
+
 		frame = new JFrame();
 		frame.setSize(400, 608);
 		frame.setTitle("ProChat");
-		JPanel masterPanel = new JPanel();
-		// masterPanel.setLayout(new BoxLayout(masterPanel,
-		// BoxLayout.PAGE_AXIS));
 
-		masterPanel.setLayout(new GridLayout(3, 1));
-
-		// JLabel toLabel = new JLabel("Who would you like to chat with?");
 		JLabel direct = new JLabel("Directly contact this person:");
-
-		/*
-		 * DefaultTableModel defTableModel = new DefaultTableModel(data, names);
-		 * contacts = new JTable(defTableModel); //contacts.setShowGrid(false);
-		 * contacts.setIntercellSpacing(new Dimension(0, 0));
-		 * contacts.setAutoCreateRowSorter(true);
-		 */
 
 		contacts = new JList<User>(data);
 		ContactsCellRenderer cellRender = new ContactsCellRenderer();
@@ -129,6 +126,10 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		send.addActionListener(this);
 
 		JPanel sendPanel = new JPanel(new GridLayout(5, 1));
+		//sendPanel.setBackground(Color.red);
+
+		//UIManager.put("MenuItem.background", Color.CYAN);
+		UIManager.put("MenuItem.opaque", true);
 
 		sendPanel.add(direct, BorderLayout.NORTH);
 		sendPanel.add(to);
@@ -192,6 +193,14 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		groupMenu.add(createGroup);
 		createGroup.addActionListener(this);
 
+		/*
+		 * //Options menu JMenu options = new JMenu("Options");
+		 * options.setMnemonic(KeyEvent.VK_O); menuBar.add(options);
+		 * 
+		 * JMenuItem frameColor = new JMenuItem("Window Color");
+		 * options.add(frameColor); frameColor.addActionListener(this);
+		 */
+
 		frame.setJMenuBar(menuBar);
 		// frame.add(masterPanel);
 		frame.add(scrollPane);
@@ -210,7 +219,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				if (packet instanceof Message) {
 
 					Message msg = (Message) packet;
-					//System.out.println("Msg: " + msg);
+					// System.out.println("Msg: " + msg);
 					// Process message
 					recieveMessage(msg);
 				}
@@ -265,7 +274,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				message.setSubject("ID");
 				message.setBody(user.getEmail());
 				message.setType(Message.Type.headline);
-				//System.out.println("Sent id: " + message.getBody());
+				// System.out.println("Sent id: " + message.getBody());
 				connection.getConnection().sendPacket(message);
 				return;
 			} else if (msg.getSubject().equals("ID")) {
@@ -273,7 +282,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				return;
 			}
 		}
-		
+
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
 		String domain = msg.getFrom().substring(msg.getFrom().indexOf("@") + 1,
 				msg.getFrom().indexOf("."));
@@ -332,6 +341,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			linkID();
 		else if (e.getActionCommand().equals("Remove Contact"))
 			removeContact();
+		else if (e.getActionCommand().equals("Window Color"))
+			setColor();
 		else if (e.getActionCommand().equals("Exit Program"))
 			System.exit(0);
 		else if (e.getActionCommand().equals("Sign Out")) {
@@ -339,6 +350,21 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			new LoginWindow();
 			frame.dispose();
 		}
+	}
+
+	private void setColor() {
+		String toAdd = JOptionPane.showInputDialog(
+				"What HEX color would you like your frames to be?", color);
+		if (toAdd == null)
+			return;
+
+		if (!toAdd.contains("#"))
+			toAdd = "#" + toAdd;
+		System.out.println("Color hex: " + toAdd);
+		color = toAdd;
+		System.out.println("Color: " + Color.decode(color));
+		frame.getContentPane().setBackground(Color.decode(color));
+		frame.setForeground(Color.decode(color));
 	}
 
 	/**

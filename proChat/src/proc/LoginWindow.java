@@ -22,8 +22,6 @@ import javax.swing.JTextField;
 
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smackx.provider.VCardProvider;
 
 /**
  * @author Cody
@@ -133,32 +131,74 @@ public class LoginWindow implements ActionListener, KeyListener {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Login")) {
+		if (e.getActionCommand().equals("Login"))
 			login();
-		} else if (e.getActionCommand().equals("Register"))
+		else if (e.getActionCommand().equals("Register"))
 			register();
+		else if (e.getActionCommand().equals("Ok"))
+			submitRegistration();
+		else if (e.getActionCommand().equals("Cancel"))
+			regframe.dispose();
 
 	}
+
+	JFrame regframe;
+	JTextField name;
+	JPasswordField pass;
 
 	/**
 	 * 
 	 */
 	private void register() {
-		int i = JOptionPane.showConfirmDialog(frame,
-				"Are you sure you want to register as " + loginName.getText()
-						+ " with the given password?");
 
-		if (i == JOptionPane.NO_OPTION)
-			return;
+		regframe = new JFrame();
+		regframe.setSize(300, 500);
+		regframe.setTitle("Register");
+		JPanel masterPanel = new JPanel();
 
+		masterPanel.setLayout(new GridLayout(5, 1));
+
+		JLabel userLabel = new JLabel("Username");
+		JLabel passLabel = new JLabel("Password");
+
+		name = new JTextField("");
+		pass = new JPasswordField("");
+
+		name.addKeyListener(this);
+		pass.addKeyListener(this);
+
+		masterPanel.add(userLabel);
+		masterPanel.add(name);
+		masterPanel.add(passLabel);
+		masterPanel.add(pass);
+
+		JButton submit = new JButton("Ok");
+		submit.addActionListener(this);
+
+		JButton register = new JButton("Cancel");
+		register.addActionListener(this);
+
+		JPanel buttons = new JPanel(new GridLayout(0, 2));
+
+		buttons.add(submit);
+		buttons.add(register);
+
+		regframe.add(masterPanel);
+		regframe.add(buttons, BorderLayout.SOUTH);
+		regframe.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
+
+		regframe.setVisible(true);
+
+	}
+
+	private void submitRegistration() {
 		AccountManager am = new AccountManager(connection.getConnection());
 		try {
-			String pass = new String(loginPass.getPassword());
-			System.out.println("Reg: " + loginName.getText() + "  " + pass);
-			am.createAccount(loginName.getText(),
-					pass);
+			String password = new String(pass.getPassword());
+			System.out.println("Reg: " + name.getText() + "  " + password);
+			am.createAccount(name.getText(), password);
 			login();
-			//System.out.println("Registered " + loginName.getText());
+			// System.out.println("Registered " + loginName.getText());
 		} catch (XMPPException e) {
 			e.printStackTrace();
 		}
