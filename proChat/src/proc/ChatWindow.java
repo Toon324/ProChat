@@ -675,10 +675,6 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 	/**
 	 * @param toAdd
-	 * @throws IOException
-	 * @throws MalformedURLException
-	 * @throws BadLocationException
-	 * @throws XMPPException
 	 */
 	private void addImage(String toAdd) {
 		try {

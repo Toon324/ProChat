@@ -73,7 +73,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	String serverName, serverIP;
 	JTextField to;
 	// JTable contacts;
-	JList<User> contacts;
+	JList<User> contacts, activeChats;
 	XmppManager connection;
 	int port;
 	ArrayList<ChatWindow> currentChats;
@@ -126,9 +126,9 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		send.addActionListener(this);
 
 		JPanel sendPanel = new JPanel(new GridLayout(5, 1));
-		//sendPanel.setBackground(Color.red);
+		// sendPanel.setBackground(Color.red);
 
-		//UIManager.put("MenuItem.background", Color.CYAN);
+		// UIManager.put("MenuItem.background", Color.CYAN);
 		UIManager.put("MenuItem.opaque", true);
 
 		sendPanel.add(direct, BorderLayout.NORTH);
@@ -189,10 +189,6 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		groupMenu.add(joinGroup);
 		joinGroup.addActionListener(this);
 
-		JMenuItem createGroup = new JMenuItem("Create Group");
-		groupMenu.add(createGroup);
-		createGroup.addActionListener(this);
-
 		/*
 		 * //Options menu JMenu options = new JMenu("Options");
 		 * options.setMnemonic(KeyEvent.VK_O); menuBar.add(options);
@@ -247,12 +243,18 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		for (RosterEntry contact : roster.getEntries()) {
 			// System.out.println("Found contact: " + contact);
 			String userContact = contact.getUser();
-			if (userContact.indexOf("@") != -1)
-				userContact = userContact
-						.substring(0, userContact.indexOf("@"));
-			User toAdd = new User(userContact, "");
-			toAdd.setPresence(roster.getPresence(contact.getUser()));
-			data[x] = toAdd;
+
+			if (userContact.contains("conference")) {
+
+				data[x] = new User(userContact, "");
+			} else {
+				if (userContact.indexOf("@") != -1)
+					userContact = userContact.substring(0,
+							userContact.indexOf("@"));
+				User toAdd = new User(userContact, "");
+				toAdd.setPresence(roster.getPresence(contact.getUser()));
+				data[x] = toAdd;
+			}
 			x++;
 		}
 		// Reload table
@@ -263,6 +265,53 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			lm.add(y, data[y]);
 
 		contacts.setModel(lm);
+	}
+
+	/**
+	 * @param name
+	 */
+	private void joinGroup(String name) {
+		MultiUserChat mu = new MultiUserChat(connection.getConnection(), name
+				+ "@conference." + serverName);
+		boolean shouldJoin = true;
+		try {
+			mu.create(user.getName());
+
+			Form f = new Form(Form.TYPE_SUBMIT);
+			FormField ff = new FormField("muc#roomconfig_persistentroom");
+			ff.setType(FormField.TYPE_BOOLEAN);
+			ff.addValue("1");
+			ff.setRequired(true);
+			ff.setLabel("Make Room Persistent?");
+			System.out.println(ff.toXML()); // - output values seem good.
+			f.addField(ff);
+
+			mu.sendConfigurationForm(f);
+
+			shouldJoin = false;
+		} catch (Exception e) {
+			System.out.println("Room already exists.");
+		}
+		try {
+
+			DiscussionHistory history = new DiscussionHistory();
+			history.setMaxStanzas(100);
+
+			ChatWindow cw = new ChatWindow(user, mu);
+			cw.show();
+			currentChats.add(cw);
+
+			if (shouldJoin)
+				mu.join(user.userName, "", history,
+						SmackConfiguration.getPacketReplyTimeout());
+
+			connection.getConnection().getRoster()
+					.createEntry(name + "@conference" + serverName, name, null);
+
+		} catch (XMPPException e1) {
+			e1.printStackTrace();
+		}
+
 	}
 
 	private void recieveMessage(Message msg) {
@@ -327,12 +376,26 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Chat"))
-			openChat(to.getText());
-		else if (e.getActionCommand().equals("Add Contact"))
+		if (e.getActionCommand().equals("Chat")) {
+
+			String connectTo = to.getText();
+
+			if (connectTo.equals("")) {
+				if (contacts.getSelectedIndex() == -1)
+					return;
+				connectTo = ((User) contacts.getSelectedValue()).getName();
+				if (connectTo == null)
+					return;
+			}
+			System.out.println("ConnectTO: " + connectTo);
+			if (connectTo.contains("conference")) {
+				String name = connectTo.substring(0, connectTo.indexOf("@"));
+				joinGroup(name);
+
+			} else
+				openChat(connectTo);
+		} else if (e.getActionCommand().equals("Add Contact"))
 			addContact();
-		else if (e.getActionCommand().equals("Create Group"))
-			createGroup();
 		else if (e.getActionCommand().equals("Join Group"))
 			joinGroup();
 		else if (e.getActionCommand().equals("View Profile"))
@@ -398,54 +461,16 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	/**
 	 * 
 	 */
-	private void createGroup() {
-		MultiUserChat mu = new MultiUserChat(connection.getConnection(),
-				"test@conference." + serverName);
-		try {
-			mu.create(user.getName());
-
-			Form f = new Form(Form.TYPE_SUBMIT);
-			FormField ff = new FormField("muc#roomconfig_persistentroom");
-			ff.setType(FormField.TYPE_BOOLEAN);
-			ff.addValue("0");
-			ff.setRequired(true);
-			ff.setLabel("Make Room Persistent?");
-			System.out.println(ff.toXML()); // - output values seem good.
-			f.addField(ff);
-
-			// mu.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
-			mu.sendConfigurationForm(f);
-
-			ChatWindow cw = new ChatWindow(user, mu);
-			cw.show();
-			currentChats.add(cw);
-
-		} catch (XMPPException e1) {
-			e1.printStackTrace();
-		}
-	}
-
-	/**
-	 * 
-	 */
 	private void joinGroup() {
-		MultiUserChat mu = new MultiUserChat(connection.getConnection(),
-				"test@conference." + serverName);
-		try {
+		String toAdd = JOptionPane
+				.showInputDialog(
+						"What group would you like to join? If it doesn't already exist, it will be created.",
+						"");
 
-			DiscussionHistory history = new DiscussionHistory();
-			history.setMaxStanzas(100);
+		if (toAdd == null || toAdd.equals(""))
+			return;
 
-			ChatWindow cw = new ChatWindow(user, mu);
-			cw.show();
-			currentChats.add(cw);
-
-			mu.join(user.userName, "", history,
-					SmackConfiguration.getPacketReplyTimeout());
-
-		} catch (XMPPException e1) {
-			e1.printStackTrace();
-		}
+		joinGroup(toAdd);
 	}
 
 	/**
