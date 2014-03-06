@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -201,7 +202,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		// frame.add(masterPanel);
 		frame.add(scrollPane);
 		frame.add(sendPanel, BorderLayout.SOUTH);
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
+		try {
+			frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("logo.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		serverIP = "129.89.185.120";
@@ -295,7 +300,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		try {
 
 			DiscussionHistory history = new DiscussionHistory();
-			history.setMaxStanzas(100);
+			history.setMaxStanzas(150);
 
 			ChatWindow cw = new ChatWindow(user, mu);
 			cw.show();

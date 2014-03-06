@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -118,7 +119,11 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 		frame.add(masterPanel);
 		frame.add(buttons, BorderLayout.SOUTH);
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
+		try {
+			frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("logo.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		frame.setVisible(true);
 	}

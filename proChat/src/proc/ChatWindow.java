@@ -214,7 +214,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 		frame.setJMenuBar(menuBar);
 		frame.add(scroller);
 		frame.add(holder, BorderLayout.SOUTH);
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
+		try {
+			frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("logo.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		// frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		// frame.addWindowListener(this);
 
@@ -333,7 +337,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		entryPanel.add(entry);
 		entryPanel.add(send, BorderLayout.EAST);
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("logo.png"));
+		try {
+			frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("logo.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		frame.add(scroller);
 		frame.add(entryPanel, BorderLayout.SOUTH);
