@@ -109,27 +109,30 @@ public class ChatWindow implements ActionListener, KeyListener,
 		// chatArea.setBackground(new Color(255, 255, 255, 200));
 
 		final JScrollPane scroller = new JScrollPane(chatArea);
-		//scroller.setAutoscrolls(true);
-		scroller.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+		// scroller.setAutoscrolls(true);
+		scroller.getVerticalScrollBar().addAdjustmentListener(
+				new AdjustmentListener() {
 
-		     BoundedRangeModel brm = scroller.getVerticalScrollBar().getModel();
-		     boolean wasAtBottom = true;
+					BoundedRangeModel brm = scroller.getVerticalScrollBar()
+							.getModel();
+					boolean wasAtBottom = true;
 
-		     public void adjustmentValueChanged(AdjustmentEvent e) {
-		    	 
-		        if (!brm.getValueIsAdjusting()) {
-		        	
-		           if (wasAtBottom) {
-		        	   System.out.println("Was at bottom!");
-		              brm.setValue(brm.getMaximum());
-		           }
-		        } else {
-		           wasAtBottom = ((brm.getValue() + brm.getExtent()) == brm.getMaximum());
-		           System.out.println("Bottom? " + wasAtBottom);
-		        }
+					public void adjustmentValueChanged(AdjustmentEvent e) {
 
-		     }
-		  });
+						if (!brm.getValueIsAdjusting()) {
+
+							if (wasAtBottom) {
+								System.out.println("Was at bottom!");
+								brm.setValue(brm.getMaximum());
+							}
+						} else {
+							wasAtBottom = ((brm.getValue() + brm.getExtent()) == brm
+									.getMaximum());
+							System.out.println("Bottom? " + wasAtBottom);
+						}
+
+					}
+				});
 
 		JButton send = new JButton("Send");
 		send.addActionListener(this);
@@ -203,7 +206,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
 		html.add(setColor);
 		setColor.addActionListener(this);
-		
+
 		JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
 		html.add(setFont);
 		setFont.addActionListener(this);
@@ -256,6 +259,70 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		// chatArea.setBackground(new Color(255, 255, 255, 200));
 
+		// Menu
+		JMenuBar menuBar = new JMenuBar();
+
+		// Build the first menu.
+		JMenu menu = new JMenu("Insert");
+		menuBar.add(menu);
+
+		JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
+		menu.add(addImage);
+		addImage.addActionListener(this);
+
+		JMenu memes = new JMenu("Meme");
+		menu.add(memes);
+
+		JMenuItem gay = new JMenuItem("Ultra Gay");
+		memes.add(gay);
+		gay.addActionListener(this);
+
+		JMenuItem noRead = new JMenuItem("Didn't Read");
+		memes.add(noRead);
+		noRead.addActionListener(this);
+
+		JMenuItem troll = new JMenuItem("Troll");
+		memes.add(troll);
+		troll.addActionListener(this);
+
+		JMenuItem desk = new JMenuItem("Desk Flip");
+		memes.add(desk);
+		desk.addActionListener(this);
+
+		JMenuItem no = new JMenuItem("NO.");
+		memes.add(no);
+		no.addActionListener(this);
+
+		JMenuItem lol = new JMenuItem("lol");
+		memes.add(lol);
+		lol.addActionListener(this);
+
+		JMenuItem suprised = new JMenuItem("Suprised");
+		memes.add(suprised);
+		suprised.addActionListener(this);
+
+		JMenuItem facepalm = new JMenuItem("Facepalm");
+		memes.add(facepalm);
+		facepalm.addActionListener(this);
+
+		JMenuItem gusta = new JMenuItem("Me Gusta");
+		memes.add(gusta);
+		gusta.addActionListener(this);
+
+		// HTML menu
+		JMenu html = new JMenu("HTML");
+		menuBar.add(html);
+
+		JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
+		html.add(setColor);
+		setColor.addActionListener(this);
+
+		JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
+		html.add(setFont);
+		setFont.addActionListener(this);
+
+		frame.setJMenuBar(menuBar);
+
 		JScrollPane scroller = new JScrollPane(chatArea);
 		scroller.setAutoscrolls(true);
 
@@ -301,15 +368,16 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		if (muc == null) // In muc chats, user messages are fed back to them, so
 							// we don't need to add them ourselves.
-			addToChatArea("<b>" + user.getName() + "</b>: " + "<font face=\"" + font + "\" color=\""
-					+ color + "\">" + entry.getText() + "</font>", null);
+			addToChatArea("<b>" + user.getName() + "</b>: " + "<font face=\""
+					+ font + "\" color=\"" + color + "\">" + entry.getText()
+					+ "</font>", null);
 
 		if (chat != null)
-			chat.sendMessage("<font face=\"" + font + "\" color=\"" + color + "\">" + entry.getText()
-					+ "</font>");
+			chat.sendMessage("<font face=\"" + font + "\" color=\"" + color
+					+ "\">" + entry.getText() + "</font>");
 		else if (muc != null)
-			muc.sendMessage("<font face=\"" + font + "\" color=\"" + color + "\">" + entry.getText()
-					+ "</font>");
+			muc.sendMessage("<font face=\"" + font + "\" color=\"" + color
+					+ "\">" + entry.getText() + "</font>");
 
 		entry.setText("");
 	}
@@ -326,7 +394,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		int minute = c.get(Calendar.MINUTE);
 
 		String minuteText = "" + minute;
-		
+
 		if (hour == 0)
 			hour = 12;
 
@@ -359,13 +427,13 @@ public class ChatWindow implements ActionListener, KeyListener,
 				InputStream buffedStream = new BufferedInputStream(inputStream);
 				clip.open(AudioSystem.getAudioInputStream(buffedStream));
 				clip.start();
-				
-				frame.toFront(); //Flash icon
+
+				frame.toFront(); // Flash icon
 			} catch (Exception e) {
 				Toolkit.getDefaultToolkit().beep();
 				e.printStackTrace();
 			}
-		}	
+		}
 	}
 
 	/**
@@ -567,15 +635,12 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * 
 	 */
 	private void setFont() {
-		Object[] possibilities = {"Arial", "Courier", "Times New Roman", "Verdana"};
-		String s = (String)JOptionPane.showInputDialog(
-		                    frame,
-		                    "What font would you like to use?",
-		                    "Font Choice",
-		                    JOptionPane.PLAIN_MESSAGE,
-		                    null, possibilities,
-		                    font);
-		
+		Object[] possibilities = { "Arial", "Courier", "Times New Roman",
+				"Verdana" };
+		String s = (String) JOptionPane.showInputDialog(frame,
+				"What font would you like to use?", "Font Choice",
+				JOptionPane.PLAIN_MESSAGE, null, possibilities, font);
+
 		System.out.println("Chosen font: " + s);
 		if (s != null && !s.equals(""))
 			font = s;
@@ -631,8 +696,9 @@ public class ChatWindow implements ActionListener, KeyListener,
 					+ toAdd + "\"><img src=\"" + toAdd + "\" width=\"" + x
 					+ "\" height=\"" + y + "\"></a>";
 
-			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-					.getDocument().getLength(), imageTag, 0, 0, null);
+			if (muc == null) // Prevent group chat feedback
+				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+						.getDocument().getLength(), imageTag, 0, 0, null);
 
 			if (chat != null)
 				chat.sendMessage("{img}" + toAdd);
@@ -645,7 +711,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		}
 
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -662,15 +728,12 @@ public class ChatWindow implements ActionListener, KeyListener,
 		 * chatArea.getDocument() .getLength() - 50)
 		 * chatArea.setCaretPosition(chatArea.getDocument().getLength());
 		 */
-		
+
 		/*
-		if (!brm.getValueIsAdjusting()) {
-			if (wasAtBottom)
-				brm.setValue(brm.getMaximum());
-		} else
-			wasAtBottom = ((brm.getValue() + brm.getExtent()) == brm
-					.getMaximum());
-		*/
+		 * if (!brm.getValueIsAdjusting()) { if (wasAtBottom)
+		 * brm.setValue(brm.getMaximum()); } else wasAtBottom = ((brm.getValue()
+		 * + brm.getExtent()) == brm .getMaximum());
+		 */
 	}
 
 	@Override
