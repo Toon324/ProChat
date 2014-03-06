@@ -210,7 +210,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				if (packet instanceof Message) {
 
 					Message msg = (Message) packet;
-					System.out.println("Msg: " + msg);
+					//System.out.println("Msg: " + msg);
 					// Process message
 					recieveMessage(msg);
 				}
@@ -258,20 +258,22 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 	private void recieveMessage(Message msg) {
 
-		if (msg.getSubject().equals("ID request")) {
-			Message message = new Message();
-			message.setTo(msg.getFrom());
-			message.setSubject("ID");
-			message.setBody(user.getEmail());
-			message.setType(Message.Type.headline);
-			System.out.println("Sent id: " + message.getBody());
-			connection.getConnection().sendPacket(message);
-			return;
-		} else if (msg.getSubject().equals("ID")) {
-			viewOtherProfile(msg.getBody());
-			return;
+		if (msg.getSubject() != null) {
+			if (msg.getSubject().equals("ID request")) {
+				Message message = new Message();
+				message.setTo(msg.getFrom());
+				message.setSubject("ID");
+				message.setBody(user.getEmail());
+				message.setType(Message.Type.headline);
+				//System.out.println("Sent id: " + message.getBody());
+				connection.getConnection().sendPacket(message);
+				return;
+			} else if (msg.getSubject().equals("ID")) {
+				viewOtherProfile(msg.getBody());
+				return;
+			}
 		}
-
+		
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
 		String domain = msg.getFrom().substring(msg.getFrom().indexOf("@") + 1,
 				msg.getFrom().indexOf("."));
@@ -657,7 +659,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	private User readSteamInfo(String steamid) {
 		User u = new User("", "");
 		u.setEmail(steamid);
-		//System.out.println("Loading info for steamID: " + steamid);
+		// System.out.println("Loading info for steamID: " + steamid);
 		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids="
 				+ steamid;
 		try {
@@ -682,8 +684,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				else if (found.equals("\"gameextrainfo\":"))
 					u.setGame(scan.next());
 
-				//if (!found.equals(""))
-					//System.out.println("Read: " + found);
+				// if (!found.equals(""))
+				// System.out.println("Read: " + found);
 
 			}
 			scan.close();
@@ -724,7 +726,6 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	private void viewOtherProfile(String id) {
 		String other = ((User) contacts.getSelectedValue()).getName();
 
-		
 		System.out.println("id recieved: " + id);
 		User u = readSteamInfo(id);
 		u.setName(other);
