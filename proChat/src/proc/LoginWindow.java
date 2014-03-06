@@ -157,6 +157,7 @@ public class LoginWindow implements ActionListener, KeyListener {
 			System.out.println("Reg: " + loginName.getText() + "  " + pass);
 			am.createAccount(loginName.getText(),
 					pass);
+			login();
 			//System.out.println("Registered " + loginName.getText());
 		} catch (XMPPException e) {
 			e.printStackTrace();
