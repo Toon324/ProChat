@@ -14,7 +14,6 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Calendar;
@@ -39,7 +38,6 @@ import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -77,7 +75,6 @@ public class ChatWindow implements ActionListener, KeyListener,
 		chat = c;
 		user = u;
 
-		JFrame.setDefaultLookAndFeelDecorated(true);
 		frame = new JFrame();
 		frame.setSize(400, 600);
 		frame.setTitle("ProChat: Chatting with " + c.getParticipant());
@@ -89,17 +86,6 @@ public class ChatWindow implements ActionListener, KeyListener,
 		kit = new HTMLEditorKit();
 		chatArea.setEditorKit(kit);
 		chatArea.addHyperlinkListener(this);
-
-		/*
-		 * StyleSheet styleSheet = kit.getStyleSheet(); styleSheet.addRule("." +
-		 * MESSAGE + " {font: 10px monaco; color: black; }"); styleSheet
-		 * .addRule("." + ERROR +
-		 * " {font: 10px monaco; color: #ff2222; background-color : #cccccc; }"
-		 * );
-		 * 
-		 * Document doc = kit.createDefaultDocument();
-		 * chatArea.setDocument(doc);
-		 */
 
 		chatArea.addKeyListener(this);
 		entry.addKeyListener(this);
