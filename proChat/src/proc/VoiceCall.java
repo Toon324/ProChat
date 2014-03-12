@@ -5,9 +5,9 @@ package proc;
 
 public class VoiceCall {
 	
-	public VoiceCall() {
+	public VoiceCall(String ip) {
 		
-		AudioCapture ac = new AudioCapture();
+		AudioCapture ac = new AudioCapture(ip);
 		
 		
 		RecieveAudio ra = new RecieveAudio();

@@ -30,12 +30,10 @@ public class AudioCapture extends JFrame {
 	TargetDataLine targetDataLine;
 	AudioInputStream audioInputStream;
 	SourceDataLine sourceDataLine;
-
-	public static void main(String args[]) {
-		new AudioCapture();
-	}// end main
-
-	public AudioCapture() {// constructor
+	String IP = "";
+	
+	public AudioCapture(String ip) {// constructor
+		IP = ip;
 		final JButton captureBtn = new JButton("Capture");
 		final JButton stopBtn = new JButton("Stop");
 		final JButton playBtn = new JButton("Playback");
@@ -112,9 +110,9 @@ public class AudioCapture extends JFrame {
 			Socket socket = null;
 
 			try {
-				// socket = new Socket("129.89.185.120", 20);
+				socket = new Socket(IP, 20);
 				Log.l("Created");
-				socket = new Socket("127.0.0.1", 20);
+				//socket = new Socket("127.0.0.1", 20);
 				Log.l("Socket created");
 			} catch (Exception e) {
 				e.printStackTrace();

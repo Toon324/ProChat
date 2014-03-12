@@ -348,7 +348,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
+				return;
+			}
+			else if (msg.getSubject().equals("IP")) {
+				new VoiceCall(msg.getBody());
+				return;
 			}
 		}
 
@@ -623,6 +627,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		}
 		try {
 			// System.out.println("Creating connection to " + connectTo);
+			
 			Chat c = connection.getChatManager().createChat(
 					connectTo + "@" + serverName, null);
 			ChatWindow chat = new ChatWindow(user, c);
@@ -644,7 +649,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				chat.addToChatArea("Could not find a reference to " + connectTo
 						+ " on the server.", null);
 			}
-
+			requestIP();
 			chat.show();
 			to.setText("");
 			return chat;
