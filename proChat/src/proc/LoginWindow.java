@@ -259,6 +259,30 @@ public class LoginWindow implements ActionListener, KeyListener {
 		} catch (Exception e1) {
 			JOptionPane.showMessageDialog(frame, "Could not login as "
 					+ loginName.getText() + "\nError: " + e1.getMessage());
+			
+			if (e1.getMessage().contains("savedInfo.txt")) {
+				//Still login if we can't store info
+				try {
+				User user = new User(loginName.getText(), new String(
+						loginPass.getPassword()));
+
+				connection.getConnection().login(user.getName(), user.getPass());
+
+				user.setEmail(connection.getConnection().getAccountManager()
+						.getAccountAttribute("email"));
+
+				Home home = new Home(user, connection);
+				home.show();
+				JOptionPane.showMessageDialog(frame, "Successfully logged in as "
+						+ loginName.getText());
+				frame.dispose();
+				}
+				catch (Exception e) {
+					JOptionPane.showMessageDialog(frame, "Could not login as "
+							+ loginName.getText() + "\nError: " + e1.getMessage());
+					e.printStackTrace();
+				}
+			}
 
 			e1.printStackTrace();
 		}

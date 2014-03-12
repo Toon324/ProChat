@@ -3,7 +3,6 @@ package proc;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -12,8 +11,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Inet4Address;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import org.jivesoftware.smack.Chat;
@@ -203,7 +203,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		frame.add(scrollPane);
 		frame.add(sendPanel, BorderLayout.SOUTH);
 		try {
-			frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("logo.png")));
+			frame.setIconImage(ImageIO.read(this.getClass()
+					.getResourceAsStream("logo.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -334,6 +335,20 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			} else if (msg.getSubject().equals("ID")) {
 				viewOtherProfile(msg.getBody());
 				return;
+			} else if (msg.getSubject().equals("IP request")) {
+				try {
+					Message message = new Message();
+					message.setTo(msg.getFrom());
+					message.setSubject("IP");
+					message.setBody(Inet4Address.getLocalHost()
+							.getHostAddress());
+					message.setType(Message.Type.headline);
+					// System.out.println("Sent ip: " + message.getBody());
+					connection.getConnection().sendPacket(message);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 			}
 		}
 
@@ -777,6 +792,17 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		message.setType(Message.Type.headline);
 		connection.getConnection().sendPacket(message);
 
+	}
+
+	private void requestIP() {
+		String other = ((User) contacts.getSelectedValue()).getName();
+
+		Message message = new Message();
+		message.setTo(other + "@" + serverName);
+		System.out.println("Requesting IP from " + message.getTo());
+		message.setSubject("IP request");
+		message.setType(Message.Type.headline);
+		connection.getConnection().sendPacket(message);
 	}
 
 	private void viewOtherProfile(String id) {
