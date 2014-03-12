@@ -1,12 +1,26 @@
 package proc;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
+import java.text.Format;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.TargetDataLine;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+import org.xiph.speex.SpeexEncoder;
 
 public class AudioCapture extends JFrame {
 
@@ -74,6 +88,7 @@ public class AudioCapture extends JFrame {
 		setTitle("Capture/Playback Demo");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(250, 130);
+		setLocation(400, 400);
 		setVisible(true);
 	}// end constructor
 
@@ -93,8 +108,8 @@ public class AudioCapture extends JFrame {
 
 			int bufferSize = (int) audioFormat.getSampleRate()
 					* audioFormat.getFrameSize();
-			byte buffer[] = new byte[bufferSize];
-			Socket socket;
+			final byte buffer[] = new byte[bufferSize];
+			Socket socket = null;
 
 			try {
 				// socket = new Socket("129.89.185.120", 20);
@@ -103,38 +118,47 @@ public class AudioCapture extends JFrame {
 				Log.l("Socket created");
 			} catch (Exception e) {
 				e.printStackTrace();
-				socket = new Socket();
 			}
 
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			BufferedOutputStream objectOutputStream = new BufferedOutputStream(
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			final BufferedOutputStream objectOutputStream = new BufferedOutputStream(
 					socket.getOutputStream());
-			Boolean running = true;
-			try {
-				while (running) {
-					int count = targetDataLine.read(buffer, 0, buffer.length);
-					if (count > 0) {
-						objectOutputStream.write(buffer, 0, count);
-						out.write(buffer, 0, count);
-						//Log.l("Wrote: " + buffer[0] + "," + buffer[1] + "," + buffer[2]);
-						InputStream input = new ByteArrayInputStream(buffer);
-						final AudioInputStream ais = new AudioInputStream(
-								input, audioFormat, buffer.length
-										/ audioFormat.getFrameSize());
+			
+			Runnable runner = new Runnable() {
 
+				public void run() {
+					try {
+						Boolean running = true;
+						while (running) {
+							int count = targetDataLine.read(buffer, 0, buffer.length);
+							if (count > 0) {
+								SpeexEncoder encoder = new SpeexEncoder();
+								encoder.init(0, audioFormat.getSampleSizeInBits(), audioFormat.getSampleSizeInBits(), audioFormat.getChannels());
+								objectOutputStream.write(buffer, 0, count);
+								out.write(buffer, 0, count);
+								//Log.l("Wrote: " + buffer[0] + "," + buffer[1] + "," + buffer[2]);
+								InputStream input = new ByteArrayInputStream(buffer);
+								final AudioInputStream ais = new AudioInputStream(
+										input, audioFormat, buffer.length
+												/ audioFormat.getFrameSize());
+
+							}
+						}
+						out.close();
+						
+						objectOutputStream.close();
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 				}
-				out.close();
-				socket.close();
-				objectOutputStream.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+				
+			};
+			
 			// Create a thread to capture the
 			// microphone data and start it
 			// running. It will run until
 			// the Stop button is clicked.
-			Thread captureThread = new Thread(new CaptureThread());
+			Thread captureThread = new Thread(runner);
 			captureThread.start();
 		} catch (Exception e) {
 			System.out.println(e);

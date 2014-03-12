@@ -336,6 +336,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	public void show() {
 		frame.setVisible(true);
 		entry.requestFocusInWindow();
+		new VoiceCall();
 	}
 
 	private void sendMessage() throws XMPPException {

@@ -40,10 +40,10 @@ public class RecieveAudio {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		frame.setSize(400, 400);
+		frame.setLocation(600,600);
 		frame.setVisible(true);
 
 		try {
-			Log.l("Entered");
 			server = new ServerSocket(20);
 			Log.l("Server created");
 			text.append("Server created. Hosting at " + server.getLocalSocketAddress());
@@ -53,11 +53,11 @@ public class RecieveAudio {
 		}
 	}
 
-	private void playAudio() {
+	public void playAudio() {
 		// try{
 
-		Log.l("Listening for audio.");
-		text.append("Listening...");
+		//Log.l("Listening for audio.");
+		text.append("\nListening...");
 		Runnable runner = new Runnable() {
 
 			public void run() {
@@ -65,7 +65,7 @@ public class RecieveAudio {
 					try {
 						socket = server.accept();
 						text.append("connection accepted");
-						Log.l("Socket created");
+						//Log.l("Socket created");
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -80,7 +80,6 @@ public class RecieveAudio {
 					}
 				} catch (IOException e) {
 					System.err.println("I/O problems:" + e);
-					System.exit(-3);
 				}
 			}
 
