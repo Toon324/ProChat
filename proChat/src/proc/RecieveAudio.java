@@ -83,7 +83,6 @@ public class RecieveAudio {
 					
 					while (true) {
 						count = in.read(buffer, 0, buffer.length);
-						Log.l("Count: " + count);
 						if (count == -1 ) {
 							text.append("\nEnd of stream detected.");
 							break;

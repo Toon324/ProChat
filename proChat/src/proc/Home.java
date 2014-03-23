@@ -343,7 +343,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					message.setBody(Inet4Address.getLocalHost()
 							.getHostAddress());
 					message.setType(Message.Type.headline);
-					// System.out.println("Sent ip: " + message.getBody());
+					System.out.println("Sent ip: " + message.getBody());
 					connection.getConnection().sendPacket(message);
 				} catch (Exception e) {
 					e.printStackTrace();
