@@ -15,6 +15,9 @@ import javax.sound.sampled.SourceDataLine;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
+import org.xiph.speex.SpeexDecoder;
+import org.xiph.speex.spi.SpeexEncoding;
+
 /**
  * @author Cody
  * 
@@ -71,13 +74,24 @@ public class RecieveAudio {
 					}
 					InputStream in = socket.getInputStream();
 					Thread playTread = new Thread();
+					
+					
+					text.append("\n"+in.available() + "     ");
 
 					int count;
-					byte[] buffer = new byte[100000];
-					while ((count = in.read(buffer, 0, buffer.length)) != -1) {
-						//Log.l("Sound found");
+					byte[] buffer = new byte[640];
+					
+					while (true) {
+						count = in.read(buffer, 0, buffer.length);
+						Log.l("Count: " + count);
+						if (count == -1 ) {
+							text.append("\nEnd of stream detected.");
+							break;
+						}
+						//text.append("\n" + buffer[0] + "  " + buffer[1] + "   " + buffer[2]);
 						PlaySentSound(buffer, playTread);
 					}
+					
 				} catch (IOException e) {
 					System.err.println("I/O problems:" + e);
 				}
@@ -102,8 +116,18 @@ public class RecieveAudio {
 
 				public void run() {
 					try {
+						SpeexDecoder decoder = new SpeexDecoder();
+						decoder.init(1, 16000, 1, false);
+						//Log.l("Decoder info: " + decoder + " buff: " + buffer);
+						decoder.processData(buffer, 0, buffer.length);
+						
+						byte[] decoded = new byte[decoder.getProcessedDataByteSize()];
+						
+						decoder.getProcessedData(decoded, 0);
 
-						InputStream input = new ByteArrayInputStream(buffer);
+						text.append("\nrecieved: " + decoded[0] + "   " + decoded[1] + "   " + decoded[2]);
+						
+						InputStream input = new ByteArrayInputStream(decoded);
 						final AudioFormat format = getAudioFormat();
 						final AudioInputStream ais = new AudioInputStream(
 								input, format, buffer.length
@@ -114,7 +138,7 @@ public class RecieveAudio {
 								.getLine(info);
 						sline.open(format);
 						sline.start();
-						Float audioLen = (buffer.length / format.getFrameSize())
+						Float audioLen = (decoded.length / format.getFrameSize())
 								* format.getFrameRate();
 
 						int bufferSize = (int) format.getSampleRate()
@@ -122,7 +146,6 @@ public class RecieveAudio {
 						byte buffer2[] = new byte[bufferSize];
 						int count2;
 						
-						text.append("\nrecieved: " + buffer2[0]);
 						ais.read(buffer2, 0, buffer2.length);
 						sline.write(buffer2, 0, buffer2.length);
 						sline.flush();

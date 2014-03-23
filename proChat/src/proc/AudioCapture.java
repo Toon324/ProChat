@@ -19,8 +19,11 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import org.xiph.speex.SpeexEncoder;
+import org.xiph.speex.spi.SpeexEncoding;
 
 public class AudioCapture extends JFrame {
 
@@ -31,69 +34,33 @@ public class AudioCapture extends JFrame {
 	AudioInputStream audioInputStream;
 	SourceDataLine sourceDataLine;
 	String IP = "";
+	JTextArea text;
+	JFrame frame;
 	
 	public AudioCapture(String ip) {// constructor
 		IP = ip;
-		final JButton captureBtn = new JButton("Capture");
-		final JButton stopBtn = new JButton("Stop");
-		final JButton playBtn = new JButton("Playback");
+		frame = new JFrame();
+		text = new JTextArea();
+		
+		JScrollPane scroller = new JScrollPane(text);
+		scroller.setAutoscrolls(true);
 
-		captureBtn.setEnabled(true);
-		stopBtn.setEnabled(false);
-		playBtn.setEnabled(false);
+		frame.add(scroller);
 
-		// Register anonymous listeners
-		captureBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				captureBtn.setEnabled(false);
-				stopBtn.setEnabled(true);
-				playBtn.setEnabled(false);
-				// Capture input data from the
-				// microphone until the Stop
-				// button is clicked.
-				captureAudio();
-			}// end actionPerformed
-		}// end ActionListener
-				);// end addActionListener()
-		getContentPane().add(captureBtn);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		stopBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				captureBtn.setEnabled(true);
-				stopBtn.setEnabled(false);
-				playBtn.setEnabled(true);
-				// Terminate the capturing of
-				// input data from the
-				// microphone.
-				stopCapture = true;
-			}// end actionPerformed
-		}// end ActionListener
-		);// end addActionListener()
-		getContentPane().add(stopBtn);
-
-		playBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// Play back all of the data
-				// that was saved during
-				// capture.
-				playAudio();
-			}// end actionPerformed
-		}// end ActionListener
-		);// end addActionListener()
-		getContentPane().add(playBtn);
-
-		getContentPane().setLayout(new FlowLayout());
-		setTitle("Capture/Playback Demo");
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(250, 130);
-		setLocation(400, 400);
-		setVisible(true);
+		frame.setSize(400, 400);
+		frame.setLocation(300,300);
+		frame.setVisible(true);
+		frame.setTitle("Input info");
+		frame.requestFocus();
+		
 	}// end constructor
 
 	// This method captures audio input
 	// from a microphone and saves it in
 	// a ByteArrayOutputStream object.
-	private void captureAudio() {
+	public void captureAudio() {
 		try {
 			// Get everything set up for
 			// capture
@@ -104,9 +71,15 @@ public class AudioCapture extends JFrame {
 			targetDataLine.open(audioFormat);
 			targetDataLine.start();
 
+			
+			frame.requestFocus();
+			
+			/*
 			int bufferSize = (int) audioFormat.getSampleRate()
 					* audioFormat.getFrameSize();
 			final byte buffer[] = new byte[bufferSize];
+			*/
+			final byte[] buffer = new byte[640];
 			Socket socket = null;
 
 			try {
@@ -131,14 +104,26 @@ public class AudioCapture extends JFrame {
 							int count = targetDataLine.read(buffer, 0, buffer.length);
 							if (count > 0) {
 								SpeexEncoder encoder = new SpeexEncoder();
-								encoder.init(0, audioFormat.getSampleSizeInBits(), audioFormat.getSampleSizeInBits(), audioFormat.getChannels());
-								objectOutputStream.write(buffer, 0, count);
-								out.write(buffer, 0, count);
+								encoder.init(1, SpeexEncoding.DEFAULT_QUALITY, 16000, 1);
+				
+								encoder.processData(buffer, 0, buffer.length);
+								byte[] encoded = new byte[encoder.getProcessedDataByteSize()];
+								encoder.getProcessedData(encoded, 0);
+								
+								text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3] );
+								
+								//objectOutputStream.write(buffer, 0, count);
+								//out.write(buffer, 0, count);
+								objectOutputStream.write(encoded, 0, encoded.length);
+								out.write(encoded,0,encoded.length);
 								//Log.l("Wrote: " + buffer[0] + "," + buffer[1] + "," + buffer[2]);
+								/*
 								InputStream input = new ByteArrayInputStream(buffer);
 								final AudioInputStream ais = new AudioInputStream(
 										input, audioFormat, buffer.length
 												/ audioFormat.getFrameSize());
+												 * 
+												 */
 
 							}
 						}
@@ -231,7 +216,7 @@ public class AudioCapture extends JFrame {
 	class CaptureThread extends Thread {
 		// An arbitrary-size temporary holding
 		// buffer
-		byte tempBuffer[] = new byte[10000];
+		byte tempBuffer[] = new byte[640];
 
 		public void run() {
 			byteArrayOutputStream = new ByteArrayOutputStream();
@@ -263,7 +248,7 @@ public class AudioCapture extends JFrame {
 	// that was saved.
 
 	class PlayThread extends Thread {
-		byte tempBuffer[] = new byte[10000];
+		byte tempBuffer[] = new byte[640];
 
 		public void run() {
 			try {
