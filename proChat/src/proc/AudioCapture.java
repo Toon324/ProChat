@@ -1,5 +1,6 @@
 package proc;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +26,7 @@ import javax.swing.JTextArea;
 import org.xiph.speex.SpeexEncoder;
 import org.xiph.speex.spi.SpeexEncoding;
 
-public class AudioCapture extends JFrame {
+public class AudioCapture extends JFrame implements ActionListener {
 
 	boolean stopCapture = false;
 	ByteArrayOutputStream byteArrayOutputStream;
@@ -44,8 +45,12 @@ public class AudioCapture extends JFrame {
 		
 		JScrollPane scroller = new JScrollPane(text);
 		scroller.setAutoscrolls(true);
+		
+		JButton start = new JButton("Start");
+		start.addActionListener(this);
 
 		frame.add(scroller);
+		frame.add(start,BorderLayout.SOUTH);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -278,5 +283,15 @@ public class AudioCapture extends JFrame {
 		}// end run
 	}// end inner class PlayThread
 		// ===================================//
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getActionCommand().equals("Start"))
+			captureAudio();
+		
+	}
 
 }// end outer class AudioCapture01.java

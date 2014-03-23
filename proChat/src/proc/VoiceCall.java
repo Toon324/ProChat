@@ -14,7 +14,7 @@ public class VoiceCall {
 		RecieveAudio ra = new RecieveAudio();
 		ra.playAudio(); //Listen for audio
 		
-		ac.captureAudio(); //Capture
+		//ac.captureAudio(); //Capture
 		
 	}
 	
