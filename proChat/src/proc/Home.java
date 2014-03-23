@@ -345,12 +345,12 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					message.setType(Message.Type.headline);
 					System.out.println("Sent ip: " + message.getBody());
 					connection.getConnection().sendPacket(message);
+					new VoiceCall(msg.getBody());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				return;
-			}
-			else if (msg.getSubject().equals("IP")) {
+			} else if (msg.getSubject().equals("IP")) {
 				new VoiceCall(msg.getBody());
 				return;
 			}
@@ -627,7 +627,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		}
 		try {
 			// System.out.println("Creating connection to " + connectTo);
-			
+
 			Chat c = connection.getChatManager().createChat(
 					connectTo + "@" + serverName, null);
 			ChatWindow chat = new ChatWindow(user, c);
@@ -802,12 +802,17 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	private void requestIP() {
 		String other = ((User) contacts.getSelectedValue()).getName();
 
-		Message message = new Message();
-		message.setTo(other + "@" + serverName);
-		System.out.println("Requesting IP from " + message.getTo());
-		message.setSubject("IP request");
-		message.setType(Message.Type.headline);
-		connection.getConnection().sendPacket(message);
+		try {
+			Message message = new Message();
+			message.setTo(other + "@" + serverName);
+			System.out.println("Requesting IP from " + message.getTo());
+			message.setSubject("IP request");
+			message.setBody(Inet4Address.getLocalHost().getHostAddress());
+			message.setType(Message.Type.headline);
+			connection.getConnection().sendPacket(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void viewOtherProfile(String id) {
