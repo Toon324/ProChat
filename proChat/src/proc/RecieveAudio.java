@@ -1,10 +1,14 @@
 package proc;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -16,7 +20,6 @@ import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
 import org.xiph.speex.SpeexDecoder;
-import org.xiph.speex.spi.SpeexEncoding;
 
 /**
  * @author Cody
@@ -49,7 +52,9 @@ public class RecieveAudio {
 		try {
 			server = new ServerSocket(20);
 			Log.l("Server created");
-			text.append("Server created. Hosting at " + server.getLocalSocketAddress());
+			text.append("Server created. Hosting at " + Home.getIP());
+			
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();

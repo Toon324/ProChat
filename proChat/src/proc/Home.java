@@ -9,12 +9,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.Inet4Address;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -83,6 +84,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	User[] data = { new User("Jon Carlos", ""), new User("Rob Stark", "") };
 	Roster roster;
 	private String color = "#E02424";
+	private static String IP;
 
 	public Home(User uu, XmppManager xmpp) throws XMPPException {
 
@@ -189,6 +191,18 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		JMenuItem joinGroup = new JMenuItem("Join Group");
 		groupMenu.add(joinGroup);
 		joinGroup.addActionListener(this);
+
+		try {
+			URL whatismyip = new URL("http://checkip.amazonaws.com");
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					whatismyip.openStream()));
+
+			String ip = in.readLine(); // you get the IP as a String
+			System.out.println("Found external IP of " + ip);
+			IP = ip;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		/*
 		 * //Options menu JMenu options = new JMenu("Options");
@@ -340,12 +354,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					Message message = new Message();
 					message.setTo(msg.getFrom());
 					message.setSubject("IP");
-					message.setBody(Inet4Address.getLocalHost()
-							.getHostAddress());
+					message.setBody(IP);
 					message.setType(Message.Type.headline);
 					System.out.println("Sent ip: " + message.getBody());
 					connection.getConnection().sendPacket(message);
-					//new VoiceCall(msg.getBody());
+					// new VoiceCall(msg.getBody());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -868,6 +881,10 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public static String getIP() {
+		return IP;
 	}
 
 }
