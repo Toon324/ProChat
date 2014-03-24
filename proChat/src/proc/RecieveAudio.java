@@ -118,7 +118,7 @@ public class RecieveAudio {
 
 				public void run() {
 					try {
-						
+						/*
 						SpeexDecoder decoder = new SpeexDecoder();
 						decoder.init(1, 16000, 1, false);
 						decoder.processData(buffer, 0, buffer.length);
@@ -130,11 +130,11 @@ public class RecieveAudio {
 						text.setText(decoded[0] + "   " + decoded[1] + "   " + decoded[2] + "   " + decoded[3]);
 						
 						InputStream input = new ByteArrayInputStream(decoded);
-						
-						//InputStream input = new ByteArrayInputStream(buffer);
+						*/
+						InputStream input = new ByteArrayInputStream(buffer);
 						final AudioFormat format = getAudioFormat();
 						final AudioInputStream ais = new AudioInputStream(
-								input, format, decoded.length
+								input, format, buffer.length
 										/ format.getFrameSize());
 						DataLine.Info info = new DataLine.Info(
 								SourceDataLine.class, format);
