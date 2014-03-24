@@ -114,6 +114,7 @@ public class AudioCapture extends JFrame implements ActionListener {
 								 * byte[encoder.getProcessedDataByteSize()];
 								 * encoder.getProcessedData(encoded, 0);
 								 */
+								/*
 								byte[] buffer2 = new byte[5];
 								ShortBuffer intBuf = ByteBuffer.wrap(buffer)
 										.order(ByteOrder.LITTLE_ENDIAN)
@@ -125,17 +126,20 @@ public class AudioCapture extends JFrame implements ActionListener {
 								for (int i = 0; i < samples16Bit.length; i++) {
 									buffer2[i] = (byte) ((samples16Bit[i] / 256) + 128);
 								}
+								*/
 
 								text.setText(buffer.length + "   " + buffer[0]
 										+ "   " + buffer[1] + "   " + buffer[2]
 										+ "   " + buffer[3]);
+								/*
 								text.append("\n" + buffer2.length + "   "
 										+ buffer2[0] + "   " + buffer2[1]
 										+ "   " + buffer2[2] + "   "
 										+ buffer2[3]);
+										*/
 
-								objectOutputStream.write(buffer2, 0,
-										buffer2.length);
+								objectOutputStream.write(buffer, 0,
+										buffer.length);
 								/*
 								 * objectOutputStream.write(encoded, 0,
 								 * encoded.length); //Log.l("Wrote: " +
