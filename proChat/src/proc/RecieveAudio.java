@@ -118,7 +118,7 @@ public class RecieveAudio {
 
 				public void run() {
 					try {
-						/*
+						
 						SpeexDecoder decoder = new SpeexDecoder();
 						decoder.init(1, 16000, 1, false);
 						decoder.processData(buffer, 0, buffer.length);
@@ -127,14 +127,14 @@ public class RecieveAudio {
 						
 						decoder.getProcessedData(decoded, 0);
 
-						text.append("\nrecieved: " + decoded[0] + "   " + decoded[1] + "   " + decoded[2]);
+						text.setText(decoded[0] + "   " + decoded[1] + "   " + decoded[2] + "   " + decoded[3]);
 						
 						InputStream input = new ByteArrayInputStream(decoded);
-						*/
-						InputStream input = new ByteArrayInputStream(buffer);
+						
+						//InputStream input = new ByteArrayInputStream(buffer);
 						final AudioFormat format = getAudioFormat();
 						final AudioInputStream ais = new AudioInputStream(
-								input, format, buffer.length
+								input, format, decoded.length
 										/ format.getFrameSize());
 						DataLine.Info info = new DataLine.Info(
 								SourceDataLine.class, format);
@@ -143,7 +143,7 @@ public class RecieveAudio {
 						sline.open(format);
 						sline.start();
 						
-						text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3]);
+						//text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3]);
 						
 						//Float audioLen = (decoded.length / format.getFrameSize())
 						//		* format.getFrameRate();
@@ -179,7 +179,7 @@ public class RecieveAudio {
 	}
 
 	private AudioFormat getAudioFormat() {
-		float sampleRate = 8000.0F;
+		float sampleRate = 16000.0F;
 		// 8000,11025,16000,22050,44100
 		int sampleSizeInBits = 16;
 		// 8,16
