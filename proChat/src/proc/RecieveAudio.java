@@ -42,7 +42,7 @@ public class RecieveAudio {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		frame.setSize(400, 400);
-		frame.setLocation(800,400);
+		frame.setLocation(800,200);
 		frame.setVisible(true);
 
 		try {
@@ -143,7 +143,7 @@ public class RecieveAudio {
 						sline.open(format);
 						sline.start();
 						
-						text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3]);
+						text.setText(buffer.length + "   " + buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3]);
 						
 						//Float audioLen = (decoded.length / format.getFrameSize())
 						//		* format.getFrameRate();
