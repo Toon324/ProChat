@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -29,15 +30,10 @@ public class RecieveAudio {
 	ServerSocket server;
 	Socket socket;
 	JTextArea text;
+	VoiceCall call;
 
-	public static void main(String[] args) {
-
-		RecieveAudio ra = new RecieveAudio();
-		Log.l("Object created");
-		ra.playAudio();
-	}
-
-	public RecieveAudio() {
+	public RecieveAudio(VoiceCall voiceCall) {
+		call = voiceCall;
 		JFrame frame = new JFrame();
 		text = new JTextArea();
 
@@ -102,6 +98,8 @@ public class RecieveAudio {
 			}
 
 		};
+		
+		
 
 		Thread playThread = new Thread(runner);
 		playThread.start();
@@ -165,8 +163,12 @@ public class RecieveAudio {
 					}
 				}
 			};
+			
+			call.getPool().execute(runnable);
+			/*
 			playThread = new Thread(runnable);
 			playThread.start();
+			*/
 		}
 
 	}

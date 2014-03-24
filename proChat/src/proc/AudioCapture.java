@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.text.Format;
+import java.util.concurrent.ExecutorService;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -37,8 +38,10 @@ public class AudioCapture extends JFrame implements ActionListener {
 	String IP = "";
 	JTextArea text;
 	JFrame frame;
+	VoiceCall call;
 	
-	public AudioCapture(String ip) {// constructor
+	public AudioCapture(String ip, VoiceCall voiceCall) {// constructor
+		call = voiceCall;
 		IP = ip;
 		frame = new JFrame();
 		text = new JTextArea();
@@ -146,8 +149,11 @@ public class AudioCapture extends JFrame implements ActionListener {
 			// microphone data and start it
 			// running. It will run until
 			// the Stop button is clicked.
+			call.getPool().execute(runner);
+			/*
 			Thread captureThread = new Thread(runner);
 			captureThread.start();
+			*/
 		} catch (Exception e) {
 			System.out.println(e);
 			System.exit(0);
