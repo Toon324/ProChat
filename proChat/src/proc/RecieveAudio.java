@@ -50,8 +50,6 @@ public class RecieveAudio {
 		}
 	}
 	
-	SourceDataLine sline;
-	DataLine.Info info;
 	final AudioFormat format = getAudioFormat();
 
 	public void playAudio() {
@@ -76,17 +74,6 @@ public class RecieveAudio {
 					
 					
 					
-					try {
-					info = new DataLine.Info(
-							SourceDataLine.class, format);
-					sline = (SourceDataLine) AudioSystem
-							.getLine(info);
-					sline.open(format);
-					sline.start();
-					}
-					catch (Exception e) {
-						e.printStackTrace();
-					}
 
 					int count;
 					byte[] buffer = new byte[call.bufferSize];
@@ -145,6 +132,13 @@ public class RecieveAudio {
 								input, format, buffer.length
 										/ format.getFrameSize());
 						
+						DataLine.Info info = new DataLine.Info(
+								SourceDataLine.class, format);
+						SourceDataLine sline = (SourceDataLine) AudioSystem
+								.getLine(info);
+						sline.open(format);
+						sline.start();
+						
 						text.setText(buffer.length + "   " + buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3]);
 						
 						//Float audioLen = (decoded.length / format.getFrameSize())
@@ -163,7 +157,7 @@ public class RecieveAudio {
 						//sline.close();
 						buffer2 = null;
 
-					} catch (IOException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					} 
 				}
