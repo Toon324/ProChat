@@ -33,30 +33,30 @@ public class AudioCapture extends JFrame implements ActionListener {
 	JTextArea text;
 	JFrame frame;
 	VoiceCall call;
-	
+
 	public AudioCapture(String ip, VoiceCall voiceCall) {// constructor
 		call = voiceCall;
 		IP = ip;
 		frame = new JFrame();
 		text = new JTextArea();
-		
+
 		JScrollPane scroller = new JScrollPane(text);
 		scroller.setAutoscrolls(true);
-		
+
 		JButton start = new JButton("Start");
 		start.addActionListener(this);
 
 		frame.add(scroller);
-		frame.add(start,BorderLayout.SOUTH);
+		frame.add(start, BorderLayout.SOUTH);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		frame.setSize(400, 400);
-		frame.setLocation(300,300);
+		frame.setLocation(300, 300);
 		frame.setVisible(true);
 		frame.setTitle("Input info");
 		frame.requestFocus();
-		
+
 	}// end constructor
 
 	// This method captures audio input
@@ -73,21 +73,20 @@ public class AudioCapture extends JFrame implements ActionListener {
 			targetDataLine.open(audioFormat);
 			targetDataLine.start();
 
-			
 			frame.requestFocus();
-			
+
 			/*
-			int bufferSize = (int) audioFormat.getSampleRate()
-					* audioFormat.getFrameSize();
-			final byte buffer[] = new byte[bufferSize];
-			*/
+			 * int bufferSize = (int) audioFormat.getSampleRate()
+			 * audioFormat.getFrameSize(); final byte buffer[] = new
+			 * byte[bufferSize];
+			 */
 			final byte[] buffer = new byte[call.bufferSize];
 			Socket socket = null;
 
 			try {
 				socket = new Socket(IP, 20);
 				Log.l("Created");
-				//socket = new Socket("127.0.0.1", 20);
+				// socket = new Socket("127.0.0.1", 20);
 				Log.l("Socket created");
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -95,71 +94,78 @@ public class AudioCapture extends JFrame implements ActionListener {
 
 			final BufferedOutputStream objectOutputStream = new BufferedOutputStream(
 					socket.getOutputStream());
-			
+
 			Runnable runner = new Runnable() {
 
 				public void run() {
 					try {
 						Boolean running = true;
 						while (running) {
-							int count = targetDataLine.read(buffer, 0, buffer.length);
+							int count = targetDataLine.read(buffer, 0,
+									buffer.length);
 							if (count > 0) {
 								/*
-								SpeexEncoder encoder = new SpeexEncoder();
-								encoder.init(1, SpeexEncoding.DEFAULT_QUALITY, 16000, 1);
-				
-								encoder.processData(buffer, 0, buffer.length);
-								byte[] encoded = new byte[encoder.getProcessedDataByteSize()];
-								encoder.getProcessedData(encoded, 0);
-								
-								*/
+								 * SpeexEncoder encoder = new SpeexEncoder();
+								 * encoder.init(1,
+								 * SpeexEncoding.DEFAULT_QUALITY, 16000, 1);
+								 * 
+								 * encoder.processData(buffer, 0,
+								 * buffer.length); byte[] encoded = new
+								 * byte[encoder.getProcessedDataByteSize()];
+								 * encoder.getProcessedData(encoded, 0);
+								 */
 								byte[] buffer2 = new byte[5];
-								if(getAudioFormat().getEncoding() == AudioFormat.Encoding.PCM_FLOAT){  
-						            ShortBuffer intBuf = ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
-						            short[] samples16Bit = new short[intBuf.remaining()];
-						            intBuf.get(samples16Bit);
-						            buffer2 = new byte[samples16Bit.length];
-						            for (int i = 0; i < samples16Bit.length; i++) {
-						                buffer2[i] = (byte)((samples16Bit[i] / 256)+128);
-						            }
-						        }
+								ShortBuffer intBuf = ByteBuffer.wrap(buffer)
+										.order(ByteOrder.LITTLE_ENDIAN)
+										.asShortBuffer();
+								short[] samples16Bit = new short[intBuf
+										.remaining()];
+								intBuf.get(samples16Bit);
+								buffer2 = new byte[samples16Bit.length];
+								for (int i = 0; i < samples16Bit.length; i++) {
+									buffer2[i] = (byte) ((samples16Bit[i] / 256) + 128);
+								}
 
-								
-								text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3] );
-								text.append("\n" + buffer2[0] + "   " + buffer2[1] + "   " + buffer2[2] + "   " + buffer2[3]);
-								
-								objectOutputStream.write(buffer2, 0, buffer2.length);
+								text.setText(buffer.length + "   " + buffer[0]
+										+ "   " + buffer[1] + "   " + buffer[2]
+										+ "   " + buffer[3]);
+								text.append("\n" + buffer2.length + "   "
+										+ buffer2[0] + "   " + buffer2[1]
+										+ "   " + buffer2[2] + "   "
+										+ buffer2[3]);
+
+								objectOutputStream.write(buffer2, 0,
+										buffer2.length);
 								/*
-								objectOutputStream.write(encoded, 0, encoded.length);
-								//Log.l("Wrote: " + buffer[0] + "," + buffer[1] + "," + buffer[2]);
-								/*
-								InputStream input = new ByteArrayInputStream(buffer);
-								final AudioInputStream ais = new AudioInputStream(
-										input, audioFormat, buffer.length
-												/ audioFormat.getFrameSize());
-												 * 
-												 */
+								 * objectOutputStream.write(encoded, 0,
+								 * encoded.length); //Log.l("Wrote: " +
+								 * buffer[0] + "," + buffer[1] + "," +
+								 * buffer[2]); /* InputStream input = new
+								 * ByteArrayInputStream(buffer); final
+								 * AudioInputStream ais = new AudioInputStream(
+								 * input, audioFormat, buffer.length /
+								 * audioFormat.getFrameSize());
+								 */
 
 							}
 						}
-						
+
 						objectOutputStream.close();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
-				
+
 			};
-			
+
 			// Create a thread to capture the
 			// microphone data and start it
 			// running. It will run until
 			// the Stop button is clicked.
 			call.getPool().execute(runner);
 			/*
-			Thread captureThread = new Thread(runner);
-			captureThread.start();
-			*/
+			 * Thread captureThread = new Thread(runner); captureThread.start();
+			 */
 		} catch (Exception e) {
 			System.out.println(e);
 			System.exit(0);
@@ -167,7 +173,6 @@ public class AudioCapture extends JFrame implements ActionListener {
 
 		// end catch
 	}// end captureAudio method
-
 
 	// This method creates and returns an
 	// AudioFormat object for a given set
@@ -261,14 +266,17 @@ public class AudioCapture extends JFrame implements ActionListener {
 	}// end inner class PlayThread
 		// ===================================//
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Start"))
 			captureAudio();
-		
+
 	}
 
 }// end outer class AudioCapture01.java
