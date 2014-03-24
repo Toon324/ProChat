@@ -472,6 +472,9 @@ public class ChatWindow implements ActionListener, KeyListener,
 			String sub = toAdd.substring(toAdd.indexOf("/r/"));
 			if (sub.contains(" "))
 				sub = sub.substring(0, sub.indexOf(" "));
+			
+			if (sub.contains("</font>"))
+				sub = sub.replace("</font>", "");
 
 			String reddit = new String("<a href" + "=" + "\"http://reddit.com"
 					+ sub + "\">" + sub + "</a>");
