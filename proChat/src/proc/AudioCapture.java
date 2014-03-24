@@ -1,17 +1,14 @@
 package proc;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
-import java.text.Format;
-import java.util.concurrent.ExecutorService;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.ShortBuffer;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -23,9 +20,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
-import org.xiph.speex.SpeexEncoder;
-import org.xiph.speex.spi.SpeexEncoding;
 
 public class AudioCapture extends JFrame implements ActionListener {
 
@@ -110,7 +104,7 @@ public class AudioCapture extends JFrame implements ActionListener {
 						while (running) {
 							int count = targetDataLine.read(buffer, 0, buffer.length);
 							if (count > 0) {
-								
+								/*
 								SpeexEncoder encoder = new SpeexEncoder();
 								encoder.init(1, SpeexEncoding.DEFAULT_QUALITY, 16000, 1);
 				
@@ -118,12 +112,24 @@ public class AudioCapture extends JFrame implements ActionListener {
 								byte[] encoded = new byte[encoder.getProcessedDataByteSize()];
 								encoder.getProcessedData(encoded, 0);
 								
+								*/
+								byte[] buffer2 = new byte[5];
+								if(getAudioFormat().getEncoding() == AudioFormat.Encoding.PCM_FLOAT){  
+						            ShortBuffer intBuf = ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
+						            short[] samples16Bit = new short[intBuf.remaining()];
+						            intBuf.get(samples16Bit);
+						            buffer2 = new byte[samples16Bit.length];
+						            for (int i = 0; i < samples16Bit.length; i++) {
+						                buffer2[i] = (byte)((samples16Bit[i] / 256)+128);
+						            }
+						        }
+
 								
 								text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3] );
+								text.append("\n" + buffer2[0] + "   " + buffer2[1] + "   " + buffer2[2] + "   " + buffer2[3]);
+								
+								objectOutputStream.write(buffer2, 0, count);
 								/*
-								objectOutputStream.write(buffer, 0, count);
-								out.write(buffer, 0, count);
-								*/
 								objectOutputStream.write(encoded, 0, encoded.length);
 								//Log.l("Wrote: " + buffer[0] + "," + buffer[1] + "," + buffer[2]);
 								/*
