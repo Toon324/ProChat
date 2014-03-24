@@ -108,13 +108,13 @@ public class ChatWindow implements ActionListener, KeyListener,
 						if (!brm.getValueIsAdjusting()) {
 
 							if (wasAtBottom) {
-								System.out.println("Was at bottom!");
+								//System.out.println("Was at bottom!");
 								brm.setValue(brm.getMaximum());
 							}
 						} else {
 							wasAtBottom = ((brm.getValue() + brm.getExtent()) == brm
 									.getMaximum());
-							System.out.println("Bottom? " + wasAtBottom);
+							//System.out.println("Bottom? " + wasAtBottom);
 						}
 
 					}

@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 public class VoiceCall {
 	
 	ExecutorService threadPool;
+	int bufferSize = 16000;
 	
 	public VoiceCall(String ip) {
 		

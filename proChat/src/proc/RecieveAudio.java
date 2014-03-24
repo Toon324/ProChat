@@ -80,7 +80,7 @@ public class RecieveAudio {
 					text.append("\n"+in.available() + "     ");
 
 					int count;
-					byte[] buffer = new byte[640];
+					byte[] buffer = new byte[call.bufferSize];
 					
 					while (true) {
 						count = in.read(buffer, 0, buffer.length);
@@ -143,12 +143,14 @@ public class RecieveAudio {
 						sline.open(format);
 						sline.start();
 						
+						text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3]);
+						
 						//Float audioLen = (decoded.length / format.getFrameSize())
 						//		* format.getFrameRate();
 
 						int bufferSize = (int) format.getSampleRate()
 								* format.getFrameSize();
-						byte buffer2[] = new byte[bufferSize];
+						byte buffer2[] = new byte[call.bufferSize];
 						//int count2;
 						
 						ais.read(buffer2, 0, buffer2.length);

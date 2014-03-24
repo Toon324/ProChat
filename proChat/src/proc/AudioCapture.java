@@ -87,7 +87,7 @@ public class AudioCapture extends JFrame implements ActionListener {
 					* audioFormat.getFrameSize();
 			final byte buffer[] = new byte[bufferSize];
 			*/
-			final byte[] buffer = new byte[640];
+			final byte[] buffer = new byte[call.bufferSize];
 			Socket socket = null;
 
 			try {
@@ -164,41 +164,6 @@ public class AudioCapture extends JFrame implements ActionListener {
 		// end catch
 	}// end captureAudio method
 
-	// This method plays back the audio
-	// data that has been saved in the
-	// ByteArrayOutputStream
-	private void playAudio() {
-		try {
-			// Get everything set up for
-			// playback.
-			// Get the previously-saved data
-			// into a byte array object.
-			byte audioData[] = byteArrayOutputStream.toByteArray();
-			// Get an input stream on the
-			// byte array containing the data
-			InputStream byteArrayInputStream = new ByteArrayInputStream(
-					audioData);
-			AudioFormat audioFormat = getAudioFormat();
-			audioInputStream = new AudioInputStream(byteArrayInputStream,
-					audioFormat, audioData.length / audioFormat.getFrameSize());
-			DataLine.Info dataLineInfo = new DataLine.Info(
-					SourceDataLine.class, audioFormat);
-			sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-			sourceDataLine.open(audioFormat);
-			sourceDataLine.start();
-
-			// Create a thread to play back
-			// the data and start it
-			// running. It will run until
-			// all the data has been played
-			// back.
-			Thread playThread = new Thread(new PlayThread());
-			playThread.start();
-		} catch (Exception e) {
-			System.out.println(e);
-			System.exit(0);
-		}// end catch
-	}// end playAudio
 
 	// This method creates and returns an
 	// AudioFormat object for a given set
@@ -229,7 +194,7 @@ public class AudioCapture extends JFrame implements ActionListener {
 	class CaptureThread extends Thread {
 		// An arbitrary-size temporary holding
 		// buffer
-		byte tempBuffer[] = new byte[640];
+		byte tempBuffer[] = new byte[call.bufferSize];
 
 		public void run() {
 			byteArrayOutputStream = new ByteArrayOutputStream();
@@ -261,7 +226,7 @@ public class AudioCapture extends JFrame implements ActionListener {
 	// that was saved.
 
 	class PlayThread extends Thread {
-		byte tempBuffer[] = new byte[640];
+		byte tempBuffer[] = new byte[call.bufferSize];
 
 		public void run() {
 			try {
