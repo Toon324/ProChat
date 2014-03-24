@@ -128,7 +128,7 @@ public class AudioCapture extends JFrame implements ActionListener {
 								text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3] );
 								text.append("\n" + buffer2[0] + "   " + buffer2[1] + "   " + buffer2[2] + "   " + buffer2[3]);
 								
-								objectOutputStream.write(buffer2, 0, count);
+								objectOutputStream.write(buffer2, 0, buffer2.length);
 								/*
 								objectOutputStream.write(encoded, 0, encoded.length);
 								//Log.l("Wrote: " + buffer[0] + "," + buffer[1] + "," + buffer[2]);
