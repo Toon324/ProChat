@@ -217,8 +217,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	public ChatWindow(User u, MultiUserChat mu) {
 		muc = mu;
 		user = u;
-
-		JFrame.setDefaultLookAndFeelDecorated(true);
+		
 		frame = new JFrame();
 		frame.setSize(400, 600);
 		frame.setTitle("ProChat: Group chat " + mu.getRoom());
