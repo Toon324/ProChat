@@ -118,9 +118,9 @@ public class RecieveAudio {
 
 				public void run() {
 					try {
+						/*
 						SpeexDecoder decoder = new SpeexDecoder();
 						decoder.init(1, 16000, 1, false);
-						//Log.l("Decoder info: " + decoder + " buff: " + buffer);
 						decoder.processData(buffer, 0, buffer.length);
 						
 						byte[] decoded = new byte[decoder.getProcessedDataByteSize()];
@@ -130,6 +130,8 @@ public class RecieveAudio {
 						text.append("\nrecieved: " + decoded[0] + "   " + decoded[1] + "   " + decoded[2]);
 						
 						InputStream input = new ByteArrayInputStream(decoded);
+						*/
+						InputStream input = new ByteArrayInputStream(buffer);
 						final AudioFormat format = getAudioFormat();
 						final AudioInputStream ais = new AudioInputStream(
 								input, format, buffer.length
@@ -140,13 +142,14 @@ public class RecieveAudio {
 								.getLine(info);
 						sline.open(format);
 						sline.start();
-						Float audioLen = (decoded.length / format.getFrameSize())
-								* format.getFrameRate();
+						
+						//Float audioLen = (decoded.length / format.getFrameSize())
+						//		* format.getFrameRate();
 
 						int bufferSize = (int) format.getSampleRate()
 								* format.getFrameSize();
 						byte buffer2[] = new byte[bufferSize];
-						int count2;
+						//int count2;
 						
 						ais.read(buffer2, 0, buffer2.length);
 						sline.write(buffer2, 0, buffer2.length);
@@ -160,7 +163,7 @@ public class RecieveAudio {
 
 					} catch (LineUnavailableException e) {
 
-					}
+					} 
 				}
 			};
 			

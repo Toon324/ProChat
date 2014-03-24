@@ -111,19 +111,21 @@ public class AudioCapture extends JFrame implements ActionListener {
 						while (running) {
 							int count = targetDataLine.read(buffer, 0, buffer.length);
 							if (count > 0) {
+								/*
 								SpeexEncoder encoder = new SpeexEncoder();
 								encoder.init(1, SpeexEncoding.DEFAULT_QUALITY, 16000, 1);
 				
 								encoder.processData(buffer, 0, buffer.length);
 								byte[] encoded = new byte[encoder.getProcessedDataByteSize()];
 								encoder.getProcessedData(encoded, 0);
+								*/
 								
 								text.setText(buffer[0] + "   " + buffer[1] + "   " + buffer[2] + "   " + buffer[3] );
 								
-								//objectOutputStream.write(buffer, 0, count);
-								//out.write(buffer, 0, count);
-								objectOutputStream.write(encoded, 0, encoded.length);
-								out.write(encoded,0,encoded.length);
+								objectOutputStream.write(buffer, 0, count);
+								out.write(buffer, 0, count);
+								//objectOutputStream.write(encoded, 0, encoded.length);
+								//out.write(encoded,0,encoded.length);
 								//Log.l("Wrote: " + buffer[0] + "," + buffer[1] + "," + buffer[2]);
 								/*
 								InputStream input = new ByteArrayInputStream(buffer);
