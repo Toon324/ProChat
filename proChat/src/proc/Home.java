@@ -364,7 +364,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				}
 				return;
 			} else if (msg.getSubject().equals("IP")) {
-				new VoiceCall(msg.getBody());
+				//new VoiceCall(msg.getBody());
 				return;
 			}
 		}
