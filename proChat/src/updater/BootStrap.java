@@ -106,8 +106,10 @@ public class BootStrap {
 						"java -jar ProChatAlpha.jar");
 				
 				frame.dispose();
-			} else
+			} else {
+				adapter.getOutputStream().writeInt(2);
 				Runtime.getRuntime().exec("java -jar ProChatAlpha.jar");
+			}
 		} catch (IOException e) {
 			text.append("\nERROR: Could not connect to server.");
 			try {
