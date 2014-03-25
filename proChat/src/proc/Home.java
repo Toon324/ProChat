@@ -813,6 +813,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	}
 
 	private void requestIP() {
+		/*
 		String other = ((User) contacts.getSelectedValue()).getName();
 
 		try {
@@ -826,6 +827,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 
 	private void viewOtherProfile(String id) {
