@@ -11,6 +11,7 @@ public class ProChat {
 	 */
 	public static void main(String[] args) {
 		try {
+			Log.createWriter(); //Create debugger
 			new LoginWindow();
 		}
 		catch (Exception e) {

@@ -36,7 +36,7 @@ public class XmppManager {
 	
 	public void init() throws XMPPException {
 		
-		System.out.println(String.format("Initializing connection to server %1$s port %2$d", server, port));
+		Log.l(String.format("Initializing connection to server %1$s port %2$d", server, port));
 
 		SmackConfiguration.setPacketReplyTimeout(packetReplyTimeout);
 		
@@ -47,7 +47,7 @@ public class XmppManager {
 		connection = new XMPPConnection(config);
 		connection.connect();
 		
-		System.out.println("Connected: " + connection.isConnected());
+		Log.l("Connected: " + connection.isConnected());
 		
 		chatManager = connection.getChatManager();
 		messageListener = new MyMessageListener();
@@ -80,7 +80,7 @@ public class XmppManager {
 		Roster roster = connection.getRoster();
 		Collection<RosterEntry> entries = roster.getEntries();		
 		for (RosterEntry entry : entries) {
-		    System.out.println(String.format("Buddy:%1$s - Status:%2$s", 
+		    Log.l(String.format("Buddy:%1$s - Status:%2$s", 
 		    		entry.getName(), entry.getStatus()));
 		}
 	}
@@ -94,13 +94,13 @@ public class XmppManager {
 	}
 	
 	public void sendMessage(String message, String buddyJID) throws XMPPException {
-		System.out.println(String.format("Sending mesage '%1$s' to user %2$s", message, buddyJID));
+		Log.l(String.format("Sending mesage '%1$s' to user %2$s", message, buddyJID));
 		Chat chat = chatManager.createChat(buddyJID, messageListener);
 		chat.sendMessage(message);
 	}
 	
 	public void createEntry(String user, String name) throws Exception {
-		System.out.println(String.format("Creating entry for buddy '%1$s' with name %2$s", user, name));
+		Log.l(String.format("Creating entry for buddy '%1$s' with name %2$s", user, name));
 		Roster roster = connection.getRoster();
 		roster.createEntry(user, name, null);
 	}
@@ -111,7 +111,7 @@ public class XmppManager {
 		public void processMessage(Chat chat, Message message) {
 			String from = message.getFrom();
 			String body = message.getBody();
-			System.out.println(String.format("Received message '%1$s' from %2$s", body, from));
+			Log.l(String.format("Received message '%1$s' from %2$s", body, from));
 		}
 		
 	}

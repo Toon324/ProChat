@@ -81,7 +81,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	ArrayList<ChatWindow> currentChats;
 	String[] names = { "Name", "Online" };
 	// Object[][] data = new Object[16][2];
-	User[] data = { new User("Jon Carlos", ""), new User("Rob Stark", "") };
+	User[] data = { new User("Jon Cena", ""), new User("Rob Stark", "") };
 	Roster roster;
 	private String color = "#E02424";
 	private static String IP;
@@ -198,7 +198,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					whatismyip.openStream()));
 
 			String ip = in.readLine(); // you get the IP as a String
-			System.out.println("Found external IP of " + ip);
+			Log.l("Found external IP of " + ip);
 			IP = ip;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -235,7 +235,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				if (packet instanceof Message) {
 
 					Message msg = (Message) packet;
-					// System.out.println("Msg: " + msg);
+					// Log.l("Msg: " + msg);
 					// Process message
 					recieveMessage(msg);
 				}
@@ -261,7 +261,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		// ensureCapacity(roster.getEntryCount());
 		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
-			// System.out.println("Found contact: " + contact);
+			// Log.l("Found contact: " + contact);
 			String userContact = contact.getUser();
 
 			if (userContact.contains("conference")) {
@@ -303,14 +303,14 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			ff.addValue("1");
 			ff.setRequired(true);
 			ff.setLabel("Make Room Persistent?");
-			System.out.println(ff.toXML()); // - output values seem good.
+			Log.l(ff.toXML()); // - output values seem good.
 			f.addField(ff);
 
 			mu.sendConfigurationForm(f);
 
 			shouldJoin = false;
 		} catch (Exception e) {
-			System.out.println("Room already exists.");
+			Log.l("Room already exists.");
 		}
 		try {
 
@@ -343,7 +343,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				message.setSubject("ID");
 				message.setBody(user.getEmail());
 				message.setType(Message.Type.headline);
-				// System.out.println("Sent id: " + message.getBody());
+				// Log.l("Sent id: " + message.getBody());
 				connection.getConnection().sendPacket(message);
 				return;
 			} else if (msg.getSubject().equals("ID")) {
@@ -356,7 +356,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					message.setSubject("IP");
 					message.setBody(IP);
 					message.setType(Message.Type.headline);
-					System.out.println("Sent ip: " + message.getBody());
+					Log.l("Sent ip: " + message.getBody());
 					connection.getConnection().sendPacket(message);
 					// new VoiceCall(msg.getBody());
 				} catch (Exception e) {
@@ -372,7 +372,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
 		String domain = msg.getFrom().substring(msg.getFrom().indexOf("@") + 1,
 				msg.getFrom().indexOf("."));
-		// System.out.println("Domain: " + domain);
+		// Log.l("Domain: " + domain);
 		ChatWindow activeChat = null;
 
 		if (domain.equals("conference")) {
@@ -381,11 +381,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 			from = msg.getFrom().substring(msg.getFrom().indexOf("/") + 1,
 					msg.getFrom().length());
-			// System.out.println("Conference from: " + from);
+			// Log.l("Conference from: " + from);
 		}
 
 		for (ChatWindow c : currentChats) {
-			// System.out.println("Found Chat with " + c.getFullFrom());
+			// Log.l("Found Chat with " + c.getFullFrom());
 			if (c.getFullFrom().equals(
 					msg.getFrom().substring(0, msg.getFrom().indexOf("/")))) {
 				activeChat = c;
@@ -397,7 +397,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			ChatWindow c = openChat(from);
 			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 			currentChats.add(c);
-			System.out.println("Added chat: " + c.getFrom());
+			Log.l("Added chat: " + c.getFrom());
 		} else {
 			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(),
 					null);
@@ -424,7 +424,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				if (connectTo == null)
 					return;
 			}
-			System.out.println("ConnectTO: " + connectTo);
+			Log.l("ConnectTO: " + connectTo);
 			if (connectTo.contains("conference")) {
 				String name = connectTo.substring(0, connectTo.indexOf("@"));
 				joinGroup(name);
@@ -460,9 +460,9 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		if (!toAdd.contains("#"))
 			toAdd = "#" + toAdd;
-		System.out.println("Color hex: " + toAdd);
+		Log.l("Color hex: " + toAdd);
 		color = toAdd;
-		System.out.println("Color: " + Color.decode(color));
+		Log.l("Color: " + Color.decode(color));
 		frame.getContentPane().setBackground(Color.decode(color));
 		frame.setForeground(Color.decode(color));
 	}
@@ -484,7 +484,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		if (i == JOptionPane.NO_OPTION)
 			return;
 
-		// System.out.println("Removing " + remove);
+		// Log.l("Removing " + remove);
 
 		try {
 			connection.getConnection().getRoster()
@@ -563,7 +563,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 */
 	private void viewProfile(User u) {
 		if (u == null) {
-			System.out.println("Null user!");
+			Log.l("Null user!");
 			return;
 		}
 
@@ -572,7 +572,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-			// System.out.println("Avatar: " + user.getAvatarURL());
+			// Log.l("Avatar: " + user.getAvatarURL());
 			JLabel avatar = new JLabel(new ImageIcon(ImageIO.read(new URL(u
 					.getAvatarURL()))));
 
@@ -639,7 +639,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				return null;
 		}
 		try {
-			// System.out.println("Creating connection to " + connectTo);
+			// Log.l("Creating connection to " + connectTo);
 
 			Chat c = connection.getChatManager().createChat(
 					connectTo + "@" + serverName, null);
@@ -649,7 +649,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			Roster roster = connection.getConnection().getRoster();
 			Presence presence = roster
 					.getPresence(connectTo + "@" + serverName);
-			// System.out.println("Presence of " + connectTo + ": " +
+			// Log.l("Presence of " + connectTo + ": " +
 			// presence.getType());
 			if (presence.getType() == Presence.Type.available) {
 				chat.addToChatArea(
@@ -711,7 +711,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 */
 	@Override
 	public void entriesUpdated(Collection<String> e) {
-		System.out.println("Entries changed.");
+		Log.l("Entries changed.");
 		loadContacts();
 
 	}
@@ -748,7 +748,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	private User readSteamInfo(String steamid) {
 		User u = new User("", "");
 		u.setEmail(steamid);
-		// System.out.println("Loading info for steamID: " + steamid);
+		// Log.l("Loading info for steamID: " + steamid);
 		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids="
 				+ steamid;
 		try {
@@ -774,7 +774,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					u.setGame(scan.next());
 
 				// if (!found.equals(""))
-				// System.out.println("Read: " + found);
+				// Log.l("Read: " + found);
 
 			}
 			scan.close();
@@ -805,7 +805,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		Message message = new Message();
 		message.setTo(other + "@" + serverName);
-		System.out.println("Requesting id from " + message.getTo());
+		Log.l("Requesting id from " + message.getTo());
 		message.setSubject("ID request");
 		message.setType(Message.Type.headline);
 		connection.getConnection().sendPacket(message);
@@ -818,7 +818,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		try {
 			Message message = new Message();
 			message.setTo(other + "@" + serverName);
-			System.out.println("Requesting IP from " + message.getTo());
+			Log.l("Requesting IP from " + message.getTo());
 			message.setSubject("IP request");
 			message.setBody(Inet4Address.getLocalHost().getHostAddress());
 			message.setType(Message.Type.headline);
@@ -831,7 +831,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	private void viewOtherProfile(String id) {
 		String other = ((User) contacts.getSelectedValue()).getName();
 
-		System.out.println("id recieved: " + id);
+		Log.l("id recieved: " + id);
 		User u = readSteamInfo(id);
 		u.setName(other);
 

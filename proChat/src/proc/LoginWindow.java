@@ -53,7 +53,7 @@ public class LoginWindow implements ActionListener, KeyListener {
 				reader.useDelimiter("\t");
 				while (reader.hasNext()) {
 					String found = reader.next();
-					// System.out.println("Found: " + found);
+					// Log.l("Found: " + found);
 					if (user.equals(""))
 						user = found;
 					else if (pass.equals(""))
@@ -200,10 +200,10 @@ public class LoginWindow implements ActionListener, KeyListener {
 		AccountManager am = new AccountManager(connection.getConnection());
 		try {
 			String password = new String(pass.getPassword());
-			System.out.println("Reg: " + name.getText() + "  " + password);
+			Log.l("Reg: " + name.getText() + "  " + password);
 			am.createAccount(name.getText(), password);
 			login();
-			// System.out.println("Registered " + loginName.getText());
+			// Log.l("Registered " + loginName.getText());
 		} catch (XMPPException e) {
 			e.printStackTrace();
 		}
