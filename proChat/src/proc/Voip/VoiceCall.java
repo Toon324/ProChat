@@ -1,7 +1,9 @@
-package proc;
+package proc.Voip;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import proc.Log;
 
 
 //Author: Cody
@@ -10,6 +12,8 @@ public class VoiceCall {
 	
 	ExecutorService threadPool;
 	int bufferSize = 16000;
+	AudioCapture ac;
+	RecieveAudio ra;
 	
 	public VoiceCall(String ip) {
 		
@@ -17,9 +21,9 @@ public class VoiceCall {
 		
 		Log.l("Starting voice call with IP " + ip);
 		
-		AudioCapture ac = new AudioCapture(ip, this);
+		ac = new AudioCapture(ip, this);
 
-		RecieveAudio ra = new RecieveAudio(this);
+		ra = new RecieveAudio(this);
 		ra.playAudio(); //Listen for audio
 		
 		//ac.captureAudio(); //Capture
@@ -28,6 +32,24 @@ public class VoiceCall {
 	
 	public ExecutorService getPool() {
 		return threadPool;
+	}
+
+	public int getBufferSize() {
+		return bufferSize;
+	}
+
+	/**
+	 * @return the ac
+	 */
+	public AudioCapture getCapture() {
+		return ac;
+	}
+
+	/**
+	 * @return the ra
+	 */
+	public RecieveAudio getRecieve() {
+		return ra;
 	}
 	
 
