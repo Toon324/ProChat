@@ -73,19 +73,31 @@ public class BootStrap {
 
 				byte buffer[] = new byte[adapter.getInputStream().readInt()];
 
-				while (true) {
+				text.append("\nRecieving file of size " + buffer.length);
+				boolean complete = false;
+				int wrote = 0;
+				while (!complete) {
 					int nRead = bufIn.read(buffer, 0, buffer.length);
-					if (nRead <= 0)
-						break;
+					if (nRead <= 0) {
+						complete = true;
+						System.out.println("Complete!");
+					}
 					bufOut.write(buffer, 0, nRead);
+					wrote += nRead;
+					//System.out.println("Total: " + wrote);
+					text.append("\n" + ((int)(100*(wrote/(double)buffer.length))) + "%");
+					if (wrote == buffer.length)
+						complete = true;
 				}
-
+				text.append("\nClosing resources..");
 				bufOut.flush();
 				out.close();
+				text.append("\nFinished writing data.");
 
 				adapter.getOutputStream().writeInt(2); // Tell the server that
 														// the client is done
 														// with it
+				text.append("\nUpdating local info..");
 				updateVersionIDTo(serverVersion);
 				
 				text.append("\nUpdated. Now launching...");
