@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Scanner;
 
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 /**
  * Checks the current version of the program against a server, then proceeds to
  * update as necessary.
@@ -24,12 +28,22 @@ public class BootStrap {
 	 */
 	public static void main(String[] args) {
 		loadVersionData();
-		System.out.println("Version: " + version);
+		
+		JFrame frame = new JFrame();
+		JTextArea text = new JTextArea();
+		JScrollPane scroller = new JScrollPane(text);
+		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(scroller);
+		frame.setSize(400,400);
+		frame.setVisible(true);
+		
+		text.setText("Local version: " + version);
 
 		NetworkAdapter adapter = new NetworkAdapter();
 		try {
 			adapter.connect("129.89.185.120", 60);
-			System.out.println("Connected to server.");
+			text.append("\nConnected to server at 129.89.185.120:60.");
 			adapter.getOutputStream().writeInt(0); // Request for version
 			adapter.getOutputStream().flush();
 
@@ -42,10 +56,10 @@ public class BootStrap {
 				} // wait
 			}
 
-			System.out.println("Server Version: " + serverVersion);
+			text.append("\nServer Version: " + serverVersion);
 
 			if (serverVersion > version) {
-				System.out.println("Updated from " + version + " to "
+				text.append("\nUpdating from " + version + " to "
 						+ serverVersion);
 				adapter.getOutputStream().writeInt(1); // Request for updated
 														// jar
@@ -73,16 +87,21 @@ public class BootStrap {
 														// the client is done
 														// with it
 				updateVersionIDTo(serverVersion);
+				
+				text.append("\nUpdated. Now launching...");
 
 				Runtime.getRuntime().exec(
 						"java -jar ProChatAlpha.jar");
+				
+				frame.dispose();
 			} else
 				Runtime.getRuntime().exec("java -jar ProChatAlpha.jar");
 		} catch (IOException e) {
-			System.out.println("ERROR: Could not connect to server.");
+			text.append("\nERROR: Could not connect to server.");
 			try {
 				Runtime.getRuntime().exec("java -jar EmployeeEvalSystem.jar");
 			} catch (IOException e1) {
+				text.append("ERROR: Could not launch the program.");
 			}
 		}
 	}
@@ -106,7 +125,7 @@ public class BootStrap {
 			if (!file.exists()) { // If file doesn't exist, create one
 				file.createNewFile();
 				FileWriter writer = new FileWriter(file);
-				writer.write("1.0");
+				writer.write("0.0");
 				writer.close();
 			}
 

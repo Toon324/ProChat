@@ -7,24 +7,41 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 /**
  * @author Cody Swendrowski
  * 
  */
 public class Server {
-	private static double version = 1.0;
+	private static double version = 0.0;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("Server has started.");
+		JFrame frame = new JFrame();
+		
+		JTextArea text = new JTextArea();
+		JScrollPane scroller = new JScrollPane(text);
+		scroller.setAutoscrolls(true);
+		
+		frame.add(scroller);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(400,400);
+		frame.setVisible(true);
+		
+		text.setText("Server has started.");
 		loadVersionData();
+		text.append("\nServer version: " + version);
+		
 		NetworkAdapter adapter = new NetworkAdapter();
 
 		try {
 			adapter.host(60);
-			System.out.println("Server is now hosting");
+			text.append("\nServer is now hosting");
 		} catch (Exception e) {
 		}
 
@@ -38,10 +55,10 @@ public class Server {
 						timeOut = System.currentTimeMillis();
 				} // Do nothing until Connected
 
-				System.out.println("Server has made a connection.");
+				text.append("\nServer has made a connection.");
 				while (adapter.isConnected()) {
 
-					System.out.println("Server is running.");
+					//System.out.println("Server is running.");
 
 					if (adapter.isDataAvailable()) {
 						System.out.println("Data available.");
@@ -52,11 +69,11 @@ public class Server {
 						if (input == 0) {
 							adapter.getOutputStream().writeDouble(version);
 							adapter.clearDataAvailable();
+							text.append("\nSent version info.");
 						}
 
 						else if (input == 1) {
 							File updatedJar = new File("ProChatAlpha.jar");
-							System.out.println("Got updatedJar.");
 							adapter.getOutputStream().writeInt(
 									(int) updatedJar.length());
 							adapter.getOutputStream().flush(); // Let client
@@ -72,10 +89,13 @@ public class Server {
 							}
 							in.close();
 							adapter.clearDataAvailable();
+							text.append("\nSent updated Jar.");
 						}
 
-						else if (input == 2)
+						else if (input == 2) {
 							adapter.setConnected(false);
+							text.append("\nClient has disconnected.");
+						}
 						
 					} else {
 						System.out.println("No data");
