@@ -33,12 +33,19 @@ public final class ConnectionListener extends Thread {
 	 * Alerts the NetworkAdapter if data is available.
 	 */
 	public void run() {
-		while (true) {
+		while (!done) {
 			try {
 				if (input.available() > 0)
 					adapter.dataAvailable();
 			} catch (IOException e) {
 			}
 		}
+		input = null;
+		adapter = null;
+	}
+	
+	boolean done = false;
+	public void setDone() {
+		done = true;
 	}
 }

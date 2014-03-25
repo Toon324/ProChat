@@ -35,6 +35,7 @@ public class NetworkAdapter {
 	public NetworkAdapter() {
 		dataAvailable = false;
 		connected = false;
+		System.out.println("Adapter created");
 	}
 
 	/**
@@ -43,6 +44,7 @@ public class NetworkAdapter {
 	 */
 	public void dataAvailable() {
 		dataAvailable = true;
+
 	}
 
 	/**
@@ -52,7 +54,7 @@ public class NetworkAdapter {
 	 *            The IP Address to connect to
 	 * @param port
 	 *            The port on the IP Address to connect to
-	 * @return 
+	 * @return
 	 * @throws IOException
 	 *             If the connection fails. Usually signifies an incorrect
 	 *             IPAddress and port configuration.
@@ -83,12 +85,15 @@ public class NetworkAdapter {
 	 */
 	public void host(int portNum) throws IOException {
 		port = portNum;
-		ServerSocket socket = new ServerSocket(port);
+		socket = new ServerSocket(port);
 		socket.setSoTimeout(0); // Wait until cancelled
+		System.out.println("Socket opened");
 
 		hostThread = new HostThread(this, socket);
 		hostThread.start();
 	}
+
+	ServerSocket socket;
 
 	/**
 	 * Returns true if there is data available in the input stream. Used to
@@ -126,12 +131,18 @@ public class NetworkAdapter {
 		return output;
 	}
 
+	ConnectionListener cL;
+
 	public void connectionAvailable() {
+		System.out.println("connection available.");
 		input = hostThread.getInputStream();
 		output = hostThread.getOutputStream();
-		ConnectionListener cL = new ConnectionListener(this, input);
+		System.out.println("Pipes gotten.");
+		cL = new ConnectionListener(this, input);
 		cL.start();
+		System.out.println("Listening");
 		connected = true;
+		hostThread.done = true;
 	}
 
 	/**
@@ -156,7 +167,14 @@ public class NetworkAdapter {
 	 * Stops listening for a connection.
 	 */
 	public void stopHosting() {
-		hostThread.interrupt();
+		// hostThread.interrupt();
+		hostThread.setDone();
+		cL.setDone();
+	}
+
+	public void rehost() {
+		hostThread.setShouldRehost();
+		stopHosting();
 	}
 
 	/**
@@ -165,20 +183,41 @@ public class NetworkAdapter {
 	 * @return True if connected
 	 */
 	public boolean isConnected() {
-		/*try {
-			if (input.read() == -1)
-				return false;
-		}
-		catch (Exception e) {
-			return false;
-		}
-		return true;
-		*/
-		
+		System.out.println("Connected? " + connected); // For reasons I don't
+														// understand, the
+														// update will only work
+														// more than once with
+														// this here.
 		return connected;
 	}
 
 	public void setConnected(boolean b) {
 		connected = b;
+	}
+
+	/**
+	 * 
+	 */
+	public void hostAvailable() {
+		try {
+			host(port);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void close() {
+		try {
+			socket.close();
+			hostThread.setDone();
+			hostThread = null;
+			input.close();
+			input = null;
+			output.close();
+			output = null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

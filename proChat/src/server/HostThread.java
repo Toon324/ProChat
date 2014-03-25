@@ -30,15 +30,26 @@ public final class HostThread extends Thread {
 	public HostThread(NetworkAdapter net, ServerSocket sock) {
 		adapter = net;
 		socket = sock;
+		System.out.println("HostThread created");
 	}
 
 	@Override
 	public void run() {
 		try {
-			Socket connection = socket.accept();
-			input = new DataInputStream(connection.getInputStream());
-			output = new DataOutputStream(connection.getOutputStream());
-			adapter.connectionAvailable();
+			if (!done) {
+				Socket connection = socket.accept();
+				input = new DataInputStream(connection.getInputStream());
+				output = new DataOutputStream(connection.getOutputStream());
+				adapter.connectionAvailable();
+			} else {
+				input = null;
+				output = null;
+				socket.close();
+				if (rehost) {
+					adapter.hostAvailable();
+					rehost = false;
+				}
+			}
 		} catch (IOException e) {
 		}
 	}
@@ -59,6 +70,25 @@ public final class HostThread extends Thread {
 	 */
 	public DataOutputStream getOutputStream() {
 		return output;
+	}
+
+	boolean done = false;
+
+	/**
+	 * 
+	 */
+	public void setDone() {
+		done = true;
+
+	}
+
+	boolean rehost = false;
+
+	/**
+	 * 
+	 */
+	public void setShouldRehost() {
+		rehost = true;
 	}
 
 }

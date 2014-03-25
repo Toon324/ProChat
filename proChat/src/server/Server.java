@@ -22,21 +22,25 @@ public class Server {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		new Server();
+	}
+
+	public Server() {
 		JFrame frame = new JFrame();
-		
+
 		JTextArea text = new JTextArea();
 		JScrollPane scroller = new JScrollPane(text);
 		scroller.setAutoscrolls(true);
-		
+
 		frame.add(scroller);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400,400);
+		frame.setSize(400, 400);
 		frame.setVisible(true);
-		
+
 		text.setText("Server has started.");
 		loadVersionData();
 		text.append("\nServer version: " + version);
-		
+
 		NetworkAdapter adapter = new NetworkAdapter();
 
 		try {
@@ -47,18 +51,19 @@ public class Server {
 
 		while (true) {
 			try {
-
+				text.append("\nServer is waiting for a new connection.");
 				long timeIn = System.currentTimeMillis();
 				while (!adapter.isConnected()) {
+					// System.out.println("Waiting..");
 					long timeOut = System.currentTimeMillis();
-					while (timeOut - timeIn <= 100)
+					while (timeOut - timeIn <= 200)
 						timeOut = System.currentTimeMillis();
 				} // Do nothing until Connected
 
 				text.append("\nServer has made a connection.");
 				while (adapter.isConnected()) {
 
-					//System.out.println("Server is running.");
+					// System.out.println("Server is running.");
 
 					if (adapter.isDataAvailable()) {
 						System.out.println("Data available.");
@@ -79,6 +84,8 @@ public class Server {
 							adapter.getOutputStream().flush(); // Let client
 																// know how long
 																// the file is
+							text.append("\nSending file of size "
+									+ updatedJar.length());
 
 							InputStream in = new FileInputStream(updatedJar);
 
@@ -86,6 +93,8 @@ public class Server {
 							int len;
 							while ((len = in.read(buf)) > 0) {
 								adapter.getOutputStream().write(buf, 0, len);
+								// text.append("\nWriting " + len +
+								// " bits of data");
 							}
 							in.close();
 							adapter.clearDataAvailable();
@@ -95,10 +104,15 @@ public class Server {
 						else if (input == 2) {
 							adapter.setConnected(false);
 							text.append("\nClient has disconnected.");
+							// adapter.rehost();
+							adapter.close();
+							adapter = new NetworkAdapter();
+							adapter.host(60);
 						}
-						
+
 					} else {
 						System.out.println("No data");
+						adapter.clearDataAvailable();
 					}
 
 					timeIn = System.currentTimeMillis();
@@ -130,7 +144,7 @@ public class Server {
 			Scanner scanner = new Scanner(file);
 
 			version = scanner.nextDouble();
-			
+
 			System.out.println("Found server version: " + version);
 
 			scanner.close();
