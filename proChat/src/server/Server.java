@@ -25,10 +25,13 @@ public class Server {
 		new Server();
 	}
 
+	JTextArea text;
+	NetworkAdapter adapter;
+
 	public Server() {
 		JFrame frame = new JFrame();
 
-		JTextArea text = new JTextArea();
+		text = new JTextArea();
 		JScrollPane scroller = new JScrollPane(text);
 		scroller.setAutoscrolls(true);
 
@@ -41,7 +44,7 @@ public class Server {
 		loadVersionData();
 		text.append("\nServer version: " + version);
 
-		NetworkAdapter adapter = new NetworkAdapter();
+		adapter = new NetworkAdapter(this);
 
 		try {
 			adapter.host(60);
@@ -49,83 +52,78 @@ public class Server {
 		} catch (Exception e) {
 		}
 
-		while (true) {
-			try {
-				text.append("\nServer is waiting for a new connection.");
-				long timeIn = System.currentTimeMillis();
-				while (!adapter.isConnected()) {
-					// System.out.println("Waiting..");
-					long timeOut = System.currentTimeMillis();
-					while (timeOut - timeIn <= 200)
-						timeOut = System.currentTimeMillis();
-				} // Do nothing until Connected
+		text.append("\nServer is waiting for a new connection.");
 
-				text.append("\nServer has made a connection.");
-				while (adapter.isConnected()) {
+	}
 
-					// System.out.println("Server is running.");
+	public void newConnection() {
+		try {
+			text.append("\nServer has made a connection.");
+			while (adapter.isConnected()) {
 
-					if (adapter.isDataAvailable()) {
-						System.out.println("Data available.");
-						int input = adapter.getInputStream().readInt();
+				// System.out.println("Server is running.");
 
-						System.out.println("Call = " + input);
+				if (adapter.isDataAvailable()) {
+					System.out.println("Data available.");
+					int input = adapter.getInputStream().readInt();
 
-						if (input == 0) {
-							adapter.getOutputStream().writeDouble(version);
-							adapter.clearDataAvailable();
-							text.append("\nSent version info.");
-						}
+					System.out.println("Call = " + input);
 
-						else if (input == 1) {
-							File updatedJar = new File("ProChatAlpha.jar");
-							adapter.getOutputStream().writeInt(
-									(int) updatedJar.length());
-							adapter.getOutputStream().flush(); // Let client
-																// know how long
-																// the file is
-							text.append("\nSending file of size "
-									+ updatedJar.length());
-
-							InputStream in = new FileInputStream(updatedJar);
-
-							byte[] buf = new byte[(int) updatedJar.length()];
-							int len;
-							while ((len = in.read(buf)) > 0) {
-								adapter.getOutputStream().write(buf, 0, len);
-								// text.append("\nWriting " + len +
-								// " bits of data");
-							}
-							in.close();
-							adapter.clearDataAvailable();
-							text.append("\nSent updated Jar.");
-						}
-
-						else if (input == 2) {
-							adapter.setConnected(false);
-							text.append("\nClient has disconnected.");
-							// adapter.rehost();
-							adapter.close();
-							adapter = new NetworkAdapter();
-							adapter.host(60);
-						}
-
-					} else {
-						System.out.println("No data");
+					if (input == 0) {
+						adapter.getOutputStream().writeDouble(version);
 						adapter.clearDataAvailable();
+						text.append("\nSent version info.");
 					}
 
-					timeIn = System.currentTimeMillis();
-					long timeOut = System.currentTimeMillis();
-					while (timeOut - timeIn <= 100)
-						timeOut = System.currentTimeMillis();
+					else if (input == 1) {
+						File updatedJar = new File("ProChatAlpha.jar");
+						adapter.getOutputStream().writeInt(
+								(int) updatedJar.length());
+						adapter.getOutputStream().flush(); // Let client
+															// know how long
+															// the file is
+						text.append("\nSending file of size "
+								+ updatedJar.length());
 
+						InputStream in = new FileInputStream(updatedJar);
+
+						byte[] buf = new byte[(int) updatedJar.length()];
+						int len;
+						while ((len = in.read(buf)) > 0) {
+							adapter.getOutputStream().write(buf, 0, len);
+							// text.append("\nWriting " + len +
+							// " bits of data");
+						}
+						in.close();
+						adapter.clearDataAvailable();
+						text.append("\nSent updated Jar.");
+					}
+
+					else if (input == 2) {
+						adapter.setConnected(false);
+						text.append("\nClient has disconnected.");
+						// adapter.rehost();
+						adapter.close();
+						adapter = new NetworkAdapter(this);
+						adapter.host(60);
+					}
+
+				} else {
+					System.out.println("No data");
+					adapter.clearDataAvailable();
 				}
 
-			} catch (Exception e) {
-				e.printStackTrace();
+				long timeIn = System.currentTimeMillis();
+				long timeOut = System.currentTimeMillis();
+				while (timeOut - timeIn <= 100)
+					timeOut = System.currentTimeMillis();
+
 			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		text.append("\nServer is waiting for a new connection.");
 	}
 
 	/**

@@ -28,11 +28,14 @@ public class NetworkAdapter {
 	protected int port;
 	protected boolean connected;
 	protected Socket connection;
+	Server server;
 
 	/**
 	 * Creates a new NetworkAdapter with no data available.
+	 * @param server 
 	 */
-	public NetworkAdapter() {
+	public NetworkAdapter(Server s) {
+		server = s;
 		dataAvailable = false;
 		connected = false;
 		System.out.println("Adapter created");
@@ -143,6 +146,7 @@ public class NetworkAdapter {
 		System.out.println("Listening");
 		connected = true;
 		hostThread.done = true;
+		server.newConnection();
 	}
 
 	/**
