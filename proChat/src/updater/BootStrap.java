@@ -2,7 +2,6 @@ package updater;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -50,11 +49,21 @@ public class BootStrap {
 
 			String serverVersion = "no data";
 			while (serverVersion.equals("no data")) {
+				try {
+				System.out.println(serverVersion);
 				if (adapter.isDataAvailable()) {
-					serverVersion = adapter.getBufferedReader().readLine();
+					text.append("version: " + serverVersion);
+					StringBuilder builder = new StringBuilder();
+					while (adapter.getInputStream().available() >= 2)
+						builder.append(adapter.getInputStream().readChar());
+					serverVersion = builder.toString();
+					
 				}
-				while (System.currentTimeMillis() % 100 != 0) {
-				} // wait
+				Thread.sleep(100);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 			text.append("\nServer Version: " + serverVersion);
