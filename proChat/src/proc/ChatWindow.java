@@ -312,8 +312,32 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		frame.setJMenuBar(menuBar);
 
-		JScrollPane scroller = new JScrollPane(chatArea);
+		final JScrollPane scroller = new JScrollPane(chatArea);
 		scroller.setAutoscrolls(true);
+		
+		scroller.getVerticalScrollBar().addAdjustmentListener(
+				new AdjustmentListener() {
+
+					BoundedRangeModel brm = scroller.getVerticalScrollBar()
+							.getModel();
+					boolean wasAtBottom = true;
+
+					public void adjustmentValueChanged(AdjustmentEvent e) {
+
+						if (!brm.getValueIsAdjusting()) {
+
+							if (wasAtBottom) {
+								//System.out.println("Was at bottom!");
+								brm.setValue(brm.getMaximum());
+							}
+						} else {
+							wasAtBottom = ((brm.getValue() + brm.getExtent()) == brm
+									.getMaximum());
+							//System.out.println("Bottom? " + wasAtBottom);
+						}
+
+					}
+				});
 
 		JButton send = new JButton("Send");
 		send.addActionListener(this);
