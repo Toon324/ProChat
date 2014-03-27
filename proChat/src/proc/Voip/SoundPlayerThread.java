@@ -55,8 +55,8 @@ public class SoundPlayerThread implements Runnable{
 			// format.getFrameSize())
 			// * format.getFrameRate();
 
-			int bufferSize = (int) format.getSampleRate()
-					* format.getFrameSize();
+			//int bufferSize = (int) format.getSampleRate()
+				//	* format.getFrameSize();
 			byte buffer2[] = new byte[call.getBufferSize()];
 			// int count2;
 
