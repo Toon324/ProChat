@@ -2,6 +2,7 @@ package updater;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -21,7 +22,7 @@ import javax.swing.JTextArea;
  */
 public class BootStrap {
 
-	static double version = 0.0;
+	static String version = "0.0.0";
 
 	/**
 	 * @param args
@@ -47,10 +48,10 @@ public class BootStrap {
 			adapter.getOutputStream().writeInt(0); // Request for version
 			adapter.getOutputStream().flush();
 
-			double serverVersion = 0.0;
-			while (serverVersion == 0.0) {
+			String serverVersion = "no data";
+			while (serverVersion.equals("no data")) {
 				if (adapter.isDataAvailable()) {
-					serverVersion = adapter.getInputStream().readDouble();
+					serverVersion = adapter.getBufferedReader().readLine();
 				}
 				while (System.currentTimeMillis() % 100 != 0) {
 				} // wait
@@ -58,7 +59,7 @@ public class BootStrap {
 
 			text.append("\nServer Version: " + serverVersion);
 
-			if (serverVersion > version) {
+			if (serverVersion.compareTo(version) > 0) {
 				text.append("\nUpdating from " + version + " to "
 						+ serverVersion);
 				adapter.getOutputStream().writeInt(1); // Request for updated
@@ -120,11 +121,11 @@ public class BootStrap {
 		}
 	}
 
-	private static void updateVersionIDTo(double serverVersion) {
+	private static void updateVersionIDTo(String serverVersion) {
 		File file = new File("src\\versionID.txt");
 		try {
 			FileWriter writer = new FileWriter(file);
-			writer.write("" + serverVersion);
+			writer.write(serverVersion);
 			writer.close();
 		} catch (Exception e) {
 		}
@@ -145,7 +146,7 @@ public class BootStrap {
 
 			Scanner scanner = new Scanner(file);
 
-			version = scanner.nextDouble();
+			version = scanner.next();
 
 			scanner.close();
 

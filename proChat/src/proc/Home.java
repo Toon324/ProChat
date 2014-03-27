@@ -315,7 +315,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		try {
 
 			DiscussionHistory history = new DiscussionHistory();
-			history.setMaxStanzas(150);
+			history.setSeconds(60*60*24); //Messages from the past day
+			//history.setMaxStanzas(150);
 
 			ChatWindow cw = new ChatWindow(user, mu);
 			cw.show();

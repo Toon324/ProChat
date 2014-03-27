@@ -1,8 +1,10 @@
 package updater;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**
@@ -26,6 +28,7 @@ public class NetworkAdapter {
 	protected int port;
 	protected boolean connected;
 	protected Socket connection;
+	private BufferedReader bufferedInput;
 
 	/**
 	 * Creates a new NetworkAdapter with no data available.
@@ -61,6 +64,7 @@ public class NetworkAdapter {
 		input = new DataInputStream(connection.getInputStream());
 		ConnectionListener cL = new ConnectionListener(this, input);
 		output = new DataOutputStream(connection.getOutputStream());
+		bufferedInput = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		cL.start();
 		connected = true;
 		return true;
@@ -91,6 +95,10 @@ public class NetworkAdapter {
 	 */
 	public DataInputStream getInputStream() {
 		return input;
+	}
+	
+	public BufferedReader getBufferedReader() {
+		return bufferedInput;
 	}
 
 	/**

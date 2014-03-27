@@ -16,7 +16,7 @@ import javax.swing.JTextArea;
  * 
  */
 public class Server {
-	private static double version = 0.0;
+	private static String version = "0.0";
 
 	/**
 	 * @param args
@@ -70,7 +70,7 @@ public class Server {
 					System.out.println("Call = " + input);
 
 					if (input == 0) {
-						adapter.getOutputStream().writeDouble(version);
+						adapter.getOutputStream().writeChars(version);
 						adapter.clearDataAvailable();
 						text.append("\nSent version info.");
 					}
@@ -135,13 +135,13 @@ public class Server {
 			if (!file.exists()) { // If file doesn't exist, create one
 				file.createNewFile();
 				FileWriter writer = new FileWriter(file);
-				writer.write("1.0");
+				writer.write("0.0.0");
 				writer.close();
 			}
 
 			Scanner scanner = new Scanner(file);
 
-			version = scanner.nextDouble();
+			version = scanner.next();
 
 			System.out.println("Found server version: " + version);
 
