@@ -293,6 +293,9 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		MultiUserChat mu = new MultiUserChat(connection.getConnection(), name
 				+ "@conference." + serverName);
 		boolean shouldJoin = true;
+		ChatWindow cw = new ChatWindow(user, mu);
+		
+		currentChats.add(cw);
 		try {
 			mu.create(user.getName());
 
@@ -316,17 +319,14 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			DiscussionHistory history = new DiscussionHistory();
 			history.setSeconds(60*60*24); //Messages from the past day
 			//history.setMaxStanzas(150);
-
-			ChatWindow cw = new ChatWindow(user, mu);
-			cw.show();
-			currentChats.add(cw);
-
 			if (shouldJoin)
 				mu.join(user.userName, "", history,
 						SmackConfiguration.getPacketReplyTimeout());
 
 			connection.getConnection().getRoster()
 					.createEntry(name + "@conference" + serverName, name, null);
+			
+			cw.show();
 
 		} catch (XMPPException e1) {
 			e1.printStackTrace();
@@ -385,7 +385,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		}
 
 		for (ChatWindow c : currentChats) {
-			// Log.l("Found Chat with " + c.getFullFrom());
+			//Log.l("Comparing " + from + " to " + c.getFullFrom());
 			if (c.getFullFrom().equals(
 					msg.getFrom().substring(0, msg.getFrom().indexOf("/")))) {
 				activeChat = c;
