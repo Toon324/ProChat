@@ -39,6 +39,8 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
+import net.miginfocom.swing.MigLayout;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
@@ -184,12 +186,21 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		// Group menu
 		JMenu groupMenu = new JMenu("Groups");
-		contactMenu.setMnemonic(KeyEvent.VK_G);
+		groupMenu.setMnemonic(KeyEvent.VK_G);
 		menuBar.add(groupMenu);
 
 		JMenuItem joinGroup = new JMenuItem("Join Group");
 		groupMenu.add(joinGroup);
 		joinGroup.addActionListener(this);
+
+		// Help menu
+		JMenu helpMenu = new JMenu("Help");
+		helpMenu.setMnemonic(KeyEvent.VK_H);
+		menuBar.add(helpMenu);
+
+		JMenuItem showQuick = new JMenuItem("Quick Guide");
+		helpMenu.add(showQuick);
+		showQuick.addActionListener(this);
 
 		try {
 			URL whatismyip = new URL("http://checkip.amazonaws.com");
@@ -294,7 +305,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				+ "@conference." + serverName);
 		boolean shouldJoin = true;
 		ChatWindow cw = new ChatWindow(user, mu);
-		
+
 		currentChats.add(cw);
 		try {
 			mu.create(user.getName());
@@ -317,15 +328,15 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		try {
 
 			DiscussionHistory history = new DiscussionHistory();
-			history.setSeconds(60*60*24); //Messages from the past day
-			//history.setMaxStanzas(150);
+			history.setSeconds(60 * 60 * 24); // Messages from the past day
+			// history.setMaxStanzas(150);
 			if (shouldJoin)
 				mu.join(user.userName, "", history,
 						SmackConfiguration.getPacketReplyTimeout());
 
 			connection.getConnection().getRoster()
 					.createEntry(name + "@conference" + serverName, name, null);
-			
+
 			cw.show();
 
 		} catch (XMPPException e1) {
@@ -364,7 +375,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				}
 				return;
 			} else if (msg.getSubject().equals("IP")) {
-				//new VoiceCall(msg.getBody());
+				// new VoiceCall(msg.getBody());
 				return;
 			}
 		}
@@ -385,7 +396,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		}
 
 		for (ChatWindow c : currentChats) {
-			//Log.l("Comparing " + from + " to " + c.getFullFrom());
+			// Log.l("Comparing " + from + " to " + c.getFullFrom());
 			if (c.getFullFrom().equals(
 					msg.getFrom().substring(0, msg.getFrom().indexOf("/")))) {
 				activeChat = c;
@@ -413,7 +424,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Chat")) {
+		String cmd = e.getActionCommand();
+		if (cmd.equals("Chat")) {
 
 			String connectTo = to.getText();
 
@@ -431,25 +443,35 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 			} else
 				openChat(connectTo);
-		} else if (e.getActionCommand().equals("Add Contact"))
+		} else if (cmd.equals("Add Contact"))
 			addContact();
-		else if (e.getActionCommand().equals("Join Group"))
+		else if (cmd.equals("Join Group"))
 			joinGroup();
-		else if (e.getActionCommand().equals("View Profile"))
+		else if (cmd.equals("View Profile"))
 			viewProfile(user);
-		else if (e.getActionCommand().equals("Link"))
+		else if (cmd.equals("Link"))
 			linkID();
-		else if (e.getActionCommand().equals("Remove Contact"))
+		else if (cmd.equals("Remove Contact"))
 			removeContact();
-		else if (e.getActionCommand().equals("Window Color"))
+		else if (cmd.equals("Window Color"))
 			setColor();
-		else if (e.getActionCommand().equals("Exit Program"))
+		else if (cmd.equals("Exit Program"))
 			System.exit(0);
-		else if (e.getActionCommand().equals("Sign Out")) {
+		else if (cmd.equals("Quick Guide"))
+			showQuickGuide();
+		else if (cmd.equals("Sign Out")) {
 			connection.getConnection().disconnect();
 			new LoginWindow();
 			frame.dispose();
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void showQuickGuide() {
+		new QuickGuide();
+
 	}
 
 	private void setColor() {
@@ -814,20 +836,16 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 	private void requestIP() {
 		/*
-		String other = ((User) contacts.getSelectedValue()).getName();
-
-		try {
-			Message message = new Message();
-			message.setTo(other + "@" + serverName);
-			Log.l("Requesting IP from " + message.getTo());
-			message.setSubject("IP request");
-			message.setBody(Inet4Address.getLocalHost().getHostAddress());
-			message.setType(Message.Type.headline);
-			connection.getConnection().sendPacket(message);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		*/
+		 * String other = ((User) contacts.getSelectedValue()).getName();
+		 * 
+		 * try { Message message = new Message(); message.setTo(other + "@" +
+		 * serverName); Log.l("Requesting IP from " + message.getTo());
+		 * message.setSubject("IP request");
+		 * message.setBody(Inet4Address.getLocalHost().getHostAddress());
+		 * message.setType(Message.Type.headline);
+		 * connection.getConnection().sendPacket(message); } catch (Exception e)
+		 * { e.printStackTrace(); }
+		 */
 	}
 
 	private void viewOtherProfile(String id) {
