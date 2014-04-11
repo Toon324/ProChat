@@ -220,6 +220,7 @@ public class LoginWindow implements ActionListener, KeyListener {
 
 	}
 
+	boolean enterFix = false;
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -227,8 +228,11 @@ public class LoginWindow implements ActionListener, KeyListener {
 	 */
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_ENTER)
-			login();
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			enterFix = !enterFix; //Allows closing of invalid login window without trying to log in again.
+			if (enterFix)
+				login();
+		}
 
 	}
 
