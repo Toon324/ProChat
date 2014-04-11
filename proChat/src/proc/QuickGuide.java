@@ -10,6 +10,7 @@ public class QuickGuide extends JFrame {
 	
 	public QuickGuide() {
 		initComponents();
+		setResizable(false);
 		setVisible(true);
 	}
 	
