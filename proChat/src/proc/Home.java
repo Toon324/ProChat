@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.Inet4Address;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -39,8 +40,6 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
-import net.miginfocom.swing.MigLayout;
-
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
@@ -61,6 +60,8 @@ import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+
+import proc.Voip.VoiceCall;
 
 /**
  * @author Cody Swendrowski
@@ -369,13 +370,13 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					message.setType(Message.Type.headline);
 					Log.l("Sent ip: " + message.getBody());
 					connection.getConnection().sendPacket(message);
-					// new VoiceCall(msg.getBody());
+					new VoiceCall(msg.getBody());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				return;
 			} else if (msg.getSubject().equals("IP")) {
-				// new VoiceCall(msg.getBody());
+				new VoiceCall(msg.getBody());
 				return;
 			}
 		}
@@ -835,17 +836,22 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	}
 
 	private void requestIP() {
-		/*
-		 * String other = ((User) contacts.getSelectedValue()).getName();
-		 * 
-		 * try { Message message = new Message(); message.setTo(other + "@" +
-		 * serverName); Log.l("Requesting IP from " + message.getTo());
-		 * message.setSubject("IP request");
-		 * message.setBody(Inet4Address.getLocalHost().getHostAddress());
-		 * message.setType(Message.Type.headline);
-		 * connection.getConnection().sendPacket(message); } catch (Exception e)
-		 * { e.printStackTrace(); }
-		 */
+
+		String other = ((User) contacts.getSelectedValue()).getName();
+
+		try {
+			Message message = new Message();
+			message.setTo(other + "@" + serverName);
+			Log.l("Requesting IP from " + message.getTo());
+			message.setSubject("IP request");
+			message.setBody(IP);
+			message.setType(Message.Type.headline);
+			Log.l("Sending IP: " + IP);
+			connection.getConnection().sendPacket(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void viewOtherProfile(String id) {

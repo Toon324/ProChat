@@ -15,6 +15,10 @@ public class VoiceCall {
 	AudioCapture ac;
 	RecieveAudio ra;
 	
+	public void main(String[] args) {
+		new VoiceCall("129.89.185.223");
+	}
+	
 	public VoiceCall(String ip) {
 		
 		threadPool = Executors.newCachedThreadPool();
