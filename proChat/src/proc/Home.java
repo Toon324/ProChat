@@ -234,6 +234,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			e.printStackTrace();
 		}
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setLocation(300, 200);
 
 		serverIP = "129.89.185.120";
 		serverName = "127.0.0.1";

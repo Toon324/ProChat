@@ -135,10 +135,12 @@ public class LoginWindow implements ActionListener, KeyListener {
         loginPass.setText(pass);
         loginPass.addKeyListener(this);
 
-        jButton1.setText("Submit");
+        jButton1.setText("Login");
+        jButton1.setActionCommand("Login");
         jButton1.addActionListener(this);
 
         jButton2.setText("Register");
+        jButton2.setActionCommand("Register");
         jButton2.addActionListener(this);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(frame.getContentPane());

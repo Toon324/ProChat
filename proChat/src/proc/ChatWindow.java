@@ -78,6 +78,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		frame = new JFrame();
 		frame.setSize(400, 600);
 		frame.setTitle("ProChat: Chatting with " + c.getParticipant());
+		frame.setLocation(550, 200);
 
 		chatArea = new JEditorPane();
 		entry = new JTextField("");
