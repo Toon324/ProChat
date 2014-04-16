@@ -3,6 +3,7 @@ package proc.Voip;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
 
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JFrame;
@@ -18,11 +19,11 @@ import proc.Log;
 public class RecieveAudio {
 	ServerSocket server;
 	Socket socket;
-	JTextArea text;
-	VoiceCall call;
+	static JTextArea text;
+	ExecutorService pool;
 
-	public RecieveAudio(VoiceCall voiceCall) {
-		call = voiceCall;
+	public RecieveAudio(ExecutorService threadPool) {
+		pool = threadPool;
 		JFrame frame = new JFrame();
 		text = new JTextArea();
 
@@ -52,7 +53,7 @@ public class RecieveAudio {
 		// Log.l("Listening for audio.");
 		text.append("\nListening...");
 
-		call.getPool().execute(new ConnectionListenerThread(this, server));
+		pool.execute(new ConnectionListenerThread(this, server));
 
 		// }
 		// catch(LineUnavailableException e) {
@@ -60,7 +61,7 @@ public class RecieveAudio {
 		// }
 	}// End of PlayAudio method
 
-	public AudioFormat getAudioFormat() {
+	public static AudioFormat getAudioFormat() {
 		float sampleRate = 16000.0F;
 		// 8000,11025,16000,22050,44100
 		int sampleSizeInBits = 16;
@@ -81,7 +82,7 @@ public class RecieveAudio {
 
 			InputStream in = s.getInputStream();
 			
-			call.getPool().execute(new AudioListenerThread(call, in));
+			pool.execute(new AudioListenerThread(pool, in));
 			
 			
 
@@ -90,7 +91,7 @@ public class RecieveAudio {
 		}
 	}
 
-	public void setInfo(String s) {
+	public static void setInfo(String s) {
 		text.setText(s);
 	}
 }

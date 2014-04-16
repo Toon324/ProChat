@@ -11,7 +11,7 @@ import proc.Log;
 public class VoiceCall {
 	
 	ExecutorService threadPool;
-	int bufferSize = 16000;
+	static int bufferSize = 16000;
 	AudioCapture ac;
 	RecieveAudio ra;
 	
@@ -25,9 +25,9 @@ public class VoiceCall {
 		
 		Log.l("Starting voice call with IP " + ip);
 		
-		ac = new AudioCapture(ip, this);
+		ac = new AudioCapture(ip, threadPool);
 
-		ra = new RecieveAudio(this);
+		ra = new RecieveAudio(threadPool);
 		ra.playAudio(); //Listen for audio
 		
 		//ac.captureAudio(); //Capture

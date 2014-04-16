@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -31,10 +33,14 @@ public class AudioCapture implements ActionListener {
 	String IP = "";
 	JTextArea text;
 	JFrame frame;
-	VoiceCall call;
+	ExecutorService pool;
+	
+	public static void main(String[] args) {
+		new AudioCapture("129.89.185.120", Executors.newCachedThreadPool()); 
+	}
 
-	public AudioCapture(String ip, VoiceCall voiceCall) {// constructor
-		call = voiceCall;
+	public AudioCapture(String ip, ExecutorService threadPool) {// constructor
+		pool = threadPool;
 		IP = ip;
 		frame = new JFrame();
 		text = new JTextArea();
@@ -63,42 +69,43 @@ public class AudioCapture implements ActionListener {
 	// a ByteArrayOutputStream object.
 	public void captureAudio() {
 		try {
-			// Get everything set up for
-			// capture
-			audioFormat = getAudioFormat();
-			DataLine.Info dataLineInfo = new DataLine.Info(
-					TargetDataLine.class, audioFormat);
-			targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-			targetDataLine.open(audioFormat);
-			targetDataLine.start();
-
-			frame.requestFocus();
-
-			/*
-			 * int bufferSize = (int) audioFormat.getSampleRate()
-			 * audioFormat.getFrameSize(); final byte buffer[] = new
-			 * byte[bufferSize];
-			 */
-			final byte[] buffer = new byte[call.bufferSize];
-			Socket socket = null;
-
-			try {
-				socket = new Socket(IP, 20);
-				Log.l("Created");
-				// socket = new Socket("127.0.0.1", 20);
-				Log.l("Socket created");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			final BufferedOutputStream objectOutputStream = new BufferedOutputStream(
-					socket.getOutputStream());
-
-			// Create a thread to capture the
-			// microphone data and send it
-			call.getPool().execute(
-					new SendAudioThread(buffer, objectOutputStream,
-							targetDataLine, text));
+//			// Get everything set up for
+//			// capture
+//			audioFormat = getAudioFormat();
+//			DataLine.Info dataLineInfo = new DataLine.Info(
+//					TargetDataLine.class, audioFormat);
+//			targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+//			targetDataLine.open(audioFormat);
+//			targetDataLine.start();
+//
+//			frame.requestFocus();
+//
+//			/*
+//			 * int bufferSize = (int) audioFormat.getSampleRate()
+//			 * audioFormat.getFrameSize(); final byte buffer[] = new
+//			 * byte[bufferSize];
+//			 */
+//			final byte[] buffer = new byte[VoiceCall.bufferSize];
+//			Socket socket = null;
+//
+//			try {
+//				socket = new Socket(IP, 20);
+//				Log.l("Created");
+//				// socket = new Socket("127.0.0.1", 20);
+//				Log.l("Socket created");
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//
+//			final BufferedOutputStream objectOutputStream = new BufferedOutputStream(
+//					socket.getOutputStream());
+//
+//			// Create a thread to capture the
+//			// microphone data and send it
+//			pool.execute(
+//					new SendAudioThread(buffer, objectOutputStream,
+//							targetDataLine, text));
+			pool.execute(new SendAudioThread(null, null, null, text));
 			/*
 			 * Thread captureThread = new Thread(runner); captureThread.start();
 			 */

@@ -1,18 +1,19 @@
 package proc.Voip;
 
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
 
 public class AudioListenerThread extends Thread implements Runnable {
 
 	byte[] buffer;
 	InputStream is;
 	int count;
-	VoiceCall voice;
+	ExecutorService pool;
 
-	public AudioListenerThread(VoiceCall call, InputStream in) {
-		voice = call;
+	public AudioListenerThread(ExecutorService p, InputStream in) {
+		pool = p;
 		is = in;
-		buffer = new byte[call.getBufferSize()];
+		buffer = new byte[VoiceCall.bufferSize];
 	}
 
 	boolean atEnd = false;
@@ -28,7 +29,7 @@ public class AudioListenerThread extends Thread implements Runnable {
 				}
 				// text.append("\n" + buffer[0] + "  " + buffer[1] + "   " +
 				// buffer[2]);
-				voice.getPool().execute(new SoundPlayerThread(buffer, voice));
+				pool.execute(new SoundPlayerThread(buffer, pool));
 			} catch (Exception e) {
 				e.printStackTrace();
 				atEnd = true;

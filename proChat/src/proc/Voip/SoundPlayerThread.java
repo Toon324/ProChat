@@ -2,6 +2,7 @@ package proc.Voip;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -12,13 +13,13 @@ import javax.sound.sampled.SourceDataLine;
 public class SoundPlayerThread implements Runnable{
 	byte[] buffer;
 	private AudioFormat format;
-	private VoiceCall call;
+	private ExecutorService pool;
 	private boolean done = false;
 
-	public SoundPlayerThread(byte[] buff, VoiceCall voice) {
+	public SoundPlayerThread(byte[] buff, ExecutorService p) {
 		buffer = buff;
-		format = voice.getRecieve().getAudioFormat();
-		call = voice;
+		format = RecieveAudio.getAudioFormat();
+		pool = p;
 	}
 
 	public void run() {
@@ -48,7 +49,7 @@ public class SoundPlayerThread implements Runnable{
 			sline.open(format);
 			sline.start();
 
-			call.getRecieve().setInfo(buffer.length + "   " + buffer[0] + "   " + buffer[1]
+			RecieveAudio.setInfo(buffer.length + "   " + buffer[0] + "   " + buffer[1]
 					+ "   " + buffer[2] + "   " + buffer[3]);
 
 			// Float audioLen = (decoded.length /
@@ -57,7 +58,7 @@ public class SoundPlayerThread implements Runnable{
 
 			//int bufferSize = (int) format.getSampleRate()
 				//	* format.getFrameSize();
-			byte buffer2[] = new byte[call.getBufferSize()];
+			byte buffer2[] = new byte[VoiceCall.bufferSize];
 			// int count2;
 
 			ais.read(buffer2, 0, buffer2.length);
