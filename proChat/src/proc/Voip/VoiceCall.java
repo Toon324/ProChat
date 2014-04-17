@@ -13,7 +13,7 @@ import proc.Log;
 public class VoiceCall {
 
 	ExecutorService threadPool;
-	static int bufferSize = 16000;
+	static int bufferSize = 8002;
 	AudioCapture ac;
 	RecieveAudio ra;
 
