@@ -34,7 +34,7 @@ public class UDPInThread implements Runnable {
 		try {	
 			
 			
-			RecieveAudio.text.append("\nWaiting on packet");
+			RecieveAudio.text.append("\nWaiting on packet at " + datagram.getAddress() + ":" + datagram.getPort());
 			sock.receive(datagram);
 			RecieveAudio.text.append("\nPacket recieved.");
 			

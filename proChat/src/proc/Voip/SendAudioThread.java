@@ -90,6 +90,8 @@ public class SendAudioThread extends Thread implements Runnable {
 			DatagramPacket toSend = new DatagramPacket(testData,
 					testData.length, InetAddress.getByName("129.89.185.120"),
 					1324);
+			
+			text.append("\nSending data to " + toSend.getAddress() +":" + toSend.getPort());
 
 			toSend.setData(testData);
 			sock.send(toSend);

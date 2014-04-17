@@ -60,6 +60,9 @@ public class AudioCapture implements ActionListener {
 		frame.setLocation(300, 300);
 		frame.setVisible(true);
 		frame.setTitle("Input info");
+		
+		text.append("This IP: " + VoiceCall.fetchExternalIP());
+		
 		frame.requestFocus();
 
 	}// end constructor

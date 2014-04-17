@@ -58,7 +58,7 @@ public class RecieveAudio {
 		// try{
 
 		// Log.l("Listening for audio.");
-		text.append("\nListening...");
+		text.append("\nListening @ IP " + VoiceCall.fetchExternalIP());
 
 		//pool.execute(new ConnectionListenerThread(this, server));
 		pool.execute(new UDPInThread());
