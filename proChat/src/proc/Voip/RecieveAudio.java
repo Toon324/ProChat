@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JFrame;
@@ -21,6 +22,12 @@ public class RecieveAudio {
 	Socket socket;
 	static JTextArea text;
 	ExecutorService pool;
+	
+	public void main(String[] args) {
+		RecieveAudio ra = new RecieveAudio(Executors.newCachedThreadPool());
+		ra.playAudio();
+		
+	}
 
 	public RecieveAudio(ExecutorService threadPool) {
 		pool = threadPool;
