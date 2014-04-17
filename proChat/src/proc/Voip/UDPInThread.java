@@ -3,7 +3,6 @@ package proc.Voip;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
@@ -21,7 +20,7 @@ public class UDPInThread implements Runnable {
 		try {
 			sock = new DatagramSocket(1324);
 			datagram = new DatagramPacket(inputData, inputData.length);
-			RecieveAudio.text.append("\nSocket Created.");
+			//RecieveAudio.text.append("\nSocket Created.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -42,17 +41,14 @@ public class UDPInThread implements Runnable {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		while (true) {
-			
+		while (true) {	
 			try {
-
 				sock.receive(datagram);
 
 				byte[] data = datagram.getData();
 				RecieveAudio.text.setText("\n" + data[0] + " " + data[1] + " " + data[2] + " " + data[3] + " " +data[4]);
 
 				ra.recievePacket(data);
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

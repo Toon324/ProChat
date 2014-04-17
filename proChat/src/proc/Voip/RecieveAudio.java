@@ -1,6 +1,5 @@
 package proc.Voip;
 
-import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -44,36 +43,21 @@ public class RecieveAudio {
 		frame.setSize(400, 400);
 		frame.setLocation(800, 200);
 		frame.setVisible(true);
-
-		// try {
-		// server = new ServerSocket(20);
-		// Log.l("Server created");
-		// text.append("Server created. Hosting at " + Home.getIP());
-		//
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
 	}
 
 	final AudioFormat format = getAudioFormat();
 	private SoundPlayerThread playAudioThread;
 
 	public void playAudio() {
-		// try{
 
-		// Log.l("Listening for audio.");
 		text.append("\nListening @ IP " + VoiceCall.fetchExternalIP());
-
-		// pool.execute(new ConnectionListenerThread(this, server));
+		
 		playAudioThread = new SoundPlayerThread();
 		pool.execute(playAudioThread);
 		pool.execute(new UDPInThread(this));
 
-		// }
-		// catch(LineUnavailableException e) {
-		// System.exit(-4);
-		// }
-	}// End of PlayAudio method
+	
+	}
 
 	public static AudioFormat getAudioFormat() {
 		float sampleRate = 8000.0F;
@@ -90,18 +74,6 @@ public class RecieveAudio {
 				bigEndian);
 	}// end getAudioFormat
 
-	public void alertConnection(Socket s) {
-		try {
-			text.append("connection accepted");
-
-			InputStream in = s.getInputStream();
-
-			pool.execute(new AudioListenerThread(pool, in));
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public static void setInfo(String s) {
 		text.setText(s);
