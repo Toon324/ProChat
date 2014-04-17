@@ -4,6 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /**
  * @author Cody
@@ -11,7 +12,7 @@ import java.net.SocketException;
  */
 public class UDPInThread implements Runnable {
 	DatagramSocket sock;
-	byte[] inputData = new byte[1024];
+	byte[] inputData = new byte[VoiceCall.bufferSize];
 	DatagramPacket datagram;
 	RecieveAudio ra;
 
@@ -33,18 +34,24 @@ public class UDPInThread implements Runnable {
 	 */
 	@Override
 	public void run() {
+		try {
+			RecieveAudio.text.append("\nWaiting on packet at "
+					+ InetAddress.getLocalHost().getHostAddress() + ":"
+					+ sock.getLocalPort() + "\n");
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		while (true) {
+			
 			try {
 
-				RecieveAudio.text.append("\nWaiting on packet at "
-						+ InetAddress.getLocalHost().getHostAddress() + ":"
-						+ sock.getLocalPort() + "\n");
 				sock.receive(datagram);
 
-				for (byte b : datagram.getData())
-					RecieveAudio.text.append(" " + b);
+				byte[] data = datagram.getData();
+				RecieveAudio.text.setText("\n" + data[0] + " " + data[1] + " " + data[2] + " " + data[3] + " " +data[4]);
 
-				ra.recievePacket(datagram.getData());
+				ra.recievePacket(data);
 
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -17,7 +17,7 @@ public class SendAudioThread extends Thread implements Runnable {
 	private BufferedOutputStream objectOutputStream;
 	JTextArea text;
 	DatagramSocket sock;
-	private boolean shouldSend;
+	private boolean shouldSend = true;
 
 	public SendAudioThread(byte[] buff, BufferedOutputStream output,
 			TargetDataLine data, JTextArea t) {
@@ -82,7 +82,7 @@ public class SendAudioThread extends Thread implements Runnable {
 		// } catch (Exception e) {
 		// e.printStackTrace();
 		// }
-		byte[] data = new byte[1024];
+		byte[] data = new byte[VoiceCall.bufferSize];
 
 		try {
 			DatagramPacket toSend = new DatagramPacket(data, data.length,

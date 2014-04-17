@@ -45,6 +45,6 @@ public class SoundPlayerThread implements Runnable {
 		sourceDataLine.write(buffer, 0, buffer.length);
 		sourceDataLine.drain();
 		hasData = true;
-		Log.l("Data loaded.");
+		//Log.l("Data loaded.");
 	}
 }

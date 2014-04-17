@@ -8,9 +8,9 @@ import java.util.concurrent.Executors;
 
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import proc.Home;
 import proc.Log;
 
 /**
@@ -33,8 +33,11 @@ public class RecieveAudio {
 		pool = threadPool;
 		JFrame frame = new JFrame();
 		text = new JTextArea();
+		
+		JScrollPane scroller = new JScrollPane(text);
+		scroller.setAutoscrolls(true);
 
-		frame.add(text);
+		frame.add(scroller);
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -73,7 +76,7 @@ public class RecieveAudio {
 	}// End of PlayAudio method
 
 	public static AudioFormat getAudioFormat() {
-		float sampleRate = 16000.0F;
+		float sampleRate = 8000.0F;
 		// 8000,11025,16000,22050,44100
 		int sampleSizeInBits = 16;
 		// 8,16
