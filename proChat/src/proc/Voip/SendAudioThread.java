@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JTextArea;
@@ -14,6 +15,7 @@ public class SendAudioThread extends Thread implements Runnable {
 	private byte[] buffer;
 	private BufferedOutputStream objectOutputStream;
 	JTextArea text;
+	DatagramSocket sock;
 
 	public SendAudioThread(byte[] buff, BufferedOutputStream output,
 			TargetDataLine data, JTextArea t) {
@@ -21,6 +23,12 @@ public class SendAudioThread extends Thread implements Runnable {
 		objectOutputStream = output;
 		targetDataLine = data;
 		text = t;
+		try {
+			sock = new DatagramSocket();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void run() {
@@ -75,29 +83,27 @@ public class SendAudioThread extends Thread implements Runnable {
 		byte[] testData = new byte[10];
 		for (int x = 0; x < testData.length; x++) {
 			testData[x] = (byte) x;
-			text.append("    " + (byte) x);
+			// text.append("  " + (byte) x);
 		}
+
 		try {
-			DatagramSocket sock = new DatagramSocket();
-			
-			while (running) {
-				try {
-					DatagramPacket toSend = new DatagramPacket(testData, 0, testData.length);
-					toSend.setAddress(InetAddress.getByName("129.89.185.120"));
-					toSend.setPort(324);
-					sock.send(toSend);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
+			DatagramPacket toSend = new DatagramPacket(testData,
+					testData.length, InetAddress.getByName("129.89.185.120"),
+					1324);
+
+			toSend.setData(testData);
+			sock.send(toSend);
+
+			text.append("\nSent.");
+
 			sock.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
 	boolean running = true;
-	
+
 	public void close() {
 		running = false;
 	}
