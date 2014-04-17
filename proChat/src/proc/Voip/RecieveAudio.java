@@ -60,8 +60,9 @@ public class RecieveAudio {
 		// Log.l("Listening for audio.");
 		text.append("\nListening...");
 
-		pool.execute(new ConnectionListenerThread(this, server));
-
+		//pool.execute(new ConnectionListenerThread(this, server));
+		pool.execute(new UDPInThread());
+		
 		// }
 		// catch(LineUnavailableException e) {
 		// System.exit(-4);
