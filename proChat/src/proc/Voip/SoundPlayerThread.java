@@ -1,78 +1,50 @@
 package proc.Voip;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.concurrent.ExecutorService;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 
-public class SoundPlayerThread implements Runnable{
-	byte[] buffer;
-	private AudioFormat format;
-	private ExecutorService pool;
-	private boolean done = false;
+import proc.Log;
 
-	public SoundPlayerThread(byte[] buff, ExecutorService p) {
-		buffer = buff;
-		format = RecieveAudio.getAudioFormat();
-		pool = p;
+public class SoundPlayerThread implements Runnable {
+	byte[] buffer;
+	private boolean hasData = false;
+	SourceDataLine sourceDataLine;
+
+	public SoundPlayerThread() {
+		try {
+			DataLine.Info dataLineInfo = new DataLine.Info(
+					SourceDataLine.class, RecieveAudio.getAudioFormat());
+			sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+			sourceDataLine.open(RecieveAudio.getAudioFormat());
+			sourceDataLine.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void run() {
-		if (done)
-			return;
-		try {
-			/*
-			 * SpeexDecoder decoder = new SpeexDecoder(); decoder.init(1, 16000,
-			 * 1, false); decoder.processData(buffer, 0, buffer.length);
-			 * 
-			 * byte[] decoded = new byte[decoder.getProcessedDataByteSize()];
-			 * 
-			 * decoder.getProcessedData(decoded, 0);
-			 * 
-			 * text.setText(decoded[0] + "   " + decoded[1] + "   " + decoded[2]
-			 * + "   " + decoded[3]);
-			 * 
-			 * InputStream input = new ByteArrayInputStream(decoded);
-			 */
-			InputStream input = new ByteArrayInputStream(buffer);
+//		while (true) {
+//			//Log.l("HasData: " + hasData);
+//			if (hasData) {
+//				Log.l("HasData.");
+//				try {
+//					sourceDataLine.write(buffer, 0, buffer.length);
+//					sourceDataLine.drain();
+//					hasData = false;
+//					Log.l("Data played to sound output.");
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+	}
 
-			final AudioInputStream ais = new AudioInputStream(input, format,
-					buffer.length / format.getFrameSize());
-
-			DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-			SourceDataLine sline = (SourceDataLine) AudioSystem.getLine(info);
-			sline.open(format);
-			sline.start();
-
-			RecieveAudio.setInfo(buffer.length + "   " + buffer[0] + "   " + buffer[1]
-					+ "   " + buffer[2] + "   " + buffer[3]);
-
-			// Float audioLen = (decoded.length /
-			// format.getFrameSize())
-			// * format.getFrameRate();
-
-			//int bufferSize = (int) format.getSampleRate()
-				//	* format.getFrameSize();
-			byte buffer2[] = new byte[VoiceCall.bufferSize];
-			// int count2;
-
-			ais.read(buffer2, 0, buffer2.length);
-			sline.write(buffer2, 0, buffer2.length);
-			sline.flush();
-			sline.drain();
-			// sline.stop();
-			// sline.close();
-			buffer2 = null;
-
-			done = true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			done = true;
-		}
+	public void loadData(byte[] toLoad) {
+		buffer = toLoad;
+		sourceDataLine.write(buffer, 0, buffer.length);
+		sourceDataLine.drain();
+		hasData = true;
+		Log.l("Data loaded.");
 	}
 }

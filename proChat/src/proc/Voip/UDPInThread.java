@@ -11,10 +11,12 @@ import java.net.SocketException;
  */
 public class UDPInThread implements Runnable {
 	DatagramSocket sock;
-	byte[] inputData = new byte[10];
+	byte[] inputData = new byte[1024];
 	DatagramPacket datagram;
-	
-	public UDPInThread() {
+	RecieveAudio ra;
+
+	public UDPInThread(RecieveAudio r) {
+		ra = r;
 		try {
 			sock = new DatagramSocket(1324);
 			datagram = new DatagramPacket(inputData, inputData.length);
@@ -31,20 +33,23 @@ public class UDPInThread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		try {	
-			
-			
-			RecieveAudio.text.append("\nWaiting on packet at " + InetAddress.getLocalHost().getHostAddress() + ":" + sock.getLocalPort());
-			sock.receive(datagram);
-			RecieveAudio.text.append("\nPacket recieved.");
-			
-			for (byte b : datagram.getData())
-				RecieveAudio.text.append("   " + b);
+		while (true) {
+			try {
 
-		} catch (Exception e) {
-			e.printStackTrace();
+				RecieveAudio.text.append("\nWaiting on packet at "
+						+ InetAddress.getLocalHost().getHostAddress() + ":"
+						+ sock.getLocalPort() + "\n");
+				sock.receive(datagram);
+
+				for (byte b : datagram.getData())
+					RecieveAudio.text.append(" " + b);
+
+				ra.recievePacket(datagram.getData());
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-
 	}
 
 }

@@ -33,7 +33,7 @@ public class Log {
 			writer.println();
 			writer.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//System.out.println("Could not access log writter.");
 		}
 	}
 

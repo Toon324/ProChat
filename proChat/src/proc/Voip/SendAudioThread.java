@@ -4,8 +4,9 @@ import java.io.BufferedOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JTextArea;
 
@@ -16,6 +17,7 @@ public class SendAudioThread extends Thread implements Runnable {
 	private BufferedOutputStream objectOutputStream;
 	JTextArea text;
 	DatagramSocket sock;
+	private boolean shouldSend;
 
 	public SendAudioThread(byte[] buff, BufferedOutputStream output,
 			TargetDataLine data, JTextArea t) {
@@ -80,23 +82,29 @@ public class SendAudioThread extends Thread implements Runnable {
 		// } catch (Exception e) {
 		// e.printStackTrace();
 		// }
-		byte[] testData = new byte[10];
-		for (int x = 0; x < testData.length; x++) {
-			testData[x] = (byte) x;
-			// text.append("  " + (byte) x);
-		}
+		byte[] data = new byte[1024];
 
 		try {
-			DatagramPacket toSend = new DatagramPacket(testData,
-					testData.length, InetAddress.getByName("129.89.185.120"),
-					1324);
-			
-			text.append("\nSending data to " + toSend.getAddress() +":" + toSend.getPort());
+			DatagramPacket toSend = new DatagramPacket(data, data.length,
+					InetAddress.getByName("129.89.185.120"), 1324);
+			DataLine.Info dataLineInfo = new DataLine.Info(
+					TargetDataLine.class, RecieveAudio.getAudioFormat());
+			TargetDataLine targetDataLine = (TargetDataLine) AudioSystem
+					.getLine(dataLineInfo);
+			targetDataLine.open(RecieveAudio.getAudioFormat());
+			targetDataLine.start();
 
-			toSend.setData(testData);
-			sock.send(toSend);
+			text.append("\nSending data to " + toSend.getAddress() + ":"
+					+ toSend.getPort());
 
-			text.append("\nSent.");
+			while (shouldSend) {
+				
+				targetDataLine.read(data, 0, data.length);
+
+				toSend.setData(data);
+				sock.send(toSend);
+
+			}
 
 			sock.close();
 		} catch (Exception e) {

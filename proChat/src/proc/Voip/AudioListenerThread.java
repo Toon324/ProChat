@@ -20,21 +20,21 @@ public class AudioListenerThread extends Thread implements Runnable {
 
 	public void run() {
 
-		if (!atEnd) {
-			try {
-				count = is.read(buffer, 0, buffer.length);
-				if (count == -1) {
-					// text.append("\nEnd of stream detected.");
-					atEnd = true;
-				}
-				// text.append("\n" + buffer[0] + "  " + buffer[1] + "   " +
-				// buffer[2]);
-				pool.execute(new SoundPlayerThread(buffer, pool));
-			} catch (Exception e) {
-				e.printStackTrace();
-				atEnd = true;
-			}
-		}
+//		if (!atEnd) {
+//			try {
+//				count = is.read(buffer, 0, buffer.length);
+//				if (count == -1) {
+//					// text.append("\nEnd of stream detected.");
+//					atEnd = true;
+//				}
+//				// text.append("\n" + buffer[0] + "  " + buffer[1] + "   " +
+//				// buffer[2]);
+//				pool.execute(new SoundPlayerThread(buffer, pool));
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				atEnd = true;
+//			}
+//		}
 
 	}
 
