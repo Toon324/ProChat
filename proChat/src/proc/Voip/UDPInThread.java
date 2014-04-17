@@ -16,8 +16,8 @@ public class UDPInThread implements Runnable {
 	
 	public UDPInThread() {
 		try {
-			sock = new DatagramSocket(324);
-			datagram = new DatagramPacket(inputData, 0, InetAddress.getByName("129.89.185.223"), 1324);
+			sock = new DatagramSocket(1324);
+			datagram = new DatagramPacket(inputData, inputData.length);
 			RecieveAudio.text.append("\nSocket Created.");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -34,7 +34,7 @@ public class UDPInThread implements Runnable {
 		try {	
 			
 			
-			RecieveAudio.text.append("\nWaiting on packet at " + datagram.getAddress() + ":" + datagram.getPort());
+			RecieveAudio.text.append("\nWaiting on packet at " + InetAddress.getLocalHost().getHostAddress() + ":" + sock.getLocalPort());
 			sock.receive(datagram);
 			RecieveAudio.text.append("\nPacket recieved.");
 			
