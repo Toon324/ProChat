@@ -12,11 +12,14 @@ import java.net.SocketException;
 public class UDPInThread implements Runnable {
 	DatagramSocket sock;
 	byte[] inputData = new byte[10];
+	DatagramPacket datagram;
 	
 	public UDPInThread() {
 		try {
 			sock = new DatagramSocket(324);
-		} catch (SocketException e) {
+			datagram = new DatagramPacket(inputData, 0, InetAddress.getByName("129.89.185.223"), 1324);
+			RecieveAudio.text.append("\nSocket Created.");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -29,9 +32,11 @@ public class UDPInThread implements Runnable {
 	@Override
 	public void run() {
 		try {	
-			DatagramPacket datagram = new DatagramPacket(inputData, 0, InetAddress.getByName("129.89.185.223"), 324);
 			
+			
+			RecieveAudio.text.append("\nWaiting on packet");
 			sock.receive(datagram);
+			RecieveAudio.text.append("\nPacket recieved.");
 			
 			for (byte b : datagram.getData())
 				RecieveAudio.text.append("   " + b);

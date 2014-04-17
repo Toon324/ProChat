@@ -23,7 +23,7 @@ public class RecieveAudio {
 	static JTextArea text;
 	ExecutorService pool;
 	
-	public void main(String[] args) {
+	public static void main(String[] args) {
 		RecieveAudio ra = new RecieveAudio(Executors.newCachedThreadPool());
 		ra.playAudio();
 		
@@ -42,14 +42,14 @@ public class RecieveAudio {
 		frame.setLocation(800, 200);
 		frame.setVisible(true);
 
-		try {
-			server = new ServerSocket(20);
-			Log.l("Server created");
-			text.append("Server created. Hosting at " + Home.getIP());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			server = new ServerSocket(20);
+//			Log.l("Server created");
+//			text.append("Server created. Hosting at " + Home.getIP());
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	final AudioFormat format = getAudioFormat();
