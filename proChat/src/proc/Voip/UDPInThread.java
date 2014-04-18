@@ -43,6 +43,10 @@ public class UDPInThread implements Runnable {
 		}
 		while (true) {	
 			try {
+				while (!sock.isConnected()) {
+					//nothing
+				}
+				RecieveAudio.text.append("\nConnection made.");
 				sock.receive(datagram);
 
 				byte[] data = datagram.getData();
