@@ -103,7 +103,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		frame = new JFrame();
 		frame.setSize(400, 608);
-		frame.setTitle("ProChat v0.1.6 ALPHA");
+		frame.setTitle("ProChat v0.1.7 ALPHA");
 
 		JLabel direct = new JLabel("Directly contact this person:");
 
