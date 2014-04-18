@@ -8,6 +8,11 @@ import javax.swing.JFrame;
  */
 public class QuickGuide extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5644755511055739242L;
+
 	public QuickGuide() {
 		initComponents();
 		setResizable(false);
