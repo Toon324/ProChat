@@ -42,8 +42,7 @@ public class SendAudioThread extends Thread implements Runnable {
 
 			text.append("\nSending data to " + toSend.getAddress() + ":"
 					+ toSend.getPort());
-			byte[] ack = new byte[1];
-			ack[0] = (byte) 1;
+			byte[] ack = "hello".getBytes();
 			toSend.setData(ack);
 			sock.connect(InetAddress.getByName(IP), 1324);
 			sock.send(toSend);
@@ -52,7 +51,7 @@ public class SendAudioThread extends Thread implements Runnable {
 				targetDataLine.read(data, 0, data.length);
 
 				toSend.setData(data);
-				sock.send(toSend);
+				//sock.send(toSend);
 			}
 
 			sock.close();
