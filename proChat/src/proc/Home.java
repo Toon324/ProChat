@@ -910,6 +910,18 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	}
 
 	public static String getIP() {
+		if (IP == null)
+			try {
+				URL whatismyip = new URL("http://checkip.amazonaws.com");
+				BufferedReader in = new BufferedReader(new InputStreamReader(
+						whatismyip.openStream()));
+
+				String ip = in.readLine(); // you get the IP as a String
+				Log.l("Found external IP of " + ip);
+				IP = ip;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		return IP;
 	}
 
