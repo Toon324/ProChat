@@ -9,15 +9,17 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JTextArea;
 
+import proc.Home;
+
 public class SendAudioThread extends Thread implements Runnable {
 
 	JTextArea text;
 	DatagramSocket sock;
 	boolean shouldSend = true;
-	private String IP;
+	private String recieverIP;
 
 	public SendAudioThread(String iP, JTextArea t) {
-		IP = iP;
+		recieverIP = iP;
 		text = t;
 		try {
 			sock = new DatagramSocket();
@@ -32,7 +34,7 @@ public class SendAudioThread extends Thread implements Runnable {
 
 		try {
 			DatagramPacket toSend = new DatagramPacket(data, data.length,
-					InetAddress.getByName(IP), 1324);
+					InetAddress.getByName(recieverIP), 1324);
 			DataLine.Info dataLineInfo = new DataLine.Info(
 					TargetDataLine.class, RecieveAudio.getAudioFormat());
 			TargetDataLine targetDataLine = (TargetDataLine) AudioSystem
@@ -42,9 +44,9 @@ public class SendAudioThread extends Thread implements Runnable {
 
 			text.append("\nSending data to " + toSend.getAddress() + ":"
 					+ toSend.getPort());
-			byte[] ack = "hello".getBytes();
+			byte[] ack = (Home.getIP() + " " + recieverIP).getBytes();
 			toSend.setData(ack);
-			sock.connect(InetAddress.getByName(IP), 1324);
+			sock.connect(InetAddress.getByName(recieverIP), 1324);
 			sock.send(toSend);
 
 			while (shouldSend) {
