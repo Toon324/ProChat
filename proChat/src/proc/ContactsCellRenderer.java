@@ -56,7 +56,7 @@ public class ContactsCellRenderer extends JLabel implements ListCellRenderer<Use
 		if (index % 2 == 0)
 			setBackground(Color.white);
 		else
-			setBackground(Color.LIGHT_GRAY);
+			setBackground(new Color(214,213,212));
 		
 		if (isSelected)
 			setBackground(new Color(172,238,238));
