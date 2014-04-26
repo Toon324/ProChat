@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.BoundedRangeModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JEditorPane;
@@ -70,6 +71,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 	private String color = "000000";
 	private String font = "Arial";
 	private String previousColor = color;
+	private boolean imagesEnabled = true;
+	private boolean customTextEnabled = true;
 
 	/**
 	 * @param c
@@ -112,13 +115,13 @@ public class ChatWindow implements ActionListener, KeyListener,
 						if (!brm.getValueIsAdjusting()) {
 
 							if (wasAtBottom) {
-								//System.out.println("Was at bottom!");
+								// System.out.println("Was at bottom!");
 								brm.setValue(brm.getMaximum());
 							}
 						} else {
 							wasAtBottom = ((brm.getValue() + brm.getExtent()) == brm
 									.getMaximum());
-							//System.out.println("Bottom? " + wasAtBottom);
+							// System.out.println("Bottom? " + wasAtBottom);
 						}
 
 					}
@@ -152,10 +155,6 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		JMenu memes = new JMenu("Meme");
 		menu.add(memes);
-
-		JMenuItem gay = new JMenuItem("Ultra Gay");
-		memes.add(gay);
-		gay.addActionListener(this);
 
 		JMenuItem noRead = new JMenuItem("Didn't Read");
 		memes.add(noRead);
@@ -201,11 +200,72 @@ public class ChatWindow implements ActionListener, KeyListener,
 		html.add(setFont);
 		setFont.addActionListener(this);
 
+		try {
+			BufferedImage toggleImagesIcon = ImageIO.read(getClass()
+					.getResourceAsStream("imageToggle.png"));
+			BufferedImage toggleTextIcon = ImageIO.read(getClass()
+					.getResourceAsStream("customText.png"));
+
+			final JButton toggleImages = new JButton(new ImageIcon(
+					toggleImagesIcon));
+			final JButton toggleText = new JButton(
+					new ImageIcon(toggleTextIcon));
+
+			toggleImages
+					.setToolTipText("Embedded images will be displayed in chat.");
+			toggleText.setToolTipText("Custom fonts and colors will be used.");
+
+			toggleImages.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (imagesEnabled) {
+
+						toggleImages
+								.setToolTipText("Embedded images will be displayed as links.");
+						toggleImages.setBackground(Color.gray);
+					} else {
+						toggleImages
+								.setToolTipText("Embedded images will be displayed in chat.");
+						toggleImages.setBackground(null);
+					}
+					imagesEnabled = !imagesEnabled;
+				}
+
+			});
+
+			toggleText.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (customTextEnabled) {
+
+						toggleText
+								.setToolTipText("Custom fonts and colors will not be used.");
+						toggleText.setBackground(Color.gray);
+					} else {
+						toggleText
+								.setToolTipText("Custom fonts and colors will be used.");
+						toggleText.setBackground(null);
+					}
+					customTextEnabled = !customTextEnabled;
+				}
+
+			});
+
+			menuBar.add(toggleImages);
+			menuBar.add(toggleText);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		frame.setJMenuBar(menuBar);
 		frame.add(scroller);
 		frame.add(holder, BorderLayout.SOUTH);
 		try {
-			frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("logo.png")));
+			frame.setIconImage(ImageIO.read(this.getClass()
+					.getResourceAsStream("logo.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -221,7 +281,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	public ChatWindow(User u, MultiUserChat mu) {
 		muc = mu;
 		user = u;
-		
+
 		frame = new JFrame();
 		frame.setSize(400, 600);
 		frame.setTitle("ProChat: Group chat " + mu.getRoom());
@@ -318,7 +378,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		final JScrollPane scroller = new JScrollPane(chatArea);
 		scroller.setAutoscrolls(true);
-		
+
 		scroller.getVerticalScrollBar().addAdjustmentListener(
 				new AdjustmentListener() {
 
@@ -331,13 +391,13 @@ public class ChatWindow implements ActionListener, KeyListener,
 						if (!brm.getValueIsAdjusting()) {
 
 							if (wasAtBottom) {
-								//System.out.println("Was at bottom!");
+								// System.out.println("Was at bottom!");
 								brm.setValue(brm.getMaximum());
 							}
 						} else {
 							wasAtBottom = ((brm.getValue() + brm.getExtent()) == brm
 									.getMaximum());
-							//System.out.println("Bottom? " + wasAtBottom);
+							// System.out.println("Bottom? " + wasAtBottom);
 						}
 
 					}
@@ -351,7 +411,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 		entryPanel.add(entry);
 		entryPanel.add(send, BorderLayout.EAST);
 		try {
-			frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("logo.png")));
+			frame.setIconImage(ImageIO.read(this.getClass()
+					.getResourceAsStream("logo.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -363,7 +424,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	public void show() {
 		frame.setVisible(true);
 		entry.requestFocusInWindow();
-		//new VoiceCall("129.89.185.120");
+		// new VoiceCall("129.89.185.120");
 	}
 
 	private void sendMessage() throws XMPPException {
@@ -405,6 +466,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	}
 
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
+		Log.l(toAdd);
 
 		toAdd = checkSpecialCases(toAdd);
 
@@ -499,7 +561,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 			String sub = toAdd.substring(toAdd.indexOf("/r/"));
 			if (sub.contains(" "))
 				sub = sub.substring(0, sub.indexOf(" "));
-			
+
 			if (sub.contains("</font>"))
 				sub = sub.replace("</font>", "");
 
@@ -519,9 +581,17 @@ public class ChatWindow implements ActionListener, KeyListener,
 	private String checkSpecialCases(String toAdd) {
 
 		if (toAdd.contains("{img}")) {
-			toAdd = convertImageURL(toAdd);
-			return ""; // This should always be a single line message, so
-						// don't check other cases.
+			Log.l("Enabled? " + imagesEnabled);
+			if (imagesEnabled) {
+				toAdd = convertImageURL(toAdd);
+				return ""; // This should always be a single line message, so
+							// don't check other cases.
+			} else {
+				toAdd.replace("{img}", ""); // will be hyperlinked like usual.
+
+				return ""; // Still a single line message
+			}
+
 		}
 		if (toAdd.contains("/you")) {
 			toAdd = toAdd.replace("/you", "<i>" + user.getName() + "</i>");
@@ -541,6 +611,14 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		toAdd = checkForHyperlink(toAdd);
 		toAdd = checkForSubreddit(toAdd);
+
+		if (!customTextEnabled) {
+			String temp = toAdd.substring(toAdd.indexOf("<font"),
+					toAdd.indexOf("\">") + 2);
+			// Log.l(temp);
+			toAdd = toAdd.replace(temp, "");
+			toAdd = toAdd.replace("</font>", "");
+		}
 
 		return toAdd;
 	}
@@ -636,8 +714,6 @@ public class ChatWindow implements ActionListener, KeyListener,
 			setColor();
 		else if (e.getActionCommand().equals("Font"))
 			setFont();
-		else if (e.getActionCommand().equals("Ultra Gay"))
-			addImage("http://www.memes.at/faces/ultra_gay_low.jpg");
 		else if (e.getActionCommand().equals("Didn't Read"))
 			addImage("http://www.memes.at/faces/didnt_read_lol_low.gif");
 		else if (e.getActionCommand().equals("Troll"))
@@ -675,15 +751,18 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * 
 	 */
 	private void setColor() {
-		
-		//Color result = JColorChooser.showDialog(null, "Choose a color", Color.getColor(color));
-		Dialog d = JColorChooser.createDialog(null, "Choose color", true, Home.chooser, null, null);
+
+		// Color result = JColorChooser.showDialog(null, "Choose a color",
+		// Color.getColor(color));
+		Dialog d = JColorChooser.createDialog(null, "Choose color", true,
+				Home.chooser, null, null);
 		d.setVisible(true);
 		Color result = Home.chooser.getColor();
 		System.out.println("Color returned: " + result);
-		color = String.format("#%02x%02x%02x", result.getRed(), result.getGreen(), result.getBlue());
+		color = String.format("#%02x%02x%02x", result.getRed(),
+				result.getGreen(), result.getBlue());
 		previousColor = color;
-		
+
 	}
 
 	/**
@@ -720,8 +799,16 @@ public class ChatWindow implements ActionListener, KeyListener,
 					+ "\" height=\"" + y + "\"></a>";
 
 			if (muc == null) // Prevent group chat feedback
-				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-						.getDocument().getLength(), imageTag, 0, 0, null);
+				if (imagesEnabled)
+					kit.insertHTML((HTMLDocument) chatArea.getDocument(),
+							chatArea.getDocument().getLength(), imageTag, 0, 0,
+							null);
+				else {
+					toAdd = "<b>" + user.getName() + ":  </b>" + checkForHyperlink(toAdd);
+					kit.insertHTML((HTMLDocument) chatArea.getDocument(),
+							chatArea.getDocument().getLength(), toAdd, 0, 0,
+							null);
+				}
 
 			if (chat != null)
 				chat.sendMessage("{img}" + toAdd);
