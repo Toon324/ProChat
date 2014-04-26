@@ -42,6 +42,8 @@ import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -71,6 +73,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	private String color = "000000";
 	private String font = "Arial";
 	private String previousColor = color;
+	private String lastMessageFrom = "";
 	private boolean imagesEnabled = true;
 	private boolean customTextEnabled = true;
 
@@ -466,13 +469,14 @@ public class ChatWindow implements ActionListener, KeyListener,
 	}
 
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
-		Log.l(toAdd);
+		// Log.l(toAdd);
 
 		toAdd = checkSpecialCases(toAdd);
 
 		if (toAdd.equals(""))
 			return;
 
+		// Adds a timestamp
 		Calendar c = Calendar.getInstance();
 		int hour = c.get(Calendar.HOUR);
 		int minute = c.get(Calendar.MINUTE);
@@ -486,16 +490,35 @@ public class ChatWindow implements ActionListener, KeyListener,
 			minuteText = "0" + minute;
 
 		try {
-			/*
-			 * chatArea.getDocument().insertString(
-			 * chatArea.getDocument().getLength(), "\n[" + hour + ":" +
-			 * minuteText + "] " + toAdd, attribute);
-			 */
 
 			String addition = "\n[" + hour + ":" + minuteText + "] " + toAdd;
+			
+			//System message
+			if (!addition.contains("<b>")) {
+				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+						.getDocument().getLength(), addition, 0, 0, null);
+				return;
+			}
+			String fromUser = addition.substring(addition.indexOf("<b>") + 3,
+					addition.indexOf("</b>"));
+			
+			Log.l("From: " + fromUser);
 
-			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-					.getDocument().getLength(), addition, 0, 0, null);
+			if (lastMessageFrom.equals(fromUser) || lastMessageFrom.equals("")) {
+				// Message is from the lastUser
+				Highlighter h = chatArea.getHighlighter();
+				int previousLength = chatArea.getDocument().getLength();
+				
+				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+						.getDocument().getLength(), addition, 0, 0, null);
+				
+				h.addHighlight(previousLength , chatArea.getDocument().getLength(), new DefaultHighlighter.DefaultHighlightPainter(new Color(212,213,214)));
+
+			} else { //New user
+				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+						.getDocument().getLength(), addition, 0, 0, null);
+				lastMessageFrom = fromUser;
+			}
 
 		} catch (Exception e1) {
 			e1.printStackTrace();
@@ -804,7 +827,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 							chatArea.getDocument().getLength(), imageTag, 0, 0,
 							null);
 				else {
-					toAdd = "<b>" + user.getName() + ":  </b>" + checkForHyperlink(toAdd);
+					toAdd = "<b>" + user.getName() + ":  </b>"
+							+ checkForHyperlink(toAdd);
 					kit.insertHTML((HTMLDocument) chatArea.getDocument(),
 							chatArea.getDocument().getLength(), toAdd, 0, 0,
 							null);
