@@ -30,7 +30,7 @@ public class AudioCapture implements ActionListener {
 	ExecutorService pool;
 
 	public static void main(String[] args) {
-		new AudioCapture("129.89.185.223", Executors.newCachedThreadPool());
+		new AudioCapture("129.89.185.120", Executors.newCachedThreadPool());
 	}
 
 	public AudioCapture(String ip, ExecutorService threadPool) {// constructor

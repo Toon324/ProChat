@@ -1,7 +1,9 @@
 package proc;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -25,6 +27,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.BoundedRangeModel;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -672,13 +675,15 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * 
 	 */
 	private void setColor() {
-		String toAdd = JOptionPane.showInputDialog(
-				"What HEX color would you like your text to be?", color);
-		if (toAdd == null)
-			return;
-		System.out.println("Color hex: " + toAdd);
-		color = toAdd;
-		previousColor = toAdd;
+		
+		//Color result = JColorChooser.showDialog(null, "Choose a color", Color.getColor(color));
+		Dialog d = JColorChooser.createDialog(null, "Choose color", true, Home.chooser, null, null);
+		d.setVisible(true);
+		Color result = Home.chooser.getColor();
+		System.out.println("Color returned: " + result);
+		color = String.format("#%02x%02x%02x", result.getRed(), result.getGreen(), result.getBlue());
+		previousColor = color;
+		
 	}
 
 	/**

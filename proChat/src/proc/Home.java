@@ -26,6 +26,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -69,6 +70,7 @@ import proc.Voip.VoiceCall;
 public class Home implements ActionListener, MouseListener, KeyListener,
 		RosterListener {
 
+	static JColorChooser chooser;
 	JFrame frame;
 	JMenuBar menuBar;
 	JMenu menu;
@@ -93,6 +95,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		connection = xmpp;
 
 		currentChats = new ArrayList<ChatWindow>();
+		chooser = new JColorChooser();
 
 		/*
 		 * try {
