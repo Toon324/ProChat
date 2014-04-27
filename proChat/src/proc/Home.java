@@ -290,8 +290,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 							userContact.indexOf("@"));
 				User toAdd = new User(userContact, "");
 				
-				toAdd.setPresence(roster.getPresence(contact.getUser()));
-				Log.l(contact.getUser() + ": " + roster.getPresence(contact.getUser()).getMode());
+				Presence p = roster.getPresence(contact.getUser());
+				toAdd.setPresence(p);
+				toAdd.setMode(p);
+//				if (userContact.contains("toon325"))
+//					Log.l(contact.getUser() + ": " + p.getMode());
 				data[x] = toAdd;
 			}
 			x++;
@@ -758,6 +761,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	public void presenceChanged(Presence e) {
 		String fullFrom = e.getFrom().substring(0,
 				e.getFrom().indexOf("/Smack"));
+		Log.l(fullFrom + " " + e);
 		// Send message of presence change to any chatwindows with that person
 		for (ChatWindow c : currentChats)
 			if (c.getFullFrom().equals(fullFrom)) {

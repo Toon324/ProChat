@@ -24,7 +24,7 @@ public class ContactsCellRenderer extends JLabel implements
 
 	public ContactsCellRenderer() {
 		setOpaque(true);
-		images = new ImageIcon[3];
+		images = new ImageIcon[4];
 		try {
 			images[0] = new ImageIcon(ImageIO.read(getClass()
 					.getResourceAsStream("available.png")));
@@ -32,6 +32,8 @@ public class ContactsCellRenderer extends JLabel implements
 					.getResourceAsStream("busy.png")));
 			images[2] = new ImageIcon(ImageIO.read(getClass()
 					.getResourceAsStream("offline.png")));
+			images[3] = new ImageIcon(ImageIO.read(getClass()
+					.getResourceAsStream("away.png")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -56,10 +58,13 @@ public class ContactsCellRenderer extends JLabel implements
 		setText(user.getName());
 
 		if (user.getPresence() == Presence.Type.available) {
+			Log.l("Mode: " + user.getMode());
 			if (user.getMode() == null || user.getMode() == Mode.available)
 				setIcon(images[0]); //Online
-			else if (user.getMode() == Mode.away || user.getMode() == Mode.dnd)
-				setIcon(images[1]); //Busy or Away
+			else if (user.getMode() == Mode.away)
+				setIcon(images[3]); //Busy or Away
+			else if (user.getMode() == Mode.dnd)
+				setIcon(images[1]);
 		} else if (user.getPresence() == Presence.Type.unavailable)
 			setIcon(images[2]); //Offline
 
