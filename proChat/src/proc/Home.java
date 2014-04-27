@@ -173,6 +173,37 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		linkSteam.setActionCommand("Link");
 		profileMenu.add(linkSteam);
 		linkSteam.addActionListener(this);
+		
+		//Status submenu
+		JMenu modeMenu = new JMenu("Set Mode");
+		profileMenu.add(modeMenu);
+		
+		JMenuItem available = new JMenuItem("Available");
+		modeMenu.add(available);
+		available.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(true, Mode.available);
+			}
+		});
+		
+		JMenuItem away = new JMenuItem("Away");
+		modeMenu.add(away);
+		away.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(true, Mode.away);
+			}
+		});
+		
+		JMenuItem busy = new JMenuItem("Busy");
+		modeMenu.add(busy);
+		busy.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(true, Mode.dnd);
+			}
+		});
 
 		// Contacts menu
 		JMenu contactMenu = new JMenu("Contacts");
@@ -289,12 +320,12 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					userContact = userContact.substring(0,
 							userContact.indexOf("@"));
 				User toAdd = new User(userContact, "");
-				
+
 				Presence p = roster.getPresence(contact.getUser());
 				toAdd.setPresence(p);
 				toAdd.setMode(p);
-//				if (userContact.contains("toon325"))
-//					Log.l(contact.getUser() + ": " + p.getMode());
+				// if (userContact.contains("toon325"))
+				// Log.l(contact.getUser() + ": " + p.getMode());
 				data[x] = toAdd;
 			}
 			x++;
@@ -381,7 +412,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					message.setType(Message.Type.headline);
 					Log.l("Sent ip: " + message.getBody());
 					connection.getConnection().sendPacket(message);
-					//new VoiceCall(msg.getBody());
+					// new VoiceCall(msg.getBody());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
