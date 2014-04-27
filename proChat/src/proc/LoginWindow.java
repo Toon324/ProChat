@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
 
 /**
  * @author Cody
@@ -307,9 +308,14 @@ public class LoginWindow implements ActionListener, KeyListener {
 					loginPass.getPassword()));
 
 			connection.getConnection().login(user.getName(), user.getPass());
-
+			
+			
 			user.setEmail(connection.getConnection().getAccountManager()
 					.getAccountAttribute("email"));
+			
+			Presence p = connection.getConnection().getRoster().getPresence(user.userName);
+			p.setMode(Presence.Mode.available);
+			connection.getConnection().sendPacket(p);
 
 			Home home = new Home(user, connection);
 			home.show();

@@ -490,8 +490,9 @@ public class ChatWindow implements ActionListener, KeyListener,
 			minuteText = "0" + minute;
 
 		try {
-
-			String addition = "\n[" + hour + ":" + minuteText + "] " + toAdd;
+			String timeStamp = "[" + hour + ":" + minuteText + "] ";
+			
+			String addition = "\n" + timeStamp +  toAdd;
 			
 			//System message
 			if (!addition.contains("<b>")) {
@@ -504,15 +505,10 @@ public class ChatWindow implements ActionListener, KeyListener,
 			
 			Log.l("From: " + fromUser);
 
-			if (lastMessageFrom.equals(fromUser) || lastMessageFrom.equals("")) {
-				// Message is from the lastUser
-				Highlighter h = chatArea.getHighlighter();
-				int previousLength = chatArea.getDocument().getLength();
-				
+			if (lastMessageFrom.equals(fromUser)) {
+				addition = addition.replace("<b>" + fromUser + "</b>:", "");
 				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 						.getDocument().getLength(), addition, 0, 0, null);
-				
-				h.addHighlight(previousLength , chatArea.getDocument().getLength(), new DefaultHighlighter.DefaultHighlightPainter(new Color(212,213,214)));
 
 			} else { //New user
 				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
