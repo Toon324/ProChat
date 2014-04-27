@@ -3,6 +3,11 @@
  */
 package proc;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Scanner;
+
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.Presence.Type;
@@ -45,11 +50,11 @@ public class User {
 	public Type getPresence() {
 		return presence;
 	}
-	
+
 	public Mode getMode() {
 		return mode;
 	}
-	
+
 	public void setMode(Presence p) {
 		mode = p.getMode();
 	}
@@ -125,6 +130,46 @@ public class User {
 		return status;
 	}
 
+	public void refreshSteamInfo() {
+		loadSteamInfo(email);
+	}
+
+	public void loadSteamInfo(String steamid) {
+		// Log.l("Loading info for steamID: " + steamid);
+		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids="
+				+ steamid;
+		try {
+			URL surl = new URL(turl);
+			URLConnection connection = surl.openConnection();
+			InputStream info = connection.getInputStream();
+			Scanner scan = new Scanner(info);
+			while (scan.hasNext()) {
+				String found = scan.next();
+				/*
+				 * if (found.equals("(") || found.equals(")") ||
+				 * found.equals("{") || found.equals("}") || found.equals("[")
+				 * || found.equals("]")) found = "";
+				 */
+
+				if (found.equals("\"avatarfull\":"))
+					setAvatarURL(scan.next());
+
+				else if (found.equals("\"profilestate\":"))
+					setSteamStatus(scan.next());
+
+				else if (found.equals("\"gameextrainfo\":"))
+					setGame(scan.next());
+
+				// if (!found.equals(""))
+				// Log.l("Read: " + found);
+
+			}
+			scan.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private String removeSteamFormatting(String input) {
 		// Removes formatting
 		input = input.replace("\"", "");
@@ -146,7 +191,7 @@ public class User {
 	 * @param u
 	 */
 	public void copySteamDataFrom(User u) {
-		//System.out.println("u: " + u);
+		// System.out.println("u: " + u);
 		avatarURL = u.getAvatarURL();
 		game = u.getGame();
 		email = u.getEmail();

@@ -303,8 +303,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		roster.addRosterListener(this);
 		loadContacts();
 		// readSteamInfo("76561197998100303");
-		User u = readSteamInfo(user.getEmail());
-		user.copySteamDataFrom(u);
+		user.loadSteamInfo(user.getEmail());
 		
 		connection.setPresence(true, "Free to chat", Mode.available);
 	}
@@ -629,7 +628,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		connection.getConnection().sendPacket(r);
 
 		user.setEmail(toAdd);
-		readSteamInfo(toAdd);
+		user.loadSteamInfo(toAdd);
 	}
 
 	/**
@@ -640,6 +639,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			Log.l("Null user!");
 			return;
 		}
+		
+		u.refreshSteamInfo();
 
 		JFrame disp = new JFrame("Profile of " + u.getName());
 		try {
@@ -819,46 +820,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		loadContacts();
 
 	}
-
-	private User readSteamInfo(String steamid) {
-		User u = new User("", "");
-		u.setEmail(steamid);
-		// Log.l("Loading info for steamID: " + steamid);
-		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids="
-				+ steamid;
-		try {
-			URL surl = new URL(turl);
-			URLConnection connection = surl.openConnection();
-			InputStream info = connection.getInputStream();
-			Scanner scan = new Scanner(info);
-			while (scan.hasNext()) {
-				String found = scan.next();
-				/*
-				 * if (found.equals("(") || found.equals(")") ||
-				 * found.equals("{") || found.equals("}") || found.equals("[")
-				 * || found.equals("]")) found = "";
-				 */
-
-				if (found.equals("\"avatarfull\":"))
-					u.setAvatarURL(scan.next());
-
-				else if (found.equals("\"profilestate\":"))
-					u.setSteamStatus(scan.next());
-
-				else if (found.equals("\"gameextrainfo\":"))
-					u.setGame(scan.next());
-
-				// if (!found.equals(""))
-				// Log.l("Read: " + found);
-
-			}
-			scan.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return u;
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -910,7 +872,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		String other = ((User) contacts.getSelectedValue()).getName();
 
 		Log.l("id recieved: " + id);
-		User u = readSteamInfo(id);
+		User u = new User(null, null);
+		u.loadSteamInfo(id);
 		u.setName(other);
 
 		viewProfile(u);
