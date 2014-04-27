@@ -5,15 +5,16 @@ import java.util.Collection;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.Presence.Type;
 
 public class XmppManager {
@@ -70,6 +71,14 @@ public class XmppManager {
 		
 	}
 	
+	public void setMode(boolean available, Mode mode) {
+		Presence.Type type = available? Type.available: Type.unavailable;
+		Presence p = new Presence(type);
+		
+		p.setMode(mode);
+		connection.sendPacket(p);
+	}
+	
 	public void destroy() {
 		if (connection!=null && connection.isConnected()) {
 			connection.disconnect();
@@ -113,6 +122,16 @@ public class XmppManager {
 			String body = message.getBody();
 			Log.l(String.format("Received message '%1$s' from %2$s", body, from));
 		}
+		
+	}
+
+	public void setPresence(boolean available, String status, Mode mode) {
+		Presence.Type type = available? Type.available: Type.unavailable;
+		Presence presence = new Presence(type);
+		
+		presence.setStatus(status);
+		presence.setMode(mode);
+		connection.sendPacket(presence);
 		
 	}
 	

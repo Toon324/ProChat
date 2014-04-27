@@ -56,6 +56,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Registration;
+import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
@@ -264,6 +265,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		// readSteamInfo("76561197998100303");
 		User u = readSteamInfo(user.getEmail());
 		user.copySteamDataFrom(u);
+		
+		connection.setPresence(true, "Free to chat", Mode.available);
 	}
 
 	/**

@@ -4,6 +4,7 @@
 package proc;
 
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.Presence.Type;
 
 /**
@@ -13,6 +14,7 @@ import org.jivesoftware.smack.packet.Presence.Type;
 public class User {
 	String userName, userPass, email, avatarURL, status, game;
 	Type presence;
+	Mode mode;
 
 	public User(String name, String pass) {
 		userName = name;
@@ -22,6 +24,7 @@ public class User {
 		avatarURL = "";
 		status = "Offline";
 		presence = Presence.Type.unavailable;
+		mode = null;
 	}
 
 	/**
@@ -41,6 +44,14 @@ public class User {
 
 	public Type getPresence() {
 		return presence;
+	}
+	
+	public Mode getMode() {
+		return mode;
+	}
+	
+	public void setMode(Presence p) {
+		mode = p.getMode();
 	}
 
 	public void setPresence(Presence p) {
