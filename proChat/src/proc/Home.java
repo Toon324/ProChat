@@ -204,6 +204,15 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				connection.setMode(true, Mode.dnd);
 			}
 		});
+		
+		JMenuItem invisible = new JMenuItem("Appear Offline");
+		modeMenu.add(invisible);
+		invisible.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(false, null);
+			}
+		});
 
 		// Contacts menu
 		JMenu contactMenu = new JMenu("Contacts");
