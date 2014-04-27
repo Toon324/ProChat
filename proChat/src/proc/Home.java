@@ -55,6 +55,7 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Type;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smackx.Form;
@@ -107,7 +108,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		frame = new JFrame();
 		frame.setSize(400, 608);
-		frame.setTitle("ProChat v0.1.7 ALPHA");
+		frame.setTitle("ProChat v0.1.8 ALPHA");
 
 		JLabel direct = new JLabel("Directly contact this person:");
 
@@ -173,6 +174,19 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		linkSteam.setActionCommand("Link");
 		profileMenu.add(linkSteam);
 		linkSteam.addActionListener(this);
+		
+		JMenuItem setStatus = new JMenuItem("Set Status");
+		profileMenu.add(setStatus);
+		setStatus.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String s = JOptionPane.showInputDialog("What should your status be?", user.getStatus());
+				Presence p = connection.setStatus(true, s);
+				user.setStatus(p);
+			}
+			
+		});
 		
 		//Status submenu
 		JMenu modeMenu = new JMenu("Set Mode");

@@ -61,7 +61,7 @@ public class XmppManager {
 		}
 	}
 	
-	public void setStatus(boolean available, String status) {
+	public Presence setStatus(boolean available, String status) {
 		
 		Presence.Type type = available? Type.available: Type.unavailable;
 		Presence presence = new Presence(type);
@@ -69,6 +69,7 @@ public class XmppManager {
 		presence.setStatus(status);
 		connection.sendPacket(presence);
 		
+		return presence;
 	}
 	
 	public void setMode(boolean available, Mode mode) {
