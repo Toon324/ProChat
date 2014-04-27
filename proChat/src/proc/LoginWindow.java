@@ -23,8 +23,6 @@ import javax.swing.JTextField;
 
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Presence.Mode;
 
 /**
  * @author Cody
@@ -34,6 +32,7 @@ public class LoginWindow implements ActionListener, KeyListener {
 	JFrame frame;
 	File saved;
 	XmppManager connection;
+	private String savedName;
 
 	public LoginWindow() {
 		
@@ -80,6 +79,8 @@ public class LoginWindow implements ActionListener, KeyListener {
 				e.printStackTrace();
 			}
 		}
+		
+		savedName = user;
 
 		frame.addKeyListener(this);
 
@@ -224,7 +225,11 @@ public class LoginWindow implements ActionListener, KeyListener {
 		JLabel userLabel = new JLabel("Username");
 		JLabel passLabel = new JLabel("Password");
 
-		name = new JTextField("");
+		if (savedName.equals(loginName.getText()))
+			name = new JTextField("");
+		else
+			name = new JTextField(loginName.getText());
+		
 		pass = new JPasswordField("");
 
 		name.addKeyListener(this);

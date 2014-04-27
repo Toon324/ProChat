@@ -3,9 +3,6 @@ package proc.Voip;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Cody
@@ -46,12 +43,12 @@ public class RelayServer {
 	        serverSocket.close();
 	   }
 	 
-	   private synchronized void sendPacket(DatagramSocket socket) throws IOException{
-	      
+//	   private synchronized void sendPacket(DatagramSocket socket) throws IOException{
+//	      
 //	        byte[] sendData = new byte[50];
 //	        ///sendData = data.getBytes();
 //	        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, homeIPAddress, homePort);
 //	        socket.send(sendPacket);
-	   }
+//	   }
 	 
 	}

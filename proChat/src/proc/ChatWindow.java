@@ -42,8 +42,6 @@ import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
@@ -503,7 +501,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 			String fromUser = addition.substring(addition.indexOf("<b>") + 3,
 					addition.indexOf("</b>"));
 			
-			Log.l("From: " + fromUser);
+			//Log.l("From: " + fromUser);
 
 			if (lastMessageFrom.equals(fromUser)) {
 				addition = addition.replace("<b>" + fromUser + "</b>:", "");

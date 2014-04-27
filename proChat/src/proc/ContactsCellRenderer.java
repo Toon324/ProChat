@@ -58,15 +58,23 @@ public class ContactsCellRenderer extends JLabel implements
 		setText(user.getName());
 
 		if (user.getPresence() == Presence.Type.available) {
-			Log.l("Mode: " + user.getMode());
-			if (user.getMode() == null || user.getMode() == Mode.available)
+			//Log.l("Mode: " + user.getMode());
+			if (user.getMode() == null || user.getMode() == Mode.available) {
 				setIcon(images[0]); //Online
-			else if (user.getMode() == Mode.away)
-				setIcon(images[3]); //Busy or Away
-			else if (user.getMode() == Mode.dnd)
-				setIcon(images[1]);
-		} else if (user.getPresence() == Presence.Type.unavailable)
+				setToolTipText(user.getName() + " is online.");
+			}
+			else if (user.getMode() == Mode.away) {
+				setIcon(images[3]); //Away
+				setToolTipText(user.getName() + " is away.");
+			}
+			else if (user.getMode() == Mode.dnd) {
+				setIcon(images[1]); //Busy
+				setToolTipText(user.getName() + " is busy.");
+			}
+		} else if (user.getPresence() == Presence.Type.unavailable) {
 			setIcon(images[2]); //Offline
+			setToolTipText(user.getName() + " is offline.");
+		}
 
 		if (index % 2 == 0)
 			setBackground(Color.white);
