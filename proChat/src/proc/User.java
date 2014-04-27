@@ -17,7 +17,7 @@ import org.jivesoftware.smack.packet.Presence.Type;
  * 
  */
 public class User {
-	String userName, userPass, email, avatarURL, status, game;
+	String userName, userPass, email, avatarURL, steamStatus, game, status;
 	Type presence;
 	Mode mode;
 
@@ -27,7 +27,7 @@ public class User {
 		email = "";
 		game = "";
 		avatarURL = "";
-		status = "Offline";
+		steamStatus = "Offline";
 		presence = Presence.Type.unavailable;
 		mode = null;
 	}
@@ -100,25 +100,25 @@ public class User {
 			int id = Integer.valueOf(stat);
 			switch (id) {
 			case 0:
-				status = "Offline";
+				steamStatus = "Offline";
 				return;
 			case 1:
-				status = "Online";
+				steamStatus = "Online";
 				return;
 			case 2:
-				status = "Busy";
+				steamStatus = "Busy";
 				return;
 			case 3:
-				status = "Away";
+				steamStatus = "Away";
 				return;
 			case 4:
-				status = "Snooze";
+				steamStatus = "Snooze";
 				return;
 			case 5:
-				status = "Looking to Trade";
+				steamStatus = "Looking to Trade";
 				return;
 			case 6:
-				status = "Looking to Play";
+				steamStatus = "Looking to Play";
 				return;
 			}
 		} catch (Exception e) {
@@ -127,7 +127,7 @@ public class User {
 	}
 
 	public String getSteamStatus() {
-		return status;
+		return steamStatus;
 	}
 
 	public void refreshSteamInfo() {
@@ -208,6 +208,20 @@ public class User {
 	public String toString() {
 		return "User: " + userName + " ID: " + email + " avatar: " + avatarURL
 				+ " game: " + game;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+	
+	public void setStatus(Presence p) {
+		status = p.getStatus();
+	}
+	
+	public void copyPresenceInfo(Presence p) {
+		setStatus(p);
+		setMode(p);
+		setPresence(p);
 	}
 
 }

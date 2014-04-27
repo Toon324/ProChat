@@ -328,10 +328,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					userContact = userContact.substring(0,
 							userContact.indexOf("@"));
 				User toAdd = new User(userContact, "");
+				
 
 				Presence p = roster.getPresence(contact.getUser());
-				toAdd.setPresence(p);
-				toAdd.setMode(p);
+				toAdd.copyPresenceInfo(p);
+				
 				// if (userContact.contains("toon325"))
 				// Log.l(contact.getUser() + ": " + p.getMode());
 				data[x] = toAdd;
