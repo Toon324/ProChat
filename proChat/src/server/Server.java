@@ -47,7 +47,7 @@ public class Server {
 		adapter = new NetworkAdapter(this);
 
 		try {
-			adapter.host(60);
+			adapter.host(1160);
 			text.append("\nServer is now hosting");
 		} catch (Exception e) {
 		}
@@ -105,7 +105,7 @@ public class Server {
 						// adapter.rehost();
 						adapter.close();
 						adapter = new NetworkAdapter(this);
-						adapter.host(60);
+						adapter.host(1160);
 					}
 
 				} else {

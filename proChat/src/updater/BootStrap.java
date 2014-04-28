@@ -42,8 +42,8 @@ public class BootStrap {
 
 		NetworkAdapter adapter = new NetworkAdapter();
 		try {
-			adapter.connect("129.89.185.120", 60);
-			text.append("\nConnected to server at 129.89.185.120:60.");
+			adapter.connect("129.89.185.223", 1160);
+			text.append("\nConnected to server at 129.89.185.223:1160.");
 			adapter.getOutputStream().writeInt(0); // Request for version
 			adapter.getOutputStream().flush();
 
@@ -52,10 +52,12 @@ public class BootStrap {
 				try {
 				System.out.println(serverVersion);
 				if (adapter.isDataAvailable()) {
-					text.append("version: " + serverVersion);
+					text.append("\n Server version: " + serverVersion);
 					StringBuilder builder = new StringBuilder();
-					while (adapter.getInputStream().available() >= 2)
+					while (adapter.getInputStream().available() > 0)
 						builder.append(adapter.getInputStream().readChar());
+					
+					System.out.println("Appending: " + builder.toString());
 					serverVersion = builder.toString();
 					
 				}
@@ -121,7 +123,9 @@ public class BootStrap {
 				Runtime.getRuntime().exec("java -jar ProChatAlpha.jar");
 			}
 		} catch (IOException e) {
+			
 			text.append("\nERROR: Could not connect to server.");
+			text.append(e.getMessage());
 			try {
 				Runtime.getRuntime().exec("java -jar EmployeeEvalSystem.jar");
 			} catch (IOException e1) {

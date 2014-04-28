@@ -112,9 +112,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 					boolean wasAtBottom = true;
 
 					public void adjustmentValueChanged(AdjustmentEvent e) {
-
 						if (!brm.getValueIsAdjusting()) {
-
 							if (wasAtBottom) {
 								// System.out.println("Was at bottom!");
 								brm.setValue(brm.getMaximum());
@@ -124,7 +122,6 @@ public class ChatWindow implements ActionListener, KeyListener,
 									.getMaximum());
 							// System.out.println("Bottom? " + wasAtBottom);
 						}
-
 					}
 				});
 

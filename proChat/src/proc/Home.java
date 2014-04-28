@@ -1,7 +1,7 @@
 package proc;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +22,6 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,7 +32,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
@@ -59,8 +57,6 @@ import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
-import proc.Voip.VoiceCall;
-
 /**
  * @author Cody Swendrowski
  * 
@@ -74,7 +70,6 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	JMenu menu;
 	User user;
 	String serverName, serverIP;
-	JTextField to;
 	// JTable contacts;
 	JList<User> contacts, activeChats;
 	XmppManager connection;
@@ -103,42 +98,30 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		 */
 
 		frame = new JFrame();
+		frame.setLayout(new GridLayout(2,1));
 		frame.setSize(400, 608);
 		frame.setTitle("ProChat v0.1.8 ALPHA");
-
-		JLabel direct = new JLabel("Directly contact this person:");
 
 		contacts = new JList<User>(data);
 		ContactsCellRenderer cellRender = new ContactsCellRenderer();
 		contacts.setCellRenderer(cellRender);
 		// contacts.setCellRenderer(new DefaultListCellRenderer());
 
-		JScrollPane scrollPane = new JScrollPane(contacts);
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setViewportView(contacts);
 
 		// contacts.setFillsViewportHeight(true);
-
-		to = new JTextField("");
 
 		/*
 		 * loginName.setBounds(70,30,150,20); loginPass.setBounds(70,65,150,20);
 		 */
 
-		to.addKeyListener(this);
-
 		contacts.addMouseListener(this);
 
-		JButton send = new JButton("Chat");
-		send.addActionListener(this);
-
-		JPanel sendPanel = new JPanel(new GridLayout(5, 1));
 		// sendPanel.setBackground(Color.red);
 
 		// UIManager.put("MenuItem.background", Color.CYAN);
 		UIManager.put("MenuItem.opaque", true);
-
-		sendPanel.add(direct, BorderLayout.NORTH);
-		sendPanel.add(to);
-		sendPanel.add(send, BorderLayout.SOUTH);
 
 		// Menu
 		menuBar = new JMenuBar();
@@ -170,24 +153,25 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		linkSteam.setActionCommand("Link");
 		profileMenu.add(linkSteam);
 		linkSteam.addActionListener(this);
-		
+
 		JMenuItem setStatus = new JMenuItem("Set Status");
 		profileMenu.add(setStatus);
 		setStatus.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String s = JOptionPane.showInputDialog("What should your status be?", user.getStatus());
+				String s = JOptionPane.showInputDialog(
+						"What should your status be?", user.getStatus());
 				Presence p = connection.setStatus(true, s);
 				user.setStatus(p);
 			}
-			
+
 		});
-		
-		//Status submenu
+
+		// Status submenu
 		JMenu modeMenu = new JMenu("Set Mode");
 		profileMenu.add(modeMenu);
-		
+
 		JMenuItem available = new JMenuItem("Available");
 		modeMenu.add(available);
 		available.addActionListener(new ActionListener() {
@@ -196,7 +180,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				connection.setMode(true, Mode.available);
 			}
 		});
-		
+
 		JMenuItem away = new JMenuItem("Away");
 		modeMenu.add(away);
 		away.addActionListener(new ActionListener() {
@@ -205,7 +189,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				connection.setMode(true, Mode.away);
 			}
 		});
-		
+
 		JMenuItem busy = new JMenuItem("Busy");
 		modeMenu.add(busy);
 		busy.addActionListener(new ActionListener() {
@@ -214,7 +198,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				connection.setMode(true, Mode.dnd);
 			}
 		});
-		
+
 		JMenuItem invisible = new JMenuItem("Appear Offline");
 		modeMenu.add(invisible);
 		invisible.addActionListener(new ActionListener() {
@@ -279,7 +263,29 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		frame.setJMenuBar(menuBar);
 		// frame.add(masterPanel);
 		frame.add(scrollPane);
-		frame.add(sendPanel, BorderLayout.SOUTH);
+		
+		scrollPane.setSize(400, 1000);
+		AdPanel image = new AdPanel();
+		
+		frame.add(image);
+//		image.setSize(image.getWidth(), 150);
+		image.setMinimumSize(new Dimension(400, 150));
+		
+		 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(frame.getContentPane());
+	        frame.getContentPane().setLayout(layout);
+	        layout.setHorizontalGroup(
+	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+	            .addComponent(scrollPane)
+	            .addComponent(image, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+	        );
+	        layout.setVerticalGroup(
+	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	            .addGroup(layout.createSequentialGroup()
+	                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
+	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+	                .addComponent(image, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+	        );
+	        
 		try {
 			frame.setIconImage(ImageIO.read(this.getClass()
 					.getResourceAsStream("logo.png")));
@@ -288,6 +294,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		}
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setLocation(300, 100);
+		//frame.pack();
 
 		serverIP = "129.89.185.120";
 		serverName = "127.0.0.1";
@@ -314,7 +321,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		loadContacts();
 		// readSteamInfo("76561197998100303");
 		user.loadSteamInfo(user.getEmail());
-		
+
 		connection.setPresence(true, "Free to chat", Mode.available);
 	}
 
@@ -338,11 +345,10 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					userContact = userContact.substring(0,
 							userContact.indexOf("@"));
 				User toAdd = new User(userContact, "");
-				
 
 				Presence p = roster.getPresence(contact.getUser());
 				toAdd.copyPresenceInfo(p);
-				
+
 				// if (userContact.contains("toon325"))
 				// Log.l(contact.getUser() + ": " + p.getMode());
 				data[x] = toAdd;
@@ -437,7 +443,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				}
 				return;
 			} else if (msg.getSubject().equals("IP")) {
-				//new VoiceCall(msg.getBody());
+				// new VoiceCall(msg.getBody());
 				return;
 			}
 		}
@@ -489,15 +495,14 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		String cmd = e.getActionCommand();
 		if (cmd.equals("Chat")) {
 
-			String connectTo = to.getText();
+			String connectTo;
 
-			if (connectTo.equals("")) {
-				if (contacts.getSelectedIndex() == -1)
-					return;
-				connectTo = ((User) contacts.getSelectedValue()).getName();
-				if (connectTo == null)
-					return;
-			}
+			if (contacts.getSelectedIndex() == -1)
+				return;
+			connectTo = ((User) contacts.getSelectedValue()).getName();
+			if (connectTo == null)
+				return;
+
 			Log.l("ConnectTO: " + connectTo);
 			if (connectTo.contains("conference")) {
 				String name = connectTo.substring(0, connectTo.indexOf("@"));
@@ -650,7 +655,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			Log.l("Null user!");
 			return;
 		}
-		
+
 		u.refreshSteamInfo();
 
 		JFrame disp = new JFrame("Profile of " + u.getName());
@@ -709,7 +714,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER)
-			openChat(to.getText());
+			openChat("");
 	}
 
 	/**
@@ -750,7 +755,6 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			}
 			requestIP();
 			chat.show();
-			to.setText("");
 			return chat;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -831,7 +835,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		loadContacts();
 
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -840,7 +844,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
-			requestOtherProfile();
+			openChat("");
 		}
 
 	}
