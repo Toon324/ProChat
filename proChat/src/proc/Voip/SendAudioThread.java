@@ -46,7 +46,6 @@ public class SendAudioThread extends Thread implements Runnable {
 					+ toSend.getPort());
 			byte[] ack = (Home.getIP() + " " + recieverIP).getBytes();
 			toSend.setData(ack);
-			sock.connect(InetAddress.getByName(recieverIP), 1324);
 			sock.send(toSend);
 
 			while (shouldSend) {
