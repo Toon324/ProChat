@@ -55,7 +55,7 @@ public class SendAudioThread extends Thread implements Runnable {
 				toSend.setData(data);
 				sock.send(toSend);
 			}
-
+			text.append("Socket closed.");
 			sock.close();
 		} catch (Exception e) {
 			e.printStackTrace();
