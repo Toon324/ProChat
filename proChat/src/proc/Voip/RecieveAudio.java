@@ -38,8 +38,6 @@ public class RecieveAudio {
 
 		frame.add(scroller);
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		frame.setSize(400, 400);
 		frame.setLocation(800, 200);
 		frame.setVisible(true);

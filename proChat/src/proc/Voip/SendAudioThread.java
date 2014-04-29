@@ -53,7 +53,7 @@ public class SendAudioThread extends Thread implements Runnable {
 				targetDataLine.read(data, 0, data.length);
 
 				toSend.setData(data);
-				//sock.send(toSend);
+				sock.send(toSend);
 			}
 
 			sock.close();
