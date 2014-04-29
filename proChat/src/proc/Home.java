@@ -725,7 +725,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 */
 	private ChatWindow openChat(String connectTo) {
 		if (connectTo.equals("")) {
-			Log.l("Fetching User from List..");
+			//Log.l("Fetching User from List..");
 			if (contacts.getSelectedIndex() == -1)
 				return null;
 			connectTo = ((User) contacts.getSelectedValue()).getName();
@@ -735,15 +735,15 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		try {
 			
 			for (ChatWindow c : currentChats) {
-				// Log.l("Comparing " + from + " to " + c.getFullFrom());
-				if (c.getFullFrom().equals(connectTo)) {
+				//Log.l("Comparing " + connectTo + " to " + c.getFrom());
+				if (c.getFrom().equals(connectTo)) {
 					c.show();
-					Log.l("Opening existing chat with " + connectTo);
+					//Log.l("Opening existing chat with " + connectTo);
 					return c;
 				}
 			}
 			
-			Log.l("Creating connection to " + connectTo);
+			//Log.l("Creating connection to " + connectTo);
 
 			Chat c = connection.getChatManager().createChat(
 					connectTo + "@" + serverName, null);
@@ -830,7 +830,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	public void presenceChanged(Presence e) {
 		String fullFrom = e.getFrom().substring(0,
 				e.getFrom().indexOf("/Smack"));
-		Log.l(fullFrom + " " + e);
+		//Log.l(fullFrom + " " + e);
 		// Send message of presence change to any chatwindows with that person
 		for (ChatWindow c : currentChats)
 			if (c.getFullFrom().equals(fullFrom)) {
@@ -870,7 +870,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		Message message = new Message();
 		message.setTo(other + "@" + serverName);
-		Log.l("Requesting id from " + message.getTo());
+		Log.l("Requesting SteamID from " + message.getTo());
 		message.setSubject("ID request");
 		message.setType(Message.Type.headline);
 		connection.getConnection().sendPacket(message);
@@ -899,7 +899,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	private void viewOtherProfile(String id) {
 		String other = ((User) contacts.getSelectedValue()).getName();
 
-		Log.l("id recieved: " + id);
+		Log.l("SteamID recieved: " + id);
 		User u = new User(null, null);
 		u.loadSteamInfo(id);
 		u.setName(other);
