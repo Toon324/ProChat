@@ -84,7 +84,7 @@ public class AdPanel extends JPanel implements MouseListener {
 		 temp = gen.nextInt(AMT);
 
 		currentIndex = temp;
-		Log.l("Now displaying ad " + currentIndex);
+		//Log.l("Now displaying ad " + currentIndex);
 		this.repaint();
 	}
 

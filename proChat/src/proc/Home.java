@@ -725,7 +725,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 */
 	private ChatWindow openChat(String connectTo) {
 		if (connectTo.equals("")) {
-
+			Log.l("Fetching User from List..");
 			if (contacts.getSelectedIndex() == -1)
 				return null;
 			connectTo = ((User) contacts.getSelectedValue()).getName();
@@ -733,6 +733,16 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				return null;
 		}
 		try {
+			
+			for (ChatWindow c : currentChats) {
+				// Log.l("Comparing " + from + " to " + c.getFullFrom());
+				if (c.getFullFrom().equals(connectTo)) {
+					c.show();
+					Log.l("Opening existing chat with " + connectTo);
+					return c;
+				}
+			}
+			
 			Log.l("Creating connection to " + connectTo);
 
 			Chat c = connection.getChatManager().createChat(
