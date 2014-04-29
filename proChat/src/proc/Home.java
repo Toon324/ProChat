@@ -57,6 +57,8 @@ import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
+import proc.Voip.VoiceCall;
+
 /**
  * @author Cody Swendrowski
  * 
@@ -441,7 +443,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				}
 				return;
 			} else if (msg.getSubject().equals("IP")) {
-				// new VoiceCall(msg.getBody());
+				 new VoiceCall(msg.getBody());
 				return;
 			}
 		}
