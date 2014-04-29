@@ -123,134 +123,9 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		// UIManager.put("MenuItem.background", Color.CYAN);
 		UIManager.put("MenuItem.opaque", true);
 
-		// Menu
-		menuBar = new JMenuBar();
+		buildMenu();
 
-		// Build the first menu.
-		menu = new JMenu("ProChat");
-		menu.getAccessibleContext().setAccessibleDescription(
-				"Menu that allows signing out or exitting the program.");
-		menuBar.add(menu);
-
-		JMenuItem signOutItem = new JMenuItem("Sign Out", KeyEvent.VK_S);
-		menu.add(signOutItem);
-		signOutItem.addActionListener(this);
-
-		JMenuItem exitItem = new JMenuItem("Exit Program", KeyEvent.VK_E);
-		menu.add(exitItem);
-		exitItem.addActionListener(this);
-
-		// Profile menu
-		JMenu profileMenu = new JMenu("Profile");
-		profileMenu.setMnemonic(KeyEvent.VK_P);
-		menuBar.add(profileMenu);
-
-		JMenuItem viewProfile = new JMenuItem("View Profile");
-		profileMenu.add(viewProfile);
-		viewProfile.addActionListener(this);
-
-		JMenuItem linkSteam = new JMenuItem("Link Steam x64 ID", KeyEvent.VK_L);
-		linkSteam.setActionCommand("Link");
-		profileMenu.add(linkSteam);
-		linkSteam.addActionListener(this);
-
-		JMenuItem setStatus = new JMenuItem("Set Status");
-		profileMenu.add(setStatus);
-		setStatus.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String s = JOptionPane.showInputDialog(
-						"What should your status be?", user.getStatus());
-				Presence p = connection.setStatus(true, s);
-				user.setStatus(p);
-			}
-
-		});
-
-		// Status submenu
-		JMenu modeMenu = new JMenu("Set Mode");
-		profileMenu.add(modeMenu);
-
-		JMenuItem available = new JMenuItem("Available");
-		modeMenu.add(available);
-		available.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				connection.setMode(true, Mode.available);
-			}
-		});
-
-		JMenuItem away = new JMenuItem("Away");
-		modeMenu.add(away);
-		away.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				connection.setMode(true, Mode.away);
-			}
-		});
-
-		JMenuItem busy = new JMenuItem("Busy");
-		modeMenu.add(busy);
-		busy.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				connection.setMode(true, Mode.dnd);
-			}
-		});
-
-		JMenuItem invisible = new JMenuItem("Appear Offline");
-		modeMenu.add(invisible);
-		invisible.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				connection.setMode(false, null);
-			}
-		});
-
-		// Contacts menu
-		JMenu contactMenu = new JMenu("Contacts");
-		contactMenu.setMnemonic(KeyEvent.VK_C);
-		menuBar.add(contactMenu);
-		contactMenu.addActionListener(this);
-
-		JMenuItem addContactItem = new JMenuItem("Add Contact");
-		contactMenu.add(addContactItem);
-		addContactItem.addActionListener(this);
-
-		JMenuItem removeContactItem = new JMenuItem("Remove Contact");
-		contactMenu.add(removeContactItem);
-		removeContactItem.addActionListener(this);
-
-		// Group menu
-		JMenu groupMenu = new JMenu("Groups");
-		groupMenu.setMnemonic(KeyEvent.VK_G);
-		menuBar.add(groupMenu);
-
-		JMenuItem joinGroup = new JMenuItem("Join Group");
-		groupMenu.add(joinGroup);
-		joinGroup.addActionListener(this);
-
-		// Help menu
-		JMenu helpMenu = new JMenu("Help");
-		helpMenu.setMnemonic(KeyEvent.VK_H);
-		menuBar.add(helpMenu);
-
-		JMenuItem showQuick = new JMenuItem("Quick Guide");
-		helpMenu.add(showQuick);
-		showQuick.addActionListener(this);
-
-		try {
-			URL whatismyip = new URL("http://checkip.amazonaws.com");
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					whatismyip.openStream()));
-
-			String ip = in.readLine(); // you get the IP as a String
-			Log.l("Found external IP of " + ip);
-			IP = ip;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		getIP();
 
 		/*
 		 * //Options menu JMenu options = new JMenu("Options");
@@ -323,6 +198,129 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		user.loadSteamInfo(user.getEmail());
 
 		connection.setPresence(true, "Free to chat", Mode.available);
+	}
+
+	/**
+	 * 
+	 */
+	private void buildMenu() {
+		// Menu
+				menuBar = new JMenuBar();
+
+				// Build the first menu.
+				menu = new JMenu("ProChat");
+				menu.getAccessibleContext().setAccessibleDescription(
+						"Menu that allows signing out or exitting the program.");
+				menuBar.add(menu);
+
+				JMenuItem signOutItem = new JMenuItem("Sign Out", KeyEvent.VK_S);
+				menu.add(signOutItem);
+				signOutItem.addActionListener(this);
+
+				JMenuItem exitItem = new JMenuItem("Exit Program", KeyEvent.VK_E);
+				menu.add(exitItem);
+				exitItem.addActionListener(this);
+
+				// Profile menu
+				JMenu profileMenu = new JMenu("Profile");
+				profileMenu.setMnemonic(KeyEvent.VK_P);
+				menuBar.add(profileMenu);
+
+				JMenuItem viewProfile = new JMenuItem("View Profile");
+				profileMenu.add(viewProfile);
+				viewProfile.addActionListener(this);
+
+				JMenuItem linkSteam = new JMenuItem("Link Steam x64 ID", KeyEvent.VK_L);
+				linkSteam.setActionCommand("Link");
+				profileMenu.add(linkSteam);
+				linkSteam.addActionListener(this);
+
+				JMenuItem setStatus = new JMenuItem("Set Status");
+				profileMenu.add(setStatus);
+				setStatus.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						String s = JOptionPane.showInputDialog(
+								"What should your status be?", user.getStatus());
+						Presence p = connection.setStatus(true, s);
+						user.setStatus(p);
+					}
+
+				});
+
+				// Status submenu
+				JMenu modeMenu = new JMenu("Set Mode");
+				profileMenu.add(modeMenu);
+
+				JMenuItem available = new JMenuItem("Available");
+				modeMenu.add(available);
+				available.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						connection.setMode(true, Mode.available);
+					}
+				});
+
+				JMenuItem away = new JMenuItem("Away");
+				modeMenu.add(away);
+				away.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						connection.setMode(true, Mode.away);
+					}
+				});
+
+				JMenuItem busy = new JMenuItem("Busy");
+				modeMenu.add(busy);
+				busy.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						connection.setMode(true, Mode.dnd);
+					}
+				});
+
+				JMenuItem invisible = new JMenuItem("Appear Offline");
+				modeMenu.add(invisible);
+				invisible.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						connection.setMode(false, null);
+					}
+				});
+
+				// Contacts menu
+				JMenu contactMenu = new JMenu("Contacts");
+				contactMenu.setMnemonic(KeyEvent.VK_C);
+				menuBar.add(contactMenu);
+				contactMenu.addActionListener(this);
+
+				JMenuItem addContactItem = new JMenuItem("Add Contact");
+				contactMenu.add(addContactItem);
+				addContactItem.addActionListener(this);
+
+				JMenuItem removeContactItem = new JMenuItem("Remove Contact");
+				contactMenu.add(removeContactItem);
+				removeContactItem.addActionListener(this);
+
+				// Group menu
+				JMenu groupMenu = new JMenu("Groups");
+				groupMenu.setMnemonic(KeyEvent.VK_G);
+				menuBar.add(groupMenu);
+
+				JMenuItem joinGroup = new JMenuItem("Join Group");
+				groupMenu.add(joinGroup);
+				joinGroup.addActionListener(this);
+
+				// Help menu
+				JMenu helpMenu = new JMenu("Help");
+				helpMenu.setMnemonic(KeyEvent.VK_H);
+				menuBar.add(helpMenu);
+
+				JMenuItem showQuick = new JMenuItem("Quick Guide");
+				helpMenu.add(showQuick);
+				showQuick.addActionListener(this);
+		
 	}
 
 	/**
