@@ -766,7 +766,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				chat.addToChatArea("Could not find a reference to " + connectTo
 						+ " on the server.", null);
 			}
-			//requestIP();
+			requestIP();
 			chat.show();
 			return chat;
 		} catch (Exception e) {
