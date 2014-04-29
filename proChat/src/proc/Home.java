@@ -453,6 +453,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				msg.getFrom().indexOf("."));
 		// Log.l("Domain: " + domain);
 		ChatWindow activeChat = null;
+		
+		Log.l("Message from: " + from + " at domain " + domain);
 
 		if (domain.equals("conference")) {
 			if (msg.getFrom().indexOf("/") == -1) // Room message
@@ -460,7 +462,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 			from = msg.getFrom().substring(msg.getFrom().indexOf("/") + 1,
 					msg.getFrom().length());
-			// Log.l("Conference from: " + from);
+			 Log.l("Conference from: " + from);
 		}
 
 		for (ChatWindow c : currentChats) {
@@ -473,6 +475,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		}
 
 		if (activeChat == null && !domain.equals("conference")) {
+			Log.l("Opening new chat with " + from);
 			ChatWindow c = openChat(from);
 			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 			currentChats.add(c);
@@ -730,7 +733,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				return null;
 		}
 		try {
-			// Log.l("Creating connection to " + connectTo);
+			Log.l("Creating connection to " + connectTo);
 
 			Chat c = connection.getChatManager().createChat(
 					connectTo + "@" + serverName, null);
@@ -753,7 +756,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				chat.addToChatArea("Could not find a reference to " + connectTo
 						+ " on the server.", null);
 			}
-			requestIP();
+			//requestIP();
 			chat.show();
 			return chat;
 		} catch (Exception e) {
