@@ -10,7 +10,9 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -24,6 +26,8 @@ import javax.swing.JTextField;
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPException;
 
+import steamWrapper.SteamRegister;
+
 /**
  * @author Cody
  * 
@@ -33,6 +37,7 @@ public class LoginWindow implements ActionListener, KeyListener {
 	File saved;
 	XmppManager connection;
 	private String savedName;
+	TreeMap<String, String> info = new TreeMap<String,String>();
 
 	public LoginWindow() {
 		
@@ -95,6 +100,12 @@ public class LoginWindow implements ActionListener, KeyListener {
 		}
 
 		DisplayInputWindow(user, pass);
+		
+		SteamRegister sr = new SteamRegister("76561197998100303");
+		sr.fetchInfo();
+		System.out.println("Fetched: " + sr.getInfoMap().get("primaryclanid:"));
+		//for (String s : sr.fetchInfo())
+			//System.out.println(s);
 	}
 
 	JTextField loginName;
