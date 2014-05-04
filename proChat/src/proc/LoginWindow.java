@@ -102,14 +102,6 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 		}
 
 		DisplayInputWindow(user, pass);
-		
-		SteamRegister sr = new SteamRegister("76561197998100303");
-		sr.loadPlayerInfo();
-		sr.addListener(this);
-		sr.requestEventsFor(SteamRegister.PlayerValues.USERNAME);
-		System.out.println("Fetched: " + sr.fetchValue(SteamRegister.PlayerValues.USERNAME));
-		//for (String s : sr.fetchInfo())
-			//System.out.println(s);
 	}
 
 	JTextField loginName;

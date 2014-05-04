@@ -2,11 +2,7 @@ package steamWrapper;
 
 public class SteamEvent {
 
-	public enum EventType {
-		PLAYER_UPDATE, FRIEND_UPDATE;
-	}
-
-	EventType event;
+	String name;
 	String key;
 	String value;
 
@@ -14,14 +10,25 @@ public class SteamEvent {
 	 * @param key
 	 * @param value
 	 */
-	public SteamEvent(EventType e, String k, String v) {
-		event = e;
+	public SteamEvent(String player, String k, String v) {
+		name = player;
 		key = k;
 		value = v;
 	}
 	
 	public String toString() {
-		return event + " Key: " + key + " Value: " + value;
+		return name + " Key: " + key + " Value: " + value;
+	}
+	
+	public String getUsername() {
+		return name;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getValue() {
+		return value;
 	}
 
 }

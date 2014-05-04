@@ -57,12 +57,16 @@ import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
+import steamWrapper.SteamEvent;
+import steamWrapper.SteamListener;
+import steamWrapper.SteamRegister;
+
 /**
  * @author Cody Swendrowski
  * 
  */
 public class Home implements ActionListener, MouseListener, KeyListener,
-		RosterListener {
+		RosterListener, SteamListener {
 
 	static JColorChooser chooser;
 	JFrame frame;
@@ -198,6 +202,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		user.loadSteamInfo(user.getEmail());
 
 		connection.setPresence(true, "Free to chat", Mode.available);
+		
+		SteamRegister sr = new SteamRegister("76561197998100303");
+		sr.loadPlayerInfo();
+		sr.addListener(this);
+		sr.requestEventsFor(SteamRegister.PlayerValues.GAME_NAME);
 	}
 
 	/**
@@ -964,6 +973,20 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				e.printStackTrace();
 			}
 		return IP;
+	}
+
+	/* (non-Javadoc)
+	 * @see steamWrapper.SteamListener#SteamUpdate(steamWrapper.SteamEvent)
+	 */
+	@Override
+	public void SteamUpdate(SteamEvent e) {
+		Log.l("Steamupdate: " + e);
+		for (int x=0; x < contacts.getModel().getSize(); x++) {
+			User u = contacts.getModel().getElementAt(x);
+			if (u.getName().equals(e.getUsername()))
+				u.setGame(e.getValue());
+		}
+		
 	}
 
 }
