@@ -53,7 +53,7 @@ public class UDPInThread implements Runnable {
 				RecieveAudio.text.append("\nConnection made.");
 				byte[] data = datagram.getData();
 				RecieveAudio.text.setText("\n" + data[0] + " " + data[1] + " " + data[2] + " " + data[3] + " " +data[4]);
-				Log.l("waiting...");
+				//Log.l("waiting...");
 				ra.recievePacket(data);
 			} catch (Exception e) {
 				e.printStackTrace();
