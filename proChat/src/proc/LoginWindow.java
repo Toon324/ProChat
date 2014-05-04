@@ -26,13 +26,15 @@ import javax.swing.JTextField;
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPException;
 
+import steamWrapper.SteamEvent;
+import steamWrapper.SteamListener;
 import steamWrapper.SteamRegister;
 
 /**
  * @author Cody
  * 
  */
-public class LoginWindow implements ActionListener, KeyListener {
+public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	JFrame frame;
 	File saved;
 	XmppManager connection;
@@ -103,6 +105,8 @@ public class LoginWindow implements ActionListener, KeyListener {
 		
 		SteamRegister sr = new SteamRegister("76561197998100303");
 		sr.loadPlayerInfo();
+		sr.addListener(this);
+		sr.requestEventsFor(SteamRegister.PlayerValues.USERNAME);
 		System.out.println("Fetched: " + sr.fetchValue(SteamRegister.PlayerValues.USERNAME));
 		//for (String s : sr.fetchInfo())
 			//System.out.println(s);
@@ -378,6 +382,15 @@ public class LoginWindow implements ActionListener, KeyListener {
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+	/* (non-Javadoc)
+	 * @see steamWrapper.SteamListener#SteamUpdate(steamWrapper.SteamEvent)
+	 */
+	@Override
+	public void SteamUpdate(SteamEvent e) {
+		System.out.println("Steamupdate: " + e);
+		
 	}
 
 }
