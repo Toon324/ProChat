@@ -11,20 +11,47 @@ import java.util.TreeMap;
 
 public class SteamRegister {
 	
-	String steamID;
-	SteamListener[] listeners = new SteamListener[10];
-	int numOfListeners = 0;
-	TreeMap<String, String> infoMap = new TreeMap<String, String>();
+	private String steamID;
+	private SteamListener[] listeners = new SteamListener[10];
+	private int numOfListeners = 0;
+	private TreeMap<String, String> infoMap = new TreeMap<String, String>();
+	
+	public enum PlayerValues {
+		STEAMID ("steamid:"),
+		VISIBLITY ("communityvisiblitystate:"),
+		PROFILE_STATE ("profilestate:"),
+		USERNAME ("personaname:"),
+		LAST_LOGOFF ("lastlogoff:"),
+		PROFILE_URL ("profileurl:"),
+		AVATAR ("avatar:"),
+		AVATAR_MEDIUM ("avatarmedium:"),
+		AVATAR_FULL ("avatarfull:"),
+		PERSONA_STATE ("personastate:"),
+		PRIMARY_CLAN ("primaryclanid:"),
+		COUNTRY ("loccountrycode:"),
+		STATE ("locstatecode:"),
+		CITY ("loccityid:");
+		
+		private final String name;
+		PlayerValues(String n) {
+			name = n;
+		}
+		
+		public String key() {
+			return name;
+		}
+	}
 	
 	public SteamRegister(String steamid) {
 		steamID = steamid;
 	}
 
-	public void fetchFriends() {
-		
+	public String fetchValue(PlayerValues p) {
+		System.out.println("Fetching " + p.key());
+		return infoMap.get(p.key());
 	}
 	
-	public ArrayList<String> fetchInfo() {
+	public ArrayList<String> loadPlayerInfo() {
 		String turl = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=B809FE9D19152246D16A66E7ECE22ADF&steamids="
 				+ steamID;
 		
@@ -38,11 +65,6 @@ public class SteamRegister {
 			String value = "";
 			while (scan.hasNext()) {
 				String found = scan.next();
-				/*
-				 * if (found.equals("(") || found.equals(")") ||
-				 * found.equals("{") || found.equals("}") || found.equals("[")
-				 * || found.equals("]")) found = "";
-				 */
 				
 				found = removeSteamFormatting(found);
 				if (!found.equals("")) {
@@ -70,10 +92,6 @@ public class SteamRegister {
 			e.printStackTrace();
 		}
 		return toReturn;
-	}
-	
-	public TreeMap<String, String> getInfoMap() {
-		return infoMap;
 	}
 	
 	private String removeSteamFormatting(String input) {
