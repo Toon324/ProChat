@@ -55,9 +55,10 @@ public class ContactsCellRenderer extends JLabel implements
 			setText("Null");
 			return this;
 		}
-		if (user.getGame() != null)
-			setText("<html>" + user.getName() + "<br/><i><small>" + user.getGame() + "</small></i></html>");
-		else if (user.getStatus() != null)
+		if (!user.getGame().equals("") && !user.getGame().equals("No current game")) {
+			setText("<html>" + user.getName() + "<br/><i><small>Currently playing " + user.getGame() + "</small></i></html>");
+			//Log.l("Set user text as " + user.getGame());
+		}else if (user.getStatus() != null)
 			setText("<html>" + user.getName() + "<br/><i><small>" + user.getStatus() + "</small></i></html>");
 		else
 			setText(user.getName());

@@ -983,9 +983,13 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		Log.l("Steamupdate: " + e);
 		for (int x=0; x < contacts.getModel().getSize(); x++) {
 			User u = contacts.getModel().getElementAt(x);
-			if (u.getName().equals(e.getUsername()))
+			//Log.l("Comparing: " + u.getName() + " to " + e.getUsername() + " ? " + u.getName().equalsIgnoreCase(e.getUsername()));
+			if (u.getName().equalsIgnoreCase(e.getUsername())) {
 				u.setGame(e.getValue());
+				Log.l("Set user " + u.getName() + " to be playing " + u.getGame());
+			}
 		}
+		contacts.repaint();
 		
 	}
 
