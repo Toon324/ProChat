@@ -59,37 +59,17 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 
 		String user = "";
 		String pass = "";
-
-		saved = new File("savedInfo.txt");
-		if (!saved.exists())
-			try {
-				saved.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		else {
-			try {
-				// Load in the saved login info
-				Scanner reader = new Scanner(saved);
-				reader.useDelimiter("\t");
-				while (reader.hasNext()) {
-					String found = reader.next();
-					// Log.l("Found: " + found);
-					if (user.equals(""))
-						user = found;
-					else if (pass.equals(""))
-						pass = found;
-				}
-				reader.close();
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 		
 		savedName = user;
 
 		frame.addKeyListener(this);
+		
+		SavedInfoLoader.createInstance();
+		
+		SavedInfoLoader savedInfo = SavedInfoLoader.getInstance();
+		
+		user = savedInfo.user;
+		pass = savedInfo.pass;
 
 		String serverIP = "129.89.185.120";
 		int port = 5222;
