@@ -8,8 +8,6 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
 
-import proc.Log;
-
 public class SteamRegister {
 
 	private int timeout;
@@ -62,7 +60,7 @@ public class SteamRegister {
 	}
 
 	public String fetchValue(PlayerValues p) {
-		System.out.println("Fetching " + p.key());
+		//System.out.println("Fetching " + p.key());
 		return infoMap.get(p.key());
 	}
 
@@ -139,7 +137,7 @@ public class SteamRegister {
 	}
 
 	public void requestEventsFor(PlayerValues p) {
-		Log.l("Watching for key " + p.key());
+		//Log.l("Watching for key " + p.key());
 		watchedKeys.add(p.key());
 	}
 
@@ -163,10 +161,10 @@ public class SteamRegister {
 					toReturn.add(found);
 					if (key.equals("")) {
 						key = found;
-						System.out.println("Key: " + found);
+						//System.out.println("Key: " + found);
 					} else {
 						value = found;
-						System.out.println("Value: " + found);
+						//System.out.println("Value: " + found);
 						infoMap.put(key, value);
 						key = "";
 						value = "";

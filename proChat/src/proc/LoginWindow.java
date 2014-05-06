@@ -9,10 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map.Entry;
-import java.util.Scanner;
-import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -28,7 +24,6 @@ import org.jivesoftware.smack.XMPPException;
 
 import steamWrapper.SteamEvent;
 import steamWrapper.SteamListener;
-import steamWrapper.SteamRegister;
 
 /**
  * @author Cody
@@ -39,7 +34,7 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	File saved;
 	XmppManager connection;
 	private String savedName;
-	TreeMap<String, String> info = new TreeMap<String,String>();
+	SavedInfoLoader savedInfo;
 
 	public LoginWindow() {
 		
@@ -66,7 +61,7 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 		
 		SavedInfoLoader.createInstance();
 		
-		SavedInfoLoader savedInfo = SavedInfoLoader.getInstance();
+		savedInfo = SavedInfoLoader.getInstance();
 		
 		user = savedInfo.user;
 		pass = savedInfo.pass;
@@ -292,10 +287,8 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	private void login() {
 		// Write info to .txt
 		try {
-			PrintWriter writer = new PrintWriter(saved);
-			writer.write(loginName.getText() + "\t"
+			savedInfo.updateSavedLogin(loginName.getText() + "\t"
 					+ new String(loginPass.getPassword()));
-			writer.close();
 
 			User user = new User(loginName.getText(), new String(
 					loginPass.getPassword()));
@@ -305,8 +298,6 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 			
 			user.setEmail(connection.getConnection().getAccountManager()
 					.getAccountAttribute("email"));
-			
-
 
 			Home home = new Home(user, connection);
 			home.show();

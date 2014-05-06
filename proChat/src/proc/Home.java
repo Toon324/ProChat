@@ -201,7 +201,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		// readSteamInfo("76561197998100303");
 		user.loadSteamInfo(user.getEmail());
 
-		connection.setPresence(true, "Free to chat", Mode.available);
+		connection.setPresence(true, SavedInfoLoader.getInstance().status, Mode.available);
 		
 		SteamRegister sr = new SteamRegister("76561197998100303");
 		sr.loadPlayerInfo();
@@ -254,6 +254,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 								"What should your status be?", user.getStatus());
 						Presence p = connection.setStatus(true, s);
 						user.setStatus(p);
+						SavedInfoLoader.getInstance().updateStatus(s);
 					}
 
 				});
