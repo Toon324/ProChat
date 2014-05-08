@@ -37,32 +37,32 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	SavedInfoLoader savedInfo;
 
 	public LoginWindow() {
-		
+
 		try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    //javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        }
-		catch (Exception e) {
+			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager
+					.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					// javax.swing.UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		frame = new JFrame();
 
 		String user = "";
 		String pass = "";
-		
+
 		savedName = user;
 
 		frame.addKeyListener(this);
-		
+
 		SavedInfoLoader.createInstance();
-		
+
 		savedInfo = SavedInfoLoader.getInstance();
-		
+
 		user = savedInfo.user;
 		pass = savedInfo.pass;
 
@@ -81,90 +81,132 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 
 	JTextField loginName;
 	JPasswordField loginPass;
-	
-	 // Variables declaration
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+
+	// Variables declaration
+	private javax.swing.JButton jButton1;
+	private javax.swing.JButton jButton2;
+	private javax.swing.JLabel jLabel1;
+	private javax.swing.JLabel jLabel2;
 
 	private void DisplayInputWindow(String user, String pass) {
 		frame = new JFrame();
 		frame.setSize(400, 600);
 		frame.setTitle("ProChat");
-		
+
 		try {
-			frame.setIconImage(ImageIO.read(this.getClass().getResourceAsStream("logo.png")));
+			frame.setIconImage(ImageIO.read(this.getClass()
+					.getResourceAsStream("logo.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		jLabel1 = new javax.swing.JLabel();
-        loginName = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        loginPass = new javax.swing.JPasswordField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+		loginName = new javax.swing.JTextField();
+		jLabel2 = new javax.swing.JLabel();
+		loginPass = new javax.swing.JPasswordField();
+		jButton1 = new javax.swing.JButton();
+		jButton2 = new javax.swing.JButton();
 
-        frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        frame.setBackground(new java.awt.Color(255, 204, 0));
+		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		frame.setBackground(new java.awt.Color(255, 204, 0));
 
-        jLabel1.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
-        jLabel1.setText("Username");
+		jLabel1.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
+		jLabel1.setText("Username");
 
-        loginName.setText(user);
-        loginName.addKeyListener(this);
+		loginName.setText(user);
+		loginName.addKeyListener(this);
 
-        jLabel2.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
-        jLabel2.setText("Password");
+		jLabel2.setFont(new java.awt.Font("Trebuchet MS", 1, 18)); // NOI18N
+		jLabel2.setText("Password");
 
-        loginPass.setText(pass);
-        loginPass.addKeyListener(this);
+		loginPass.setText(pass);
+		loginPass.addKeyListener(this);
 
-        jButton1.setText("Login");
-        jButton1.setActionCommand("Login");
-        jButton1.addActionListener(this);
+		jButton1.setText("Login");
+		jButton1.setActionCommand("Login");
+		jButton1.addActionListener(this);
 
-        jButton2.setText("Register");
-        jButton2.setActionCommand("Register");
-        jButton2.addActionListener(this);
+		jButton2.setText("Register");
+		jButton2.setActionCommand("Register");
+		jButton2.addActionListener(this);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(frame.getContentPane());
-        frame.getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(loginPass, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(loginName)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(loginName, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(loginPass, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-		
-        frame.setLocation(500, 300);
+		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(
+				frame.getContentPane());
+		frame.getContentPane().setLayout(layout);
+		layout.setHorizontalGroup(layout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(
+						layout.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(
+										layout.createParallelGroup(
+												javax.swing.GroupLayout.Alignment.LEADING)
+												.addComponent(
+														loginPass,
+														javax.swing.GroupLayout.Alignment.TRAILING)
+												.addComponent(loginName)
+												.addGroup(
+														layout.createSequentialGroup()
+																.addGroup(
+																		layout.createParallelGroup(
+																				javax.swing.GroupLayout.Alignment.LEADING)
+																				.addComponent(
+																						jLabel1)
+																				.addComponent(
+																						jLabel2)
+																				.addComponent(
+																						jButton1,
+																						javax.swing.GroupLayout.PREFERRED_SIZE,
+																						191,
+																						javax.swing.GroupLayout.PREFERRED_SIZE))
+																.addPreferredGap(
+																		javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+																		javax.swing.GroupLayout.DEFAULT_SIZE,
+																		Short.MAX_VALUE)
+																.addComponent(
+																		jButton2,
+																		javax.swing.GroupLayout.PREFERRED_SIZE,
+																		183,
+																		javax.swing.GroupLayout.PREFERRED_SIZE)))
+								.addContainerGap()));
+		layout.setVerticalGroup(layout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(
+						layout.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(jLabel1)
+								.addPreferredGap(
+										javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+								.addComponent(loginName,
+										javax.swing.GroupLayout.PREFERRED_SIZE,
+										31,
+										javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addGap(18, 18, 18)
+								.addComponent(jLabel2)
+								.addPreferredGap(
+										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+								.addComponent(loginPass,
+										javax.swing.GroupLayout.PREFERRED_SIZE,
+										28,
+										javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(
+										javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+										23, Short.MAX_VALUE)
+								.addGroup(
+										layout.createParallelGroup(
+												javax.swing.GroupLayout.Alignment.LEADING,
+												false)
+												.addComponent(
+														jButton2,
+														javax.swing.GroupLayout.DEFAULT_SIZE,
+														41, Short.MAX_VALUE)
+												.addComponent(
+														jButton1,
+														javax.swing.GroupLayout.DEFAULT_SIZE,
+														javax.swing.GroupLayout.DEFAULT_SIZE,
+														Short.MAX_VALUE))
+								.addContainerGap()));
+
+		frame.setLocation(500, 300);
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -211,7 +253,7 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 			name = new JTextField("");
 		else
 			name = new JTextField(loginName.getText());
-		
+
 		pass = new JPasswordField("");
 
 		name.addKeyListener(this);
@@ -266,6 +308,7 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	}
 
 	boolean enterFix = false;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -274,7 +317,8 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	@Override
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			enterFix = !enterFix; //Allows closing of invalid login window without trying to log in again.
+			enterFix = !enterFix; // Allows closing of invalid login window
+									// without trying to log in again.
 			if (enterFix)
 				login();
 		}
@@ -287,47 +331,47 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	private void login() {
 		// Write info to .txt
 		try {
-			savedInfo.updateSavedLogin(loginName.getText() + "\t"
-					+ new String(loginPass.getPassword()));
+			savedInfo.updateSavedLogin(loginName.getText(), new String(
+					loginPass.getPassword()));
 
 			User user = new User(loginName.getText(), new String(
 					loginPass.getPassword()));
 
 			connection.getConnection().login(user.getName(), user.getPass());
-			
-			
+
 			user.setEmail(connection.getConnection().getAccountManager()
 					.getAccountAttribute("email"));
 
 			Home home = new Home(user, connection);
 			home.show();
-//			JOptionPane.showMessageDialog(frame, "Successfully logged in as "
-//					+ loginName.getText());
+			// JOptionPane.showMessageDialog(frame, "Successfully logged in as "
+			// + loginName.getText());
 			frame.dispose();
 		} catch (Exception e1) {
 			JOptionPane.showMessageDialog(frame, "Could not login as "
 					+ loginName.getText() + "\nError: " + e1.getMessage());
-			
+
 			if (e1.getMessage().contains("savedInfo.txt")) {
-				//Still login if we can't store info
+				// Still login if we can't store info
 				try {
-				User user = new User(loginName.getText(), new String(
-						loginPass.getPassword()));
+					User user = new User(loginName.getText(), new String(
+							loginPass.getPassword()));
 
-				connection.getConnection().login(user.getName(), user.getPass());
+					connection.getConnection().login(user.getName(),
+							user.getPass());
 
-				user.setEmail(connection.getConnection().getAccountManager()
-						.getAccountAttribute("email"));
+					user.setEmail(connection.getConnection()
+							.getAccountManager().getAccountAttribute("email"));
 
-				Home home = new Home(user, connection);
-				home.show();
-				JOptionPane.showMessageDialog(frame, "Successfully logged in as "
-						+ loginName.getText());
-				frame.dispose();
-				}
-				catch (Exception e) {
-					JOptionPane.showMessageDialog(frame, "Could not login as "
-							+ loginName.getText() + "\nError: " + e1.getMessage());
+					Home home = new Home(user, connection);
+					home.show();
+					JOptionPane.showMessageDialog(frame,
+							"Successfully logged in as " + loginName.getText());
+					frame.dispose();
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(frame,
+							"Could not login as " + loginName.getText()
+									+ "\nError: " + e1.getMessage());
 					e.printStackTrace();
 				}
 			}
@@ -347,13 +391,15 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see steamWrapper.SteamListener#SteamUpdate(steamWrapper.SteamEvent)
 	 */
 	@Override
 	public void SteamUpdate(SteamEvent e) {
 		System.out.println("Steamupdate: " + e);
-		
+
 	}
 
 }

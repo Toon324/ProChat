@@ -37,7 +37,7 @@ public class SavedInfoLoader {
 				//reader.useDelimiter("\t");
 				while (reader.hasNextLine()) {
 					String found = reader.nextLine();
-					toWrite.append(found + "\r\n");
+					//toWrite.append(found + "\r\n");
 					Log.l("Line: " + found);
 					
 					handleLine(reader, found);
@@ -91,8 +91,10 @@ public class SavedInfoLoader {
 	/**
 	 * @param string
 	 */
-	public void updateSavedLogin(String newLogin) {
-		toWrite.replace(toWrite.indexOf("[LOGIN]"), toWrite.indexOf("[STATUS]"), "[LOGIN]\r\n" + newLogin + "\r\n");
+	public void updateSavedLogin(String u, String p) {
+		user = u;
+		pass = p;
+		//toWrite.replace(toWrite.indexOf("[LOGIN]"), toWrite.indexOf("[STATUS]"), "[LOGIN]\r\n" + newLogin + "\r\n");
 		
 		write();
 		
@@ -103,7 +105,13 @@ public class SavedInfoLoader {
 	 */
 	private void write() {
 		try {
+			
 			PrintWriter writer = new PrintWriter(saved);
+			writer.write("[LOGIN]\r\n");
+			writer.write(user + "\t" + pass +"\r\n");
+			writer.write("[STATUS]\r\n");
+			writer.write(status + "\r\n");
+			
 			writer.write(toWrite.toString());
 			writer.close();
 			
@@ -118,7 +126,8 @@ public class SavedInfoLoader {
 	 * @param s
 	 */
 	public void updateStatus(String s) {
-		toWrite.replace(toWrite.indexOf("[STATUS]"), toWrite.length(), "[STATUS]\r\n" + s + "\r\n");
+		//toWrite.replace(toWrite.indexOf("[STATUS]"), toWrite.length(), "[STATUS]\r\n" + s + "\r\n");
+		status = s;
 		write();
 	}
 	
