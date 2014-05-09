@@ -203,6 +203,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		connection.setPresence(true, SavedInfoLoader.getInstance().status, Mode.available);
 		
+		//Keep track of Toon324's steam profile
 		SteamRegister sr = new SteamRegister("76561197998100303");
 		sr.loadPlayerInfo();
 		sr.addListener(this);
