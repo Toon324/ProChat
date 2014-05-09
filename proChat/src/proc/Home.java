@@ -104,7 +104,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		frame = new JFrame();
 		frame.setLayout(new GridLayout(2,1));
 		frame.setSize(400, 608);
-		frame.setTitle("ProChat v0.1.8 ALPHA");
+		frame.setTitle("ProChat v0.1.9 ALPHA");
 
 		contacts = new JList<User>(data);
 		ContactsCellRenderer cellRender = new ContactsCellRenderer();
@@ -287,6 +287,15 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						connection.setMode(true, Mode.dnd);
+					}
+				});
+				
+				JMenuItem ltp = new JMenuItem("Looking to play");
+				modeMenu.add(ltp);
+				ltp.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						connection.setMode(true, Mode.xa);
 					}
 				});
 

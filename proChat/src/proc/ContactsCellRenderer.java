@@ -2,9 +2,11 @@ package proc;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
@@ -19,24 +21,61 @@ import org.jivesoftware.smack.packet.Presence.Mode;
 @SuppressWarnings("serial")
 public class ContactsCellRenderer extends JLabel implements
 		ListCellRenderer<User> {
+	
+	private final int SQUARE = 30;
 
-	ImageIcon[] images;
+	MyIcon[] images;
 
 	public ContactsCellRenderer() {
 		setOpaque(true);
-		images = new ImageIcon[4];
+		images = new MyIcon[5];
 		try {
-			images[0] = new ImageIcon(ImageIO.read(getClass()
+			images[0] = new MyIcon(ImageIO.read(getClass()
 					.getResourceAsStream("available.png")));
-			images[1] = new ImageIcon(ImageIO.read(getClass()
+			images[1] = new MyIcon(ImageIO.read(getClass()
 					.getResourceAsStream("busy.png")));
-			images[2] = new ImageIcon(ImageIO.read(getClass()
+			images[2] = new MyIcon(ImageIO.read(getClass()
 					.getResourceAsStream("offline.png")));
-			images[3] = new ImageIcon(ImageIO.read(getClass()
+			images[3] = new MyIcon(ImageIO.read(getClass()
 					.getResourceAsStream("away.png")));
+			images[4] = new MyIcon(ImageIO.read(getClass()
+					.getResourceAsStream("ltp.png")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private class MyIcon implements Icon {
+		BufferedImage image;
+		
+		public MyIcon(BufferedImage i) {
+			image = i;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.swing.Icon#getIconHeight()
+		 */
+		@Override
+		public int getIconHeight() {
+			return SQUARE;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.swing.Icon#getIconWidth()
+		 */
+		@Override
+		public int getIconWidth() {
+			return SQUARE;
+		}
+
+		/* (non-Javadoc)
+		 * @see javax.swing.Icon#paintIcon(java.awt.Component, java.awt.Graphics, int, int)
+		 */
+		@Override
+		public void paintIcon(Component c, Graphics g, int x, int y) {
+			g.drawImage(image, x, y, x+SQUARE, y+SQUARE, 0, 0, image.getWidth(), image.getHeight(), null);
+		}
+		
 	}
 
 	/*
@@ -76,6 +115,10 @@ public class ContactsCellRenderer extends JLabel implements
 			else if (user.getMode() == Mode.dnd) {
 				setIcon(images[1]); //Busy
 				setToolTipText(user.getName() + " is busy.");
+			}
+			else if (user.getMode() == Mode.xa) {
+				setIcon(images[4]); //Looking to play
+				setToolTipText(user.getName() + " is looking to play a game.");
 			}
 		} else if (user.getPresence() == Presence.Type.unavailable) {
 			setIcon(images[2]); //Offline
