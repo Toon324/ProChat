@@ -47,6 +47,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -57,20 +58,20 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 public class ChatWindow implements ActionListener, KeyListener,
 		HyperlinkListener {
 
-	JFrame frame;
-	JEditorPane chatArea;
-	JTextField entry;
-	JButton send;
-	JLabel status;
-	User user;
-	String sendTo, serverName;
-	Chat chat;
-	MultiUserChat muc;
-	XmppManager connection;
-	HTMLEditorKit kit;
+	public JFrame frame;
+	
+	private JEditorPane chatArea;
+	private JTextField entry;
+	private JLabel status;
+	private User user;
+	private Chat chat;
+	private MultiUserChat muc;
+	private HTMLEditorKit kit;
+	
 	private String color = "000000";
-	private String font = "Arial";
 	private String previousColor = color;
+	private String font = "Arial";
+	
 	private String lastMessageFrom = "";
 	private boolean imagesEnabled = true;
 	private boolean customTextEnabled = true;
@@ -421,24 +422,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		if (toAdd.equals(""))
 			return;
-
-		// Adds a timestamp
-		Calendar c = Calendar.getInstance();
-		int hour = c.get(Calendar.HOUR);
-		int minute = c.get(Calendar.MINUTE);
-
-		String minuteText = "" + minute;
-
-		if (hour == 0)
-			hour = 12;
-
-		if (minute < 10)
-			minuteText = "0" + minute;
+		
 
 		try {
-			String timeStamp = "[" + hour + ":" + minuteText + "] ";
 			
-			String addition = "\n" + timeStamp +  toAdd;
+			String addition = "\n" + generateTimeStamp() +  " " + toAdd;
 			
 			//System message
 			if (!addition.contains("<b>")) {
@@ -468,21 +456,48 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		caretFix();
 
-		if (!frame.isFocused()) {
-			try {
-				Clip clip = AudioSystem.getClip();
-				InputStream inputStream = getClass().getResourceAsStream(
-						"alert.wav");
-				InputStream buffedStream = new BufferedInputStream(inputStream);
-				clip.open(AudioSystem.getAudioInputStream(buffedStream));
-				clip.start();
-
-				frame.toFront(); // Flash icon
-			} catch (Exception e) {
-				Toolkit.getDefaultToolkit().beep();
-				e.printStackTrace();
-			}
+		if (!frame.isFocused() && user.getMode() != Mode.away && user.getMode() != Mode.dnd) {
+			playSound();
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void playSound() {
+		try {
+			Clip clip = AudioSystem.getClip();
+			InputStream inputStream = getClass().getResourceAsStream(
+					"alert.wav");
+			InputStream buffedStream = new BufferedInputStream(inputStream);
+			clip.open(AudioSystem.getAudioInputStream(buffedStream));
+			clip.start();
+
+			frame.toFront(); // Flash icon
+		} catch (Exception e) {
+			Toolkit.getDefaultToolkit().beep();
+			e.printStackTrace();
+		}
+		
+	}
+
+	/**
+	 * @return
+	 */
+	private String generateTimeStamp() {
+		Calendar c = Calendar.getInstance();
+		int hour = c.get(Calendar.HOUR);
+		int minute = c.get(Calendar.MINUTE);
+
+		String minuteText = "" + minute;
+
+		if (hour == 0)
+			hour = 12;
+
+		if (minute < 10)
+			minuteText = "0" + minute;
+		
+		return "[" + hour + ":" + minuteText + "]";
 	}
 
 	/**
@@ -854,7 +869,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * 
 	 */
 	public void disableInput() {
-		// entry.setEditable(false);
+		entry.setEditable(false);
 	}
 
 	/**

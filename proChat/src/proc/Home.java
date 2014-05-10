@@ -68,21 +68,19 @@ import steamWrapper.SteamRegister;
 public class Home implements ActionListener, MouseListener, KeyListener,
 		RosterListener, SteamListener {
 
-	static JColorChooser chooser;
-	JFrame frame;
-	JMenuBar menuBar;
-	JMenu menu;
-	User user;
-	String serverName, serverIP;
-	// JTable contacts;
-	JList<User> contacts, activeChats;
-	XmppManager connection;
+	public static JColorChooser chooser;
+	
+	private JFrame frame;
+	private JMenuBar menuBar;
+	private JMenu menu;
+	private User user;
+	private String serverName;
+	private JList<User> contacts;
+	private XmppManager connection;
 	int port;
-	ArrayList<ChatWindow> currentChats;
-	String[] names = { "Name", "Online" };
-	// Object[][] data = new Object[16][2];
-	User[] data = { new User("Jon Cena", ""), new User("Rob Stark", "") };
-	Roster roster;
+	private ArrayList<ChatWindow> currentChats;
+	private User[] data = { new User("Jon Cena", ""), new User("Rob Stark", "") };
+	private Roster roster;
 	private String color = "#E02424";
 	private static String IP;
 
@@ -175,9 +173,9 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		frame.setLocation(300, 100);
 		//frame.pack();
 
-		serverIP = "129.89.185.120";
+		//serverIP = "129.89.185.120";
 		serverName = "127.0.0.1";
-		port = 5222;
+		//port = 5222;
 		connection.setStatus(true, "");
 
 		PacketListener myListener = new PacketListener() {
@@ -513,7 +511,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		// Log.l("Domain: " + domain);
 		ChatWindow activeChat = null;
 		
-		Log.l("Message from: " + from + " at domain " + domain);
+		//Log.l("Message from: " + from + " at domain " + domain);
 
 		if (domain.equals("conference")) {
 			if (msg.getFrom().indexOf("/") == -1) // Room message
@@ -521,7 +519,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 			from = msg.getFrom().substring(msg.getFrom().indexOf("/") + 1,
 					msg.getFrom().length());
-			 Log.l("Conference from: " + from);
+			// Log.l("Conference from: " + from);
 		}
 
 		for (ChatWindow c : currentChats) {
@@ -538,7 +536,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			ChatWindow c = openChat(from);
 			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 			currentChats.add(c);
-			Log.l("Added chat: " + c.getFrom());
+			//Log.l("Added chat: " + c.getFrom());
 		} else {
 			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(),
 					null);
