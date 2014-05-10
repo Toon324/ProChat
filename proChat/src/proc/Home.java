@@ -349,15 +349,21 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	private void loadContacts() {
 		roster.reload();
 		data = new User[roster.getEntryCount()];
+		
+		ArrayList<User> avail = new ArrayList<User>();
+		ArrayList<User> busy = new ArrayList<User>();
+		ArrayList<User> away = new ArrayList<User>();
+		ArrayList<User> ltp = new ArrayList<User>();
+		ArrayList<User> offline = new ArrayList<User>();
+		
 		// ensureCapacity(roster.getEntryCount());
-		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
 			// Log.l("Found contact: " + contact);
 			String userContact = contact.getUser();
 
 			if (userContact.contains("conference")) {
 
-				data[x] = new User(userContact, "");
+				avail.add(new User(userContact, ""));
 			} else {
 				if (userContact.indexOf("@") != -1)
 					userContact = userContact.substring(0,
@@ -366,11 +372,46 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 				Presence p = roster.getPresence(contact.getUser());
 				toAdd.copyPresenceInfo(p);
+				
+				if (p.getType() == Presence.Type.unavailable)
+					offline.add(toAdd);
+				else if (p.getMode() == null || p.getMode() == Mode.available)
+					avail.add(toAdd);
+				else if (p.getMode() == Mode.away)
+					away.add(toAdd);
+				else if (p.getMode() == Mode.dnd)
+					busy.add(toAdd);
+				else if (p.getMode() == Mode.xa)
+					ltp.add(toAdd);
+				else {
+					Log.l("Unknown mode: " + p.getMode());
+					offline.add(toAdd);
+				}
 
 				// if (userContact.contains("toon325"))
 				// Log.l(contact.getUser() + ": " + p.getMode());
-				data[x] = toAdd;
 			}
+		}
+		//Add in sorted stacks in the correct order
+		int x = 0;
+		for (User u : avail) {
+			data[x] = u;
+			x++;
+		}
+		for (User u : ltp) {
+			data[x] = u;
+			x++;
+		}
+		for (User u : busy) {
+			data[x] = u;
+			x++;
+		}
+		for (User u : away) {
+			data[x] = u;
+			x++;
+		}
+		for (User u : offline) {
+			data[x] = u;
 			x++;
 		}
 		// Reload table
