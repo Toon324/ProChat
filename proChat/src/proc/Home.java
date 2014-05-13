@@ -437,7 +437,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 					message.setType(Message.Type.headline);
 					Log.l("Sent ip: " + message.getBody());
 					connection.getConnection().sendPacket(message);
-					// new VoiceCall(msg.getBody());
+					//new VoiceCall(msg.getBody());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

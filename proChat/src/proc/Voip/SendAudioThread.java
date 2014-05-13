@@ -4,12 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.TargetDataLine;
 import javax.swing.JTextArea;
-
-import proc.Home;
 
 public class SendAudioThread extends Thread implements Runnable {
 
@@ -37,10 +32,18 @@ public class SendAudioThread extends Thread implements Runnable {
 	private void signalRelayServer() {
 		byte[] data = new byte[150];
 		try {
-			DatagramPacket toSend = new DatagramPacket(data, data.length,
-					InetAddress.getByName(recieverIP), 1324);
-			toSend.setData(recieverIP.getBytes());
-			sock.send(toSend);
+			//Send out request to talk with IP
+			DatagramPacket packet = new DatagramPacket(data, data.length,
+					InetAddress.getByName("129.89.185.223"), 1324);
+			packet.setData(recieverIP.getBytes());
+			sock.send(packet);
+			
+			//Listen for return IP
+			DatagramSocket returnSock = new DatagramSocket(1324);
+			returnSock.receive(packet);
+			returnSock.close();
+			
+			System.out.println("IP returned: " + new String(packet.getData()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
