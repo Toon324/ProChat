@@ -16,6 +16,10 @@ public class SendAudioThread extends Thread implements Runnable {
 	public SendAudioThread(String iP, JTextArea t) {
 		recieverIP = iP;
 		text = t;
+		
+		String s = null;
+		System.out.println(s);
+		
 		try {
 			sock = new DatagramSocket();
 		} catch (Exception e) {
@@ -39,9 +43,7 @@ public class SendAudioThread extends Thread implements Runnable {
 			sock.send(packet);
 			
 			//Listen for return IP
-			DatagramSocket returnSock = new DatagramSocket(1324);
-			returnSock.receive(packet);
-			returnSock.close();
+			UDPInThread.sock.receive(packet);
 			
 			System.out.println("IP returned: " + new String(packet.getData()));
 		} catch (Exception e) {

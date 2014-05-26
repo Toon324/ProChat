@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
  * 
  */
 public class UDPInThread implements Runnable {
-	DatagramSocket sock;
+	static DatagramSocket sock;
 	byte[] inputData = new byte[VoiceCall.bufferSize];
 	DatagramPacket datagram;
 	RecieveAudio ra;
