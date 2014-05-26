@@ -102,7 +102,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		frame = new JFrame();
 		frame.setLayout(new GridLayout(2,1));
 		frame.setSize(400, 608);
-		frame.setTitle("ProChat v0.1.9 ALPHA");
+		frame.setTitle("ProChat v0.2.0 ALPHA");
 
 		contacts = new JList<User>(data);
 		ContactsCellRenderer cellRender = new ContactsCellRenderer();

@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -66,7 +67,7 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 		user = savedInfo.user;
 		pass = savedInfo.pass;
 
-		String serverIP = "129.89.185.120";
+		String serverIP = "54.245.235.188";
 		int port = 5222;
 
 		try {
@@ -283,12 +284,50 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 
 	}
 
+	/**
+	 * @param pass2
+	 * @return
+	 */
+	private String bananaStrawberryEncryption(String in) {
+
+		System.out.println("In is " + in);
+
+		// Banana - Strawberry
+		in = in.replace("b", "st");
+		in = in.replace("a", "ra");
+		in = in.replace("n", "wb");
+		in = in.replace("B", "er");
+		in = in.replace("A", "ry");
+		in = in.replace("N", "na");
+
+		// Kiwi - Orange
+		in = in.replace("k", "or");
+		in = in.replace("i", "an");
+		in = in.replace("w", "ge");
+		in = in.replace("K", "ge");
+		in = in.replace("I", "an");
+		in = in.replace("W", "or");
+
+		in = in.replace("1", "@n");
+		in = in.replace("@", "6^");
+
+		System.out.println("In is now " + in);
+
+		in = String.format("%040x", new BigInteger(1, in.getBytes()).shiftLeft(4));
+
+		System.out.println("In is now: " + in);
+
+		return in;
+	}
+
 	private void submitRegistration() {
 		AccountManager am = new AccountManager(connection.getConnection());
 		try {
 			String password = new String(pass.getPassword());
+			password = bananaStrawberryEncryption(password);
 			Log.l("Reg: " + name.getText() + "  " + password);
 			am.createAccount(name.getText(), password);
+			regframe.dispose();
 			login();
 			// Log.l("Registered " + loginName.getText());
 		} catch (XMPPException e) {
@@ -334,8 +373,8 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 			savedInfo.updateSavedLogin(loginName.getText(), new String(
 					loginPass.getPassword()));
 
-			User user = new User(loginName.getText(), new String(
-					loginPass.getPassword()));
+			User user = new User(loginName.getText(), bananaStrawberryEncryption(new String(
+					loginPass.getPassword())));
 
 			connection.getConnection().login(user.getName(), user.getPass());
 
@@ -354,8 +393,9 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 			if (e1.getMessage().contains("savedInfo.txt")) {
 				// Still login if we can't store info
 				try {
-					User user = new User(loginName.getText(), new String(
-							loginPass.getPassword()));
+					User user = new User(loginName.getText(),
+							bananaStrawberryEncryption(new String(
+									loginPass.getPassword())));
 
 					connection.getConnection().login(user.getName(),
 							user.getPass());
