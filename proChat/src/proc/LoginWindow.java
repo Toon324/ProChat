@@ -304,9 +304,9 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 		in = in.replace("k", "or");
 		in = in.replace("i", "an");
 		in = in.replace("w", "ge");
-		in = in.replace("K", "ge");
-		in = in.replace("I", "an");
-		in = in.replace("W", "or");
+		in = in.replace("K", "eg");
+		in = in.replace("I", "na");
+		in = in.replace("W", "pr");
 
 		in = in.replace("1", "@n");
 		in = in.replace("@", "6^");
