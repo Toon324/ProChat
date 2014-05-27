@@ -21,8 +21,7 @@ import javax.swing.JTextArea;
  * 
  */
 public class Server {
-	private static String version = "0.0";
-	private static TreeMap<String, String> infoMap = new TreeMap<String, String>();
+	private TreeMap<String, String> infoMap = new TreeMap<String, String>();
 
 	/**
 	 * @param args
@@ -35,45 +34,24 @@ public class Server {
 			e.printStackTrace();
 		}
 	}
-
-	JTextArea text;
-	NetworkAdapter adapter;
 	private ExecutorService threadPool;
 	private int cnt = 0;
 
 	public Server() throws IOException {
 		threadPool = Executors.newCachedThreadPool();
-		JFrame frame = new JFrame();
 
-		text = new JTextArea();
-		JScrollPane scroller = new JScrollPane(text);
-		scroller.setAutoscrolls(true);
-
-		frame.add(scroller);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400, 400);
-		frame.setVisible(true);
-
-		text.setText("Server has started.");
 		loadVersionData();
-		text.append("\nServer version: " + version);
-
-		/*
-		 * adapter = new NetworkAdapter(this);
-		 * 
-		 * try { adapter.host(1160); text.append("\nServer is now hosting"); }
-		 * catch (Exception e) { }
-		 */
 
 		boolean shouldRun = true;
 
 		ServerSocket server = new ServerSocket(1160);
+		System.out.println("Server has started at " + server.getInetAddress());
 
 		while (shouldRun) {
 			Socket client = null;
 			
 			try {
-				text.append("\nServer is waiting for a new connection.");
+				//System.out.println("\nServer is waiting for a new connection.");
 				client = server.accept();
 			}
 			catch (Exception e) {
@@ -81,86 +59,21 @@ public class Server {
 			}
 			
 			threadPool.execute(new ServerHelper(this, client, "Helper" + cnt ));
+			System.out.println("Created helper iteration " + cnt);
 			cnt++;
+			
+			//Refresh version numbers every 25 connections
+			if (cnt % 25 == 0)
+				loadVersionData();
 		}
 		
 		server.close();
 	}
 
-//	public void newConnection() {
-//		try {
-//			text.append("\nServer has made a connection.");
-//			while (adapter.isConnected()) {
-//
-//				// System.out.println("Server is running.");
-//
-//				if (adapter.isDataAvailable()) {
-//					System.out.println("Data available.");
-//					int input = adapter.getInputStream().readInt();
-//
-//					System.out.println("Call = " + input);
-//
-//					if (input == 0) {
-//						adapter.getOutputStream().writeChars(version);
-//						adapter.clearDataAvailable();
-//						text.append("\nSent version info.");
-//					}
-//
-//					else if (input == 1) {
-//						File updatedJar = new File("ProChatAlpha.jar");
-//						adapter.getOutputStream().writeInt(
-//								(int) updatedJar.length());
-//						adapter.getOutputStream().flush(); // Let client
-//															// know how long
-//															// the file is
-//						text.append("\nSending file of size "
-//								+ updatedJar.length());
-//
-//						InputStream in = new FileInputStream(updatedJar);
-//
-//						byte[] buf = new byte[(int) updatedJar.length()];
-//						int len;
-//						while ((len = in.read(buf)) > 0) {
-//							adapter.getOutputStream().write(buf, 0, len);
-//							// text.append("\nWriting " + len +
-//							// " bits of data");
-//						}
-//						in.close();
-//						adapter.clearDataAvailable();
-//						text.append("\nSent updated Jar.");
-//					}
-//
-//					else if (input == 2) {
-//						adapter.setConnected(false);
-//						text.append("\nClient has disconnected.");
-//						// adapter.rehost();
-//						adapter.close();
-//						adapter = new NetworkAdapter(this);
-//						adapter.host(1160);
-//					}
-//
-//				} else {
-//					System.out.println("No data");
-//					adapter.clearDataAvailable();
-//				}
-//
-//				long timeIn = System.currentTimeMillis();
-//				long timeOut = System.currentTimeMillis();
-//				while (timeOut - timeIn <= 100)
-//					timeOut = System.currentTimeMillis();
-//
-//			}
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		text.append("\nServer is waiting for a new connection.");
-//	}
-
 	/**
 	 * 
 	 */
-	private static void loadVersionData() {
+	private void loadVersionData() {
 		File file = new File("serverVersionID.txt");
 		try {
 			if (!file.exists()) { // If file doesn't exist, create one
