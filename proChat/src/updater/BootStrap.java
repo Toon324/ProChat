@@ -21,6 +21,8 @@ import javax.swing.JTextArea;
  */
 public class BootStrap {
 
+	private static final String IP = "174.102.178.65";
+	private static final int PORT = 1160;
 	static String version = "0.0.0";
 
 	/**
@@ -42,9 +44,9 @@ public class BootStrap {
 
 		NetworkAdapter adapter = new NetworkAdapter();
 		try {
-			adapter.connect("129.89.185.223", 1160);
-			text.append("\nConnected to server at 129.89.185.223:1160.");
-			adapter.getOutputStream().writeInt(0); // Request for version
+			adapter.connect(IP, PORT);
+			text.append("\nConnected to server at " + IP + ":" + PORT);
+			adapter.getOutputStream().write("VERSION\tProChatAlpha.jar".getBytes()); // Request for version
 			adapter.getOutputStream().flush();
 
 			String serverVersion = "no data";
@@ -73,7 +75,7 @@ public class BootStrap {
 			if (serverVersion.compareTo(version) > 0) {
 				text.append("\nUpdating from " + version + " to "
 						+ serverVersion);
-				adapter.getOutputStream().writeInt(1); // Request for updated
+				adapter.getOutputStream().write("UPDATE\tProchatAlpha.jar".getBytes()); // Request for updated
 														// jar
 
 				BufferedInputStream bufIn = new BufferedInputStream(
@@ -106,7 +108,7 @@ public class BootStrap {
 				out.close();
 				text.append("\nFinished writing data.");
 
-				adapter.getOutputStream().writeInt(2); // Tell the server that
+				adapter.getOutputStream().write("CLOSE".getBytes()); // Tell the server that
 														// the client is done
 														// with it
 				text.append("\nUpdating local info..");
