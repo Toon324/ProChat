@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Provides convenience method for connecting to a specified IP address and
@@ -29,6 +31,8 @@ public class NetworkAdapter {
 	protected boolean connected;
 	protected Socket connection;
 	Server server;
+	
+	ExecutorService threadPool = Executors.newCachedThreadPool();
 
 	/**
 	 * Creates a new NetworkAdapter with no data available.
@@ -92,8 +96,9 @@ public class NetworkAdapter {
 		socket.setSoTimeout(0); // Wait until cancelled
 		System.out.println("Socket opened");
 
-		hostThread = new HostThread(this, socket);
-		hostThread.start();
+		threadPool.execute(new HostThread(this, socket));
+//		hostThread = new HostThread(this, socket);
+//		hostThread.start();
 	}
 
 	ServerSocket socket;
@@ -146,7 +151,7 @@ public class NetworkAdapter {
 		System.out.println("Listening");
 		connected = true;
 		hostThread.done = true;
-		server.newConnection();
+		//server.newConnection();
 	}
 
 	/**
