@@ -73,7 +73,7 @@ public class Server {
 	/**
 	 * 
 	 */
-	private void loadVersionData() {
+	public void loadVersionData() {
 		File file = new File("serverVersionID.txt");
 		try {
 			if (!file.exists()) { // If file doesn't exist, create one

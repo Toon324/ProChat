@@ -102,6 +102,8 @@ public class ServerHelper implements Runnable {
 					client.close();
 					shouldRun = false;
 				}
+				else if (cmd.equals("RELOAD_VERSIONS"))
+					server.loadVersionData();
 			}
 			
 			input.close();
