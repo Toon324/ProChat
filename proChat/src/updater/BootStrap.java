@@ -25,7 +25,7 @@ import javax.swing.JTextArea;
  */
 public class BootStrap {
 
-	private static final String IP = "174.102.178.65";
+	private static final String IP = "54.245.236.86";
 	private static final int PORT = 1160;
 	static String version = "0.0.0";
 

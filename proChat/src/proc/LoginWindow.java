@@ -67,7 +67,7 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 		user = savedInfo.user;
 		pass = savedInfo.pass;
 
-		String serverIP = "54.245.235.188";
+		String serverIP = "54.200.92.207";
 		int port = 5222;
 
 		try {

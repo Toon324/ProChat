@@ -35,10 +35,6 @@ public class RelayServer {
 	             String ipIn = in.substring(0, in.indexOf(" "));
 	             String ipOut = in.substring(in.indexOf(" "), in.length());
 	             System.out.println("From: " + ipIn + " To: " + ipOut);
-	             
-	             
-	             
-	      
 	        }
 	        serverSocket.close();
 	   }
