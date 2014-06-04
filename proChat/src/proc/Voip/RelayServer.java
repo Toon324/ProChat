@@ -4,20 +4,20 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author Cody
  * 
  */
 public class RelayServer {
-	
+
 	private TreeMap<String, String> map = new TreeMap<String, String>();
 
 	public static void main(String[] args) {
@@ -31,98 +31,34 @@ public class RelayServer {
 		}
 	}
 
-	private boolean shouldRun = true;
+	private ExecutorService threadPool;
+	private int cnt = 0;
 
 	private void startServer() throws IOException, InterruptedException {
-		JFrame frame = new JFrame("Relay Server");
-		
-		frame.setSize(400, 200);
-		
-		JTextArea text = new JTextArea();
-		JScrollPane scroller = new JScrollPane(text);
-		scroller.setAutoscrolls(true);
-		frame.add(scroller);
-		frame.setVisible(true);
-		
-		
-		DatagramSocket serverSocket = new DatagramSocket(1324);
-		byte[] receiveData = new byte[150];
+		threadPool = Executors.newCachedThreadPool();
+
+		boolean shouldRun = true;
+
+		ServerSocket server = new ServerSocket(1324);
+		System.out.println("Server has started at " + server.getInetAddress());
 
 		while (shouldRun) {
-			DatagramPacket receivePacket = new DatagramPacket(receiveData,
-					receiveData.length);
-			text.append("Listening...");
-			serverSocket.receive(receivePacket);
-			text.append("\nData: " + receivePacket.getData()[0] + " " + receivePacket.getData()[1]);
-			String destination = new String(receivePacket.getData());
-			String source = receivePacket.getSocketAddress() + "";
-			source = source.replace("/", "");
-			
-			text.append("\nFrom: " + source + " To: " + destination);
-			
-			boolean placed = false;
-			
-			for (Entry<String, String> e : map.entrySet()) {
-				if (source.contains(e.getKey())) {
-					placed = true;
-					map.put(source, e.getValue());
-					map.remove(e.getKey());
-					try {
-						sendInfo(e);
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-				else if (source.contains(e.getValue())) {
-					placed = true;
-					e.setValue(source);
-					try {
-						sendInfo(e);
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
+			Socket client = null;
+
+			try {
+				// System.out.println("\nServer is waiting for a new connection.");
+				client = server.accept();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			
-			if (!placed)
-				map.put(source, destination);
-			
+
+			threadPool.execute(new RelayHelper(this, client, "Helper" + cnt));
+			System.out.println("Created helper iteration " + cnt);
+			cnt++;
 			printMap();
-
 		}
-		serverSocket.close();
-	}
 
-	/**
-	 * @param e
-	 * @throws SocketException 
-	 */
-	private void sendInfo(Entry<String, String> e) throws Exception {
-		byte[] toSend = new byte[50];
-		DatagramPacket packet = new DatagramPacket(toSend, toSend.length);
-		packet.setPort(1324);
-		DatagramSocket socket = new DatagramSocket();
-		
-		//Send IP2 (value) to IP1 (key)
-		toSend = e.getValue().getBytes();
-		packet.setData(toSend);
-		packet.setAddress(InetAddress.getByName(e.getKey()));
-		
-		socket.send(packet);
-		System.out.println("2->1: Sent " + new String(packet.getData()) + " to " + packet.getAddress()); 
-		
-		//Send IP1 to IP2
-		toSend = e.getKey().getBytes();
-		packet.setData(toSend);
-		packet.setAddress(InetAddress.getByName(e.getValue()));
-		System.out.println("1->2: Sent " + new String(packet.getData()) + " to " + packet.getAddress()); 
-		
-		socket.send(packet);
-		
-		socket.close();
-		
+		server.close();
 	}
 
 	/**
@@ -130,18 +66,13 @@ public class RelayServer {
 	 */
 	private void printMap() {
 		for (Entry<String, String> e : map.entrySet())
-			System.out.println("Entry found: " + e.getKey() + " " + e.getValue());
-		
-	}
+			System.out.println("Entry found: " + e.getKey() + " "
+					+ e.getValue());
 
-	// private synchronized void sendPacket(DatagramSocket socket) throws
-	// IOException{
-	//
-	// byte[] sendData = new byte[50];
-	// ///sendData = data.getBytes();
-	// DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
-	// homeIPAddress, homePort);
-	// socket.send(sendPacket);
-	// }
+	}
+	
+	public TreeMap<String, String> getMap() {
+		return map;
+	}
 
 }
