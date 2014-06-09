@@ -49,15 +49,23 @@ public class RelayHelper implements Runnable {
 
 			boolean shouldRun = true;
 			while (shouldRun) {
-				String otherIP = input.readLine();
-				String ownIP = client.getInetAddress().toString();
-				
-				System.out.println("A (" + ownIP + ") is requesting connection to B (" + otherIP + ")");
+				if (input.ready()) {
+					String otherIP = input.readLine();
+					String ownIP = client.getInetAddress().toString().replace("/", "");
 
-				if (map.containsKey(otherIP))
-					map.put(otherIP, ownIP);
-				else
-					map.put(ownIP, otherIP);
+					System.out.println(name + ": A (" + ownIP
+							+ ") is requesting connection to B (" + otherIP
+							+ ")");
+
+					if (map.containsKey(otherIP)) {
+						map.put(otherIP, ownIP);
+						System.out.println(name
+								+ ": Map already had otherip. Matching IPs.");
+					} else {
+						map.put(ownIP, otherIP);
+						System.out.println(name + ": New entry created.");
+					}
+				}
 			}
 			input.close();
 			output.close();

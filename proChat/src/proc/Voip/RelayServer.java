@@ -1,16 +1,14 @@
 package proc.Voip;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import proc.Home;
 
 /**
  * @author Cody
@@ -40,18 +38,18 @@ public class RelayServer {
 		boolean shouldRun = true;
 
 		ServerSocket server = new ServerSocket(1324);
-		System.out.println("Server has started at " + server.getInetAddress());
+		System.out.println("Server has started at " + Home.getIP() + ":1324");
 
 		while (shouldRun) {
 			Socket client = null;
 
 			try {
-				// System.out.println("\nServer is waiting for a new connection.");
+				System.out.println("\nServer is waiting for a new connection.");
 				client = server.accept();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
+			
 			threadPool.execute(new RelayHelper(this, client, "Helper" + cnt));
 			System.out.println("Created helper iteration " + cnt);
 			cnt++;
