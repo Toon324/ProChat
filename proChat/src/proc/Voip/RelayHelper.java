@@ -45,26 +45,35 @@ public class RelayHelper implements Runnable {
 			DataOutputStream output = new DataOutputStream(
 					client.getOutputStream());
 
-			TreeMap<String, String> map = server.getMap();
+			IPMap<String, String> map = server.getMap();
 
 			boolean shouldRun = true;
 			while (shouldRun) {
 				if (input.ready()) {
 					String otherIP = input.readLine();
 					String ownIP = client.getInetAddress().toString().replace("/", "");
+					ownIP = ownIP + ":" + client.getLocalPort();
+					
+					String searchIP = "";
+					if (otherIP.contains(":"))
+						searchIP = otherIP.substring(0, otherIP.indexOf(":"));
+					else
+						searchIP = otherIP;
 
 					System.out.println(name + ": A (" + ownIP
 							+ ") is requesting connection to B (" + otherIP
-							+ ")");
+							+ ") (Search: " + searchIP + ")");
 
-					if (map.containsKey(otherIP)) {
-						map.put(otherIP, ownIP);
+					if (map.containsKey(searchIP)) {
+						String match = map.get(searchIP);
 						System.out.println(name
-								+ ": Map already had otherip. Matching IPs.");
+								+ ": Map already had otherip. Matched IP: " + match);
+						sendInfo(ownIP, match);
 					} else {
 						map.put(ownIP, otherIP);
 						System.out.println(name + ": New entry created.");
 					}
+					server.printMap();
 				}
 			}
 			input.close();
@@ -79,25 +88,34 @@ public class RelayHelper implements Runnable {
 	 * @param e
 	 * @throws SocketException
 	 */
-	private void sendInfo(Entry<String, String> e) throws Exception {
+	private void sendInfo(String A, String B) throws Exception {
 		byte[] toSend = new byte[50];
 		DatagramPacket packet = new DatagramPacket(toSend, toSend.length);
 		packet.setPort(1324);
 		DatagramSocket socket = new DatagramSocket();
+		
+		String ip1 = B;
+		String ip2 = A;
+		
+		if (ip1.contains(":"))
+			ip1 = ip1.substring(0, ip1.indexOf(":"));
+		
+		if (ip2.contains(":"))
+			ip2 = ip2.substring(0, ip2.indexOf(":"));
 
-		// Send IP2 (value) to IP1 (key)
-		toSend = e.getValue().getBytes();
+		// Send IP2 (A) to IP1 (B)
+		toSend = A.getBytes();
 		packet.setData(toSend);
-		packet.setAddress(InetAddress.getByName(e.getKey()));
+		packet.setAddress(InetAddress.getByName(ip1));
 
 		socket.send(packet);
 		System.out.println("2->1: Sent " + new String(packet.getData())
 				+ " to " + packet.getAddress());
 
 		// Send IP1 to IP2
-		toSend = e.getKey().getBytes();
+		toSend = B.getBytes();
 		packet.setData(toSend);
-		packet.setAddress(InetAddress.getByName(e.getValue()));
+		packet.setAddress(InetAddress.getByName(ip2));
 		System.out.println("1->2: Sent " + new String(packet.getData())
 				+ " to " + packet.getAddress());
 

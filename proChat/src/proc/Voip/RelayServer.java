@@ -16,7 +16,7 @@ import proc.Home;
  */
 public class RelayServer {
 
-	private TreeMap<String, String> map = new TreeMap<String, String>();
+	private IPMap<String, String> map = new IPMap<String, String>();
 
 	public static void main(String[] args) {
 		RelayServer rs = new RelayServer();
@@ -62,14 +62,14 @@ public class RelayServer {
 	/**
 	 * 
 	 */
-	private void printMap() {
+	void printMap() {
 		for (Entry<String, String> e : map.entrySet())
 			System.out.println("Entry found: " + e.getKey() + " "
 					+ e.getValue());
 
 	}
 	
-	public TreeMap<String, String> getMap() {
+	public IPMap<String, String> getMap() {
 		return map;
 	}
 
