@@ -67,16 +67,6 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 		user = savedInfo.user;
 		pass = savedInfo.pass;
 
-		String serverIP = "54.200.92.207";
-		int port = 5222;
-
-		try {
-			connection = new XmppManager(serverIP, port);
-			connection.init();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 		DisplayInputWindow(user, pass);
 	}
 
@@ -88,6 +78,8 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	private javax.swing.JButton jButton2;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
+	private JTextField serverIP;
+	private JTextField serverPort;
 
 	private void DisplayInputWindow(String user, String pass) {
 		frame = new JFrame();
@@ -106,6 +98,9 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 		loginPass = new javax.swing.JPasswordField();
 		jButton1 = new javax.swing.JButton();
 		jButton2 = new javax.swing.JButton();
+
+		serverIP = new JTextField("ServerIP");
+		serverPort = new JTextField("Port");
 
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		frame.setBackground(new java.awt.Color(255, 204, 0));
@@ -313,7 +308,8 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 
 		System.out.println("In is now " + in);
 
-		in = String.format("%040x", new BigInteger(1, in.getBytes()).shiftLeft(4));
+		in = String.format("%040x",
+				new BigInteger(1, in.getBytes()).shiftLeft(4));
 
 		System.out.println("In is now: " + in);
 
@@ -369,12 +365,22 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	 */
 	private void login() {
 		// Write info to .txt
+		String serverIP = "54.200.92.207";
+		int port = 5222;
 		try {
+			connection = new XmppManager(serverIP, port);
+			connection.init();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+
 			savedInfo.updateSavedLogin(loginName.getText(), new String(
 					loginPass.getPassword()));
 
-			User user = new User(loginName.getText(), bananaStrawberryEncryption(new String(
-					loginPass.getPassword())));
+			User user = new User(loginName.getText(),
+					bananaStrawberryEncryption(new String(
+							loginPass.getPassword())));
 
 			connection.getConnection().login(user.getName(), user.getPass());
 

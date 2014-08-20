@@ -42,8 +42,15 @@ import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence.Mode;
+import org.jivesoftware.smackx.ChatState;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 
 /**
  * @author Cody Swendrowski
@@ -290,7 +297,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		groupChat = mu;
 		user = u;
 		
-		setupChatWindow("ProChat: Group chat + " groupChat.getRoom());
+		setupChatWindow("ProChat: Group chat + " + groupChat.getRoom());
 	}
 
 	public void show() {
@@ -338,8 +345,16 @@ public class ChatWindow implements ActionListener, KeyListener,
 	}
 
 	private void addTextToChat(String toAdd) {
-		kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-				.getDocument().getLength(), toAdd, 0, 0, null);
+		try {
+			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+					.getDocument().getLength(), toAdd, 0, 0, null);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void addToChatArea(String toAdd, AttributeSet attribute) {

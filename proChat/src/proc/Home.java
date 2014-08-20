@@ -129,16 +129,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 		getIP();
 
-		/*
-		 * //Options menu JMenu options = new JMenu("Options");
-		 * options.setMnemonic(KeyEvent.VK_O); menuBar.add(options);
-		 * 
-		 * JMenuItem frameColor = new JMenuItem("Window Color");
-		 * options.add(frameColor); frameColor.addActionListener(this);
-		 */
-
 		frame.setJMenuBar(menuBar);
-		// frame.add(masterPanel);
 		frame.add(scrollPane);
 
 		scrollPane.setSize(400, 1000);

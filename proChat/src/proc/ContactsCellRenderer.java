@@ -22,7 +22,7 @@ import org.jivesoftware.smack.packet.Presence.Mode;
 public class ContactsCellRenderer extends JLabel implements
 		ListCellRenderer<User> {
 
-	private final int SQUARE = 30;
+	private final int SIZE = 30;
 
 	MyIcon[] images;
 
@@ -59,7 +59,7 @@ public class ContactsCellRenderer extends JLabel implements
 		 */
 		@Override
 		public int getIconHeight() {
-			return SQUARE;
+			return SIZE;
 		}
 
 		/*
@@ -69,7 +69,7 @@ public class ContactsCellRenderer extends JLabel implements
 		 */
 		@Override
 		public int getIconWidth() {
-			return SQUARE;
+			return SIZE;
 		}
 
 		/*
@@ -80,7 +80,7 @@ public class ContactsCellRenderer extends JLabel implements
 		 */
 		@Override
 		public void paintIcon(Component c, Graphics g, int x, int y) {
-			g.drawImage(image, x, y, x + SQUARE, y + SQUARE, 0, 0,
+			g.drawImage(image, x, y, x + SIZE, y + SIZE, 0, 0,
 					image.getWidth(), image.getHeight(), null);
 		}
 
