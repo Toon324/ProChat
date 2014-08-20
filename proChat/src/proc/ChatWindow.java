@@ -45,12 +45,6 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Presence.Mode;
-import org.jivesoftware.smackx.ChatState;
-import org.jivesoftware.smackx.muc.MultiUserChat;
-
 /**
  * @author Cody Swendrowski
  * 
@@ -59,22 +53,22 @@ public class ChatWindow implements ActionListener, KeyListener,
 		HyperlinkListener {
 
 	public JFrame frame;
-	
+
 	private JEditorPane chatArea;
-	private JTextField entry;
+	private JTextField chatEntry;
 	private JLabel status;
 	private User user;
 	private Chat chat;
-	private MultiUserChat muc;
+	private MultiUserChat groupChat;
 	private HTMLEditorKit kit;
-	
-	private String color = "000000";
-	private String previousColor = color;
+
+	private String fontColor = "000000";
+	private String previousFontColor = fontColor;
 	private String font = "Arial";
-	
+
 	private String lastMessageFrom = "";
 	private boolean imagesEnabled = true;
-	private boolean customTextEnabled = true;
+	private boolean customFontsEnabled = true;
 
 	/**
 	 * @param c
@@ -83,26 +77,47 @@ public class ChatWindow implements ActionListener, KeyListener,
 		chat = c;
 		user = u;
 
+		setupChatWindow("ProChat: Chatting with " + c.getParticipant());
+	}
+
+	private void setupChatWindow(String title) {
+		setupFrame(title);
+		setupChat();
+		addScroller();
+		addMenu();
+	}
+
+	private void setupFrame(String title) {
 		frame = new JFrame();
 		frame.setSize(400, 600);
-		frame.setTitle("ProChat: Chatting with " + c.getParticipant());
+		frame.setTitle(title);
 		frame.setLocation(550, 200);
 
-		chatArea = new JEditorPane();
-		entry = new JTextField("");
-		chatArea.setContentType("text/html");
+		JButton send = new JButton("Send");
+		send.addActionListener(this);
 
-		kit = new HTMLEditorKit();
-		chatArea.setEditorKit(kit);
-		chatArea.addHyperlinkListener(this);
+		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
 
-		chatArea.addKeyListener(this);
-		entry.addKeyListener(this);
+		status = new JLabel("");
 
-		chatArea.setEditable(false);
+		JPanel holder = new JPanel(new GridLayout(2, 1));
+		holder.add(status, BorderLayout.NORTH);
 
-		// chatArea.setBackground(new Color(255, 255, 255, 200));
+		entryPanel.add(chatEntry);
+		entryPanel.add(send, BorderLayout.EAST);
 
+		holder.add(entryPanel);
+		frame.add(holder, BorderLayout.SOUTH);
+
+		try {
+			frame.setIconImage(ImageIO.read(this.getClass()
+					.getResourceAsStream("logo.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void addScroller() {
 		final JScrollPane scroller = new JScrollPane(chatArea);
 		// scroller.setAutoscrolls(true);
 		scroller.getVerticalScrollBar().addAdjustmentListener(
@@ -126,159 +141,145 @@ public class ChatWindow implements ActionListener, KeyListener,
 					}
 				});
 
-		JButton send = new JButton("Send");
-		send.addActionListener(this);
-
-		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
-
-		status = new JLabel("");
-
-		JPanel holder = new JPanel(new GridLayout(2, 1));
-		holder.add(status, BorderLayout.NORTH);
-
-		entryPanel.add(entry);
-		entryPanel.add(send, BorderLayout.EAST);
-
-		holder.add(entryPanel);
-
-		// Menu
-		JMenuBar menuBar = new JMenuBar();
-		
-		buildMenu(menuBar);
-
-		frame.setJMenuBar(menuBar);
 		frame.add(scroller);
-		frame.add(holder, BorderLayout.SOUTH);
-		try {
-			frame.setIconImage(ImageIO.read(this.getClass()
-					.getResourceAsStream("logo.png")));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		// frame.addWindowListener(this);
+	}
 
+	private void setupChat() {
+		chatArea = new JEditorPane();
+		chatEntry = new JTextField("");
+		chatArea.setContentType("text/html");
+
+		kit = new HTMLEditorKit();
+		chatArea.setEditorKit(kit);
+		chatArea.addHyperlinkListener(this);
+
+		chatArea.addKeyListener(this);
+		chatEntry.addKeyListener(this);
+
+		chatArea.setEditable(false);
 	}
 
 	/**
 	 * @param menuBar
 	 */
-	private void buildMenu(JMenuBar menuBar) {
+	private void addMenu() {
+		JMenuBar menuBar = new JMenuBar();
 		// Build the first menu.
-				JMenu menu = new JMenu("Insert");
-				menuBar.add(menu);
+		JMenu menu = new JMenu("Insert");
+		menuBar.add(menu);
 
-				JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
-				menu.add(addImage);
-				addImage.addActionListener(this);
+		JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
+		menu.add(addImage);
+		addImage.addActionListener(this);
 
-				JMenu savedImages = new JMenu("Saved");
-				menu.add(savedImages);
+		JMenu savedImages = new JMenu("Saved");
+		menu.add(savedImages);
 
-				JMenuItem noRead = new JMenuItem("Didn't Read");
-				savedImages.add(noRead);
-				noRead.addActionListener(this);
+		JMenuItem noRead = new JMenuItem("Didn't Read");
+		savedImages.add(noRead);
+		noRead.addActionListener(this);
 
-				JMenuItem troll = new JMenuItem("Troll");
-				savedImages.add(troll);
-				troll.addActionListener(this);
+		JMenuItem troll = new JMenuItem("Troll");
+		savedImages.add(troll);
+		troll.addActionListener(this);
 
-				JMenuItem desk = new JMenuItem("Desk Flip");
-				savedImages.add(desk);
-				desk.addActionListener(this);
+		JMenuItem desk = new JMenuItem("Desk Flip");
+		savedImages.add(desk);
+		desk.addActionListener(this);
 
-				JMenuItem no = new JMenuItem("NO.");
-				savedImages.add(no);
-				no.addActionListener(this);
+		JMenuItem no = new JMenuItem("NO.");
+		savedImages.add(no);
+		no.addActionListener(this);
 
-				JMenuItem lol = new JMenuItem("lol");
-				savedImages.add(lol);
-				lol.addActionListener(this);
+		JMenuItem lol = new JMenuItem("lol");
+		savedImages.add(lol);
+		lol.addActionListener(this);
 
-				JMenuItem suprised = new JMenuItem("Suprised");
-				savedImages.add(suprised);
-				suprised.addActionListener(this);
+		JMenuItem suprised = new JMenuItem("Suprised");
+		savedImages.add(suprised);
+		suprised.addActionListener(this);
 
-				JMenuItem facepalm = new JMenuItem("Facepalm");
-				savedImages.add(facepalm);
-				facepalm.addActionListener(this);
+		JMenuItem facepalm = new JMenuItem("Facepalm");
+		savedImages.add(facepalm);
+		facepalm.addActionListener(this);
 
-				JMenuItem gusta = new JMenuItem("Me Gusta");
-				savedImages.add(gusta);
-				gusta.addActionListener(this);
+		JMenuItem gusta = new JMenuItem("Me Gusta");
+		savedImages.add(gusta);
+		gusta.addActionListener(this);
 
-				// HTML menu
-				JMenu html = new JMenu("HTML");
-				menuBar.add(html);
+		// HTML menu
+		JMenu html = new JMenu("HTML");
+		menuBar.add(html);
 
-				JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
-				html.add(setColor);
-				setColor.addActionListener(this);
+		JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
+		html.add(setColor);
+		setColor.addActionListener(this);
 
-				JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
-				html.add(setFont);
-				setFont.addActionListener(this);
+		JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
+		html.add(setFont);
+		setFont.addActionListener(this);
 
-				try {
-					BufferedImage toggleImagesIcon = ImageIO.read(getClass()
-							.getResourceAsStream("imageToggle.png"));
-					BufferedImage toggleTextIcon = ImageIO.read(getClass()
-							.getResourceAsStream("customText.png"));
+		try {
+			BufferedImage toggleImagesIcon = ImageIO.read(getClass()
+					.getResourceAsStream("imageToggle.png"));
+			BufferedImage toggleTextIcon = ImageIO.read(getClass()
+					.getResourceAsStream("customText.png"));
 
-					final JButton toggleImages = new JButton(new ImageIcon(
-							toggleImagesIcon));
-					final JButton toggleText = new JButton(
-							new ImageIcon(toggleTextIcon));
+			final JButton toggleImages = new JButton(new ImageIcon(
+					toggleImagesIcon));
+			final JButton toggleText = new JButton(
+					new ImageIcon(toggleTextIcon));
 
-					toggleImages
-							.setToolTipText("Embedded images will be displayed in chat.");
-					toggleText.setToolTipText("Custom fonts and colors will be used.");
+			toggleImages
+					.setToolTipText("Embedded images will be displayed in chat.");
+			toggleText.setToolTipText("Custom fonts and colors will be used.");
 
-					toggleImages.addActionListener(new ActionListener() {
+			toggleImages.addActionListener(new ActionListener() {
 
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							if (imagesEnabled) {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (imagesEnabled) {
 
-								toggleImages
-										.setToolTipText("Embedded images will be displayed as links.");
-								toggleImages.setBackground(Color.gray);
-							} else {
-								toggleImages
-										.setToolTipText("Embedded images will be displayed in chat.");
-								toggleImages.setBackground(null);
-							}
-							imagesEnabled = !imagesEnabled;
-						}
-
-					});
-
-					toggleText.addActionListener(new ActionListener() {
-
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							if (customTextEnabled) {
-
-								toggleText
-										.setToolTipText("Custom fonts and colors will not be used.");
-								toggleText.setBackground(Color.gray);
-							} else {
-								toggleText
-										.setToolTipText("Custom fonts and colors will be used.");
-								toggleText.setBackground(null);
-							}
-							customTextEnabled = !customTextEnabled;
-						}
-
-					});
-
-					menuBar.add(toggleImages);
-					menuBar.add(toggleText);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+						toggleImages
+								.setToolTipText("Embedded images will be displayed as links.");
+						toggleImages.setBackground(Color.gray);
+					} else {
+						toggleImages
+								.setToolTipText("Embedded images will be displayed in chat.");
+						toggleImages.setBackground(null);
+					}
+					imagesEnabled = !imagesEnabled;
 				}
-		
+
+			});
+
+			toggleText.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (customFontsEnabled) {
+
+						toggleText
+								.setToolTipText("Custom fonts and colors will not be used.");
+						toggleText.setBackground(Color.gray);
+					} else {
+						toggleText
+								.setToolTipText("Custom fonts and colors will be used.");
+						toggleText.setBackground(null);
+					}
+					customFontsEnabled = !customFontsEnabled;
+				}
+
+			});
+
+			menuBar.add(toggleImages);
+			menuBar.add(toggleText);
+			frame.setJMenuBar(menuBar);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -286,133 +287,59 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * @param mu
 	 */
 	public ChatWindow(User u, MultiUserChat mu) {
-		muc = mu;
+		groupChat = mu;
 		user = u;
-
-		frame = new JFrame();
-		frame.setSize(400, 600);
-		frame.setTitle("ProChat: Group chat " + mu.getRoom());
-
-		chatArea = new JEditorPane();
-		entry = new JTextField("");
-		chatArea.setContentType("text/html");
-
-		kit = new HTMLEditorKit();
-		chatArea.setEditorKit(kit);
-		chatArea.addHyperlinkListener(this);
-
-		/*
-		 * StyleSheet styleSheet = kit.getStyleSheet(); styleSheet.addRule("." +
-		 * MESSAGE + " {font: 10px monaco; color: black; }"); styleSheet
-		 * .addRule("." + ERROR +
-		 * " {font: 10px monaco; color: #ff2222; background-color : #cccccc; }"
-		 * );
-		 * 
-		 * Document doc = kit.createDefaultDocument();
-		 * chatArea.setDocument(doc);
-		 */
-
-		chatArea.addKeyListener(this);
-		entry.addKeyListener(this);
-
-		chatArea.setEditable(false);
-
-		// chatArea.setBackground(new Color(255, 255, 255, 200));
-
-		// Menu
-		JMenuBar menuBar = new JMenuBar();
-
-		buildMenu(menuBar);
-
-		frame.setJMenuBar(menuBar);
-
-		final JScrollPane scroller = new JScrollPane(chatArea);
-		scroller.setAutoscrolls(true);
-
-		scroller.getVerticalScrollBar().addAdjustmentListener(
-				new AdjustmentListener() {
-
-					BoundedRangeModel brm = scroller.getVerticalScrollBar()
-							.getModel();
-					boolean wasAtBottom = true;
-
-					public void adjustmentValueChanged(AdjustmentEvent e) {
-
-						if (!brm.getValueIsAdjusting()) {
-
-							if (wasAtBottom) {
-								// System.out.println("Was at bottom!");
-								brm.setValue(brm.getMaximum());
-							}
-						} else {
-							wasAtBottom = ((brm.getValue() + brm.getExtent()) == brm
-									.getMaximum());
-							// System.out.println("Bottom? " + wasAtBottom);
-						}
-
-					}
-				});
-
-		JButton send = new JButton("Send");
-		send.addActionListener(this);
-
-		JPanel entryPanel = new JPanel(new GridLayout(1, 2));
-
-		entryPanel.add(entry);
-		entryPanel.add(send, BorderLayout.EAST);
-		try {
-			frame.setIconImage(ImageIO.read(this.getClass()
-					.getResourceAsStream("logo.png")));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		frame.add(scroller);
-		frame.add(entryPanel, BorderLayout.SOUTH);
+		
+		setupChatWindow("ProChat: Group chat + " groupChat.getRoom());
 	}
 
 	public void show() {
 		frame.setVisible(true);
-		entry.requestFocusInWindow();
+		chatEntry.requestFocusInWindow();
 		// new VoiceCall("129.89.185.120");
 	}
 
 	private void sendMessage() throws XMPPException {
-		if (entry.getText().equals(""))
+		if (chatEntry.getText().equals(""))
 			return;
-		else if (entry.getText().equals("/me")) {
+		else if (chatEntry.getText().equals("/me")) {
 			try {
-				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-						.getDocument().getLength(), "<i>" + user.getName()
-						+ "</i>", 0, 0, null);
+				addTextToChat("<i>" + user.getName() + "</i>");
 
 				if (chat != null)
 					chat.sendMessage("/you");
-				else if (muc != null)
-					muc.sendMessage("/you");
-				entry.setText("");
+				else if (groupChat != null)
+					groupChat.sendMessage("/you");
+				chatEntry.setText("");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return;
 		}
 
-		checkForGreenText(entry.getText());
+		checkForGreenText(chatEntry.getText());
 
-		if (muc == null) // In muc chats, user messages are fed back to them, so
-							// we don't need to add them ourselves.
-			addToChatArea("<b>" + user.getName() + "</b>: " + "<font face=\""
-					+ font + "\" color=\"" + color + "\">" + entry.getText()
-					+ "</font>", null);
+		if (groupChat == null) // In muc chats, user messages are fed back to
+								// them, so
+								// we don't need to add them ourselves.
+			addToChatArea(
+					"<b>" + user.getName() + "</b>: " + "<font face=\"" + font
+							+ "\" color=\"" + fontColor + "\">"
+							+ chatEntry.getText() + "</font>", null);
 
 		if (chat != null)
-			chat.sendMessage("<font face=\"" + font + "\" color=\"" + color
-					+ "\">" + entry.getText() + "</font>");
-		else if (muc != null)
-			muc.sendMessage("<font face=\"" + font + "\" color=\"" + color
-					+ "\">" + entry.getText() + "</font>");
+			chat.sendMessage("<font face=\"" + font + "\" color=\"" + fontColor
+					+ "\">" + chatEntry.getText() + "</font>");
+		else if (groupChat != null)
+			groupChat.sendMessage("<font face=\"" + font + "\" color=\""
+					+ fontColor + "\">" + chatEntry.getText() + "</font>");
 
-		entry.setText("");
+		chatEntry.setText("");
+	}
+
+	private void addTextToChat(String toAdd) {
+		kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
+				.getDocument().getLength(), toAdd, 0, 0, null);
 	}
 
 	public void addToChatArea(String toAdd, AttributeSet attribute) {
@@ -422,31 +349,27 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		if (toAdd.equals(""))
 			return;
-		
 
 		try {
-			
-			String addition = "\n" + generateTimeStamp() +  " " + toAdd;
-			
-			//System message
+
+			String addition = "\n" + generateTimeStamp() + " " + toAdd;
+
+			// System message
 			if (!addition.contains("<b>")) {
-				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-						.getDocument().getLength(), addition, 0, 0, null);
+				addTextToChat(addition);
 				return;
 			}
 			String fromUser = addition.substring(addition.indexOf("<b>") + 3,
 					addition.indexOf("</b>"));
-			
-			//Log.l("From: " + fromUser);
+
+			// Log.l("From: " + fromUser);
 
 			if (lastMessageFrom.equals(fromUser)) {
 				addition = addition.replace("<b>" + fromUser + "</b>:", "");
-				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-						.getDocument().getLength(), addition, 0, 0, null);
+				addTextToChat(addition);
 
-			} else { //New user
-				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-						.getDocument().getLength(), addition, 0, 0, null);
+			} else { // New user
+				addTextToChat(addition);
 				lastMessageFrom = fromUser;
 			}
 
@@ -456,15 +379,16 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		caretFix();
 
-		if (!frame.isFocused() && user.getMode() != Mode.away && user.getMode() != Mode.dnd) {
-			playSound();
+		if (!frame.isFocused() && user.getMode() != Mode.away
+				&& user.getMode() != Mode.dnd) {
+			playAlertSound();
 		}
 	}
 
 	/**
 	 * 
 	 */
-	private void playSound() {
+	private void playAlertSound() {
 		try {
 			Clip clip = AudioSystem.getClip();
 			InputStream inputStream = getClass().getResourceAsStream(
@@ -478,7 +402,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 			Toolkit.getDefaultToolkit().beep();
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
@@ -496,7 +420,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		if (minute < 10)
 			minuteText = "0" + minute;
-		
+
 		return "[" + hour + ":" + minuteText + "]";
 	}
 
@@ -561,7 +485,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	private String checkSpecialCases(String toAdd) {
 
 		if (toAdd.contains("{img}")) {
-			Log.l("Enabled? " + imagesEnabled);
+			//Log.l("Enabled? " + imagesEnabled);
 			if (imagesEnabled) {
 				toAdd = convertImageURL(toAdd);
 				return ""; // This should always be a single line message, so
@@ -592,7 +516,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		toAdd = checkForHyperlink(toAdd);
 		toAdd = checkForSubreddit(toAdd);
 
-		if (!customTextEnabled) {
+		if (!customFontsEnabled) {
 			String temp = toAdd.substring(toAdd.indexOf("<font"),
 					toAdd.indexOf("\">") + 2);
 			// Log.l(temp);
@@ -612,10 +536,10 @@ public class ChatWindow implements ActionListener, KeyListener,
 		String temp = toAdd;
 		// System.out.println("temp: " + temp);
 		if (temp.contains(">>")) {
-			previousColor = color;
-			color = "1AFF00";
+			previousFontColor = fontColor;
+			fontColor = "1AFF00";
 		} else
-			color = previousColor;
+			fontColor = previousFontColor;
 
 	}
 
@@ -739,9 +663,9 @@ public class ChatWindow implements ActionListener, KeyListener,
 		d.setVisible(true);
 		Color result = Home.chooser.getColor();
 		System.out.println("Color returned: " + result);
-		color = String.format("#%02x%02x%02x", result.getRed(),
+		fontColor = String.format("#%02x%02x%02x", result.getRed(),
 				result.getGreen(), result.getBlue());
-		previousColor = color;
+		previousFontColor = fontColor;
 
 	}
 
@@ -778,7 +702,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 					+ toAdd + "\"><img src=\"" + toAdd + "\" width=\"" + x
 					+ "\" height=\"" + y + "\"></a>";
 
-			if (muc == null) // Prevent group chat feedback
+			if (groupChat == null) // Prevent group chat feedback
 				if (imagesEnabled)
 					kit.insertHTML((HTMLDocument) chatArea.getDocument(),
 							chatArea.getDocument().getLength(), imageTag, 0, 0,
@@ -793,8 +717,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 			if (chat != null)
 				chat.sendMessage("{img}" + toAdd);
-			else if (muc != null)
-				muc.sendMessage("{img}" + toAdd);
+			else if (groupChat != null)
+				groupChat.sendMessage("{img}" + toAdd);
 
 			caretFix();
 		} catch (Exception e) {
@@ -862,14 +786,15 @@ public class ChatWindow implements ActionListener, KeyListener,
 			return chat.getParticipant().substring(0,
 					chat.getParticipant().indexOf("@"));
 		else
-			return muc.getRoom().substring(0, muc.getRoom().indexOf("@"));
+			return groupChat.getRoom().substring(0,
+					groupChat.getRoom().indexOf("@"));
 	}
 
 	/**
 	 * 
 	 */
 	public void disableInput() {
-		entry.setEditable(false);
+		chatEntry.setEditable(false);
 	}
 
 	/**
@@ -920,7 +845,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		if (chat != null)
 			return chat.getParticipant();
 		else
-			return muc.getRoom();
+			return groupChat.getRoom();
 	}
 
 	/**
