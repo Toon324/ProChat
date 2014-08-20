@@ -38,8 +38,8 @@ public class ContactsCellRenderer extends JLabel implements
 					"offline.png")));
 			images[3] = new MyIcon(ImageIO.read(getClass().getResourceAsStream(
 					"away.png")));
-			images[4] = new MyIcon(ImageIO.read(getClass().getResourceAsStream(
-					"ltp.png")));
+//			images[4] = new MyIcon(ImageIO.read(getClass().getResourceAsStream(
+//					"ltp.png")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -112,7 +112,7 @@ public class ContactsCellRenderer extends JLabel implements
 			setText("<html>" + user.getName() + "<br/><i><small>"
 					+ user.getStatus() + "</small></i></html>");
 		else
-			setText(user.getName());
+			setText(user.nickname);
 
 		if (user.getPresence() == Presence.Type.unavailable) {
 			setIcon(images[2]); // Offline

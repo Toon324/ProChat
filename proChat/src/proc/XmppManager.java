@@ -43,7 +43,7 @@ public class XmppManager {
 		
 		config = new ConnectionConfiguration(server, port);
 		config.setSASLAuthenticationEnabled(false);
-		config.setSecurityMode(SecurityMode.disabled);
+		//config.setSecurityMode(SecurityMode.disabled);
 		
 		connection = new XMPPConnection(config);
 		connection.connect();

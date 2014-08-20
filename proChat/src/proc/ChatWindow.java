@@ -59,7 +59,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		HyperlinkListener {
 
 	public JFrame frame;
-	
+
 	private JEditorPane chatArea;
 	private JTextField entry;
 	private JLabel status;
@@ -67,11 +67,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 	private Chat chat;
 	private MultiUserChat muc;
 	private HTMLEditorKit kit;
-	
+
 	private String color = "000000";
 	private String previousColor = color;
 	private String font = "Arial";
-	
+
 	private String lastMessageFrom = "";
 	private boolean imagesEnabled = true;
 	private boolean customTextEnabled = true;
@@ -143,7 +143,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		// Menu
 		JMenuBar menuBar = new JMenuBar();
-		
+
 		buildMenu(menuBar);
 
 		frame.setJMenuBar(menuBar);
@@ -165,120 +165,120 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 */
 	private void buildMenu(JMenuBar menuBar) {
 		// Build the first menu.
-				JMenu menu = new JMenu("Insert");
-				menuBar.add(menu);
+		JMenu menu = new JMenu("Insert");
+		menuBar.add(menu);
 
-				JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
-				menu.add(addImage);
-				addImage.addActionListener(this);
+		JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
+		menu.add(addImage);
+		addImage.addActionListener(this);
 
-				JMenu savedImages = new JMenu("Saved");
-				menu.add(savedImages);
+		JMenu savedImages = new JMenu("Saved");
+		menu.add(savedImages);
 
-				JMenuItem noRead = new JMenuItem("Didn't Read");
-				savedImages.add(noRead);
-				noRead.addActionListener(this);
+		JMenuItem noRead = new JMenuItem("Didn't Read");
+		savedImages.add(noRead);
+		noRead.addActionListener(this);
 
-				JMenuItem troll = new JMenuItem("Troll");
-				savedImages.add(troll);
-				troll.addActionListener(this);
+		JMenuItem troll = new JMenuItem("Troll");
+		savedImages.add(troll);
+		troll.addActionListener(this);
 
-				JMenuItem desk = new JMenuItem("Desk Flip");
-				savedImages.add(desk);
-				desk.addActionListener(this);
+		JMenuItem desk = new JMenuItem("Desk Flip");
+		savedImages.add(desk);
+		desk.addActionListener(this);
 
-				JMenuItem no = new JMenuItem("NO.");
-				savedImages.add(no);
-				no.addActionListener(this);
+		JMenuItem no = new JMenuItem("NO.");
+		savedImages.add(no);
+		no.addActionListener(this);
 
-				JMenuItem lol = new JMenuItem("lol");
-				savedImages.add(lol);
-				lol.addActionListener(this);
+		JMenuItem lol = new JMenuItem("lol");
+		savedImages.add(lol);
+		lol.addActionListener(this);
 
-				JMenuItem suprised = new JMenuItem("Suprised");
-				savedImages.add(suprised);
-				suprised.addActionListener(this);
+		JMenuItem suprised = new JMenuItem("Suprised");
+		savedImages.add(suprised);
+		suprised.addActionListener(this);
 
-				JMenuItem facepalm = new JMenuItem("Facepalm");
-				savedImages.add(facepalm);
-				facepalm.addActionListener(this);
+		JMenuItem facepalm = new JMenuItem("Facepalm");
+		savedImages.add(facepalm);
+		facepalm.addActionListener(this);
 
-				JMenuItem gusta = new JMenuItem("Me Gusta");
-				savedImages.add(gusta);
-				gusta.addActionListener(this);
+		JMenuItem gusta = new JMenuItem("Me Gusta");
+		savedImages.add(gusta);
+		gusta.addActionListener(this);
 
-				// HTML menu
-				JMenu html = new JMenu("HTML");
-				menuBar.add(html);
+		// HTML menu
+		JMenu html = new JMenu("HTML");
+		menuBar.add(html);
 
-				JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
-				html.add(setColor);
-				setColor.addActionListener(this);
+		JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
+		html.add(setColor);
+		setColor.addActionListener(this);
 
-				JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
-				html.add(setFont);
-				setFont.addActionListener(this);
+		JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
+		html.add(setFont);
+		setFont.addActionListener(this);
 
-				try {
-					BufferedImage toggleImagesIcon = ImageIO.read(getClass()
-							.getResourceAsStream("imageToggle.png"));
-					BufferedImage toggleTextIcon = ImageIO.read(getClass()
-							.getResourceAsStream("customText.png"));
+		try {
+			BufferedImage toggleImagesIcon = ImageIO.read(getClass()
+					.getResourceAsStream("imageToggle.png"));
+			BufferedImage toggleTextIcon = ImageIO.read(getClass()
+					.getResourceAsStream("customText.png"));
 
-					final JButton toggleImages = new JButton(new ImageIcon(
-							toggleImagesIcon));
-					final JButton toggleText = new JButton(
-							new ImageIcon(toggleTextIcon));
+			final JButton toggleImages = new JButton(new ImageIcon(
+					toggleImagesIcon));
+			final JButton toggleText = new JButton(
+					new ImageIcon(toggleTextIcon));
 
-					toggleImages
-							.setToolTipText("Embedded images will be displayed in chat.");
-					toggleText.setToolTipText("Custom fonts and colors will be used.");
+			toggleImages
+					.setToolTipText("Embedded images will be displayed in chat.");
+			toggleText.setToolTipText("Custom fonts and colors will be used.");
 
-					toggleImages.addActionListener(new ActionListener() {
+			toggleImages.addActionListener(new ActionListener() {
 
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							if (imagesEnabled) {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (imagesEnabled) {
 
-								toggleImages
-										.setToolTipText("Embedded images will be displayed as links.");
-								toggleImages.setBackground(Color.gray);
-							} else {
-								toggleImages
-										.setToolTipText("Embedded images will be displayed in chat.");
-								toggleImages.setBackground(null);
-							}
-							imagesEnabled = !imagesEnabled;
-						}
-
-					});
-
-					toggleText.addActionListener(new ActionListener() {
-
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							if (customTextEnabled) {
-
-								toggleText
-										.setToolTipText("Custom fonts and colors will not be used.");
-								toggleText.setBackground(Color.gray);
-							} else {
-								toggleText
-										.setToolTipText("Custom fonts and colors will be used.");
-								toggleText.setBackground(null);
-							}
-							customTextEnabled = !customTextEnabled;
-						}
-
-					});
-
-					menuBar.add(toggleImages);
-					menuBar.add(toggleText);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+						toggleImages
+								.setToolTipText("Embedded images will be displayed as links.");
+						toggleImages.setBackground(Color.gray);
+					} else {
+						toggleImages
+								.setToolTipText("Embedded images will be displayed in chat.");
+						toggleImages.setBackground(null);
+					}
+					imagesEnabled = !imagesEnabled;
 				}
-		
+
+			});
+
+			toggleText.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (customTextEnabled) {
+
+						toggleText
+								.setToolTipText("Custom fonts and colors will not be used.");
+						toggleText.setBackground(Color.gray);
+					} else {
+						toggleText
+								.setToolTipText("Custom fonts and colors will be used.");
+						toggleText.setBackground(null);
+					}
+					customTextEnabled = !customTextEnabled;
+				}
+
+			});
+
+			menuBar.add(toggleImages);
+			menuBar.add(toggleText);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -406,11 +406,9 @@ public class ChatWindow implements ActionListener, KeyListener,
 					+ "</font>", null);
 
 		if (chat != null)
-			chat.sendMessage("<font face=\"" + font + "\" color=\"" + color
-					+ "\">" + entry.getText() + "</font>");
+			chat.sendMessage(entry.getText());
 		else if (muc != null)
-			muc.sendMessage("<font face=\"" + font + "\" color=\"" + color
-					+ "\">" + entry.getText() + "</font>");
+			muc.sendMessage(entry.getText());
 
 		entry.setText("");
 	}
@@ -422,13 +420,12 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		if (toAdd.equals(""))
 			return;
-		
 
 		try {
-			
-			String addition = "\n" + generateTimeStamp() +  " " + toAdd;
-			
-			//System message
+
+			String addition = "\n" + generateTimeStamp() + " " + toAdd;
+
+			// System message
 			if (!addition.contains("<b>")) {
 				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 						.getDocument().getLength(), addition, 0, 0, null);
@@ -436,15 +433,15 @@ public class ChatWindow implements ActionListener, KeyListener,
 			}
 			String fromUser = addition.substring(addition.indexOf("<b>") + 3,
 					addition.indexOf("</b>"));
-			
-			//Log.l("From: " + fromUser);
+
+			// Log.l("From: " + fromUser);
 
 			if (lastMessageFrom.equals(fromUser)) {
 				addition = addition.replace("<b>" + fromUser + "</b>:", "");
 				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 						.getDocument().getLength(), addition, 0, 0, null);
 
-			} else { //New user
+			} else { // New user
 				kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
 						.getDocument().getLength(), addition, 0, 0, null);
 				lastMessageFrom = fromUser;
@@ -456,7 +453,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		caretFix();
 
-		if (!frame.isFocused() && user.getMode() != Mode.away && user.getMode() != Mode.dnd) {
+		if (!frame.isFocused() && user.getMode() != Mode.away
+				&& user.getMode() != Mode.dnd) {
 			playSound();
 		}
 	}
@@ -478,7 +476,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 			Toolkit.getDefaultToolkit().beep();
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
@@ -496,7 +494,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		if (minute < 10)
 			minuteText = "0" + minute;
-		
+
 		return "[" + hour + ":" + minuteText + "]";
 	}
 
@@ -573,6 +571,10 @@ public class ChatWindow implements ActionListener, KeyListener,
 			}
 
 		}
+
+		if (toAdd.contains(".png") || toAdd.contains(".jpg"))
+			toAdd = convertImageURL(toAdd);
+
 		if (toAdd.contains("/you")) {
 			toAdd = toAdd.replace("/you", "<i>" + user.getName() + "</i>");
 		}
@@ -625,7 +627,14 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 */
 	private String convertImageURL(String toAdd) {
 		// System.out.println("Input: " + toAdd);
-		toAdd = toAdd.substring(toAdd.indexOf("{img}") + 5, toAdd.length());
+		if (toAdd.contains("{img}"))
+			toAdd = toAdd.substring(toAdd.indexOf("{img}") + 5, toAdd.length());
+		else if (toAdd.contains(".png"))
+			toAdd = toAdd.substring(toAdd.indexOf("http"),
+					toAdd.indexOf(".png") + 4);
+		else
+			toAdd = toAdd.substring(toAdd.indexOf("http"),
+					toAdd.indexOf(".jpg") + 4);
 		// System.out.println("URL: " + toAdd);
 
 		try {

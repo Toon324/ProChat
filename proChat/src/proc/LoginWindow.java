@@ -67,7 +67,7 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 		user = savedInfo.user;
 		pass = savedInfo.pass;
 
-		String serverIP = "54.200.92.207";
+		String serverIP = "chat.hipchat.com";
 		int port = 5222;
 
 		try {
@@ -289,35 +289,38 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 	 * @return
 	 */
 	private String bananaStrawberryEncryption(String in) {
-
-		System.out.println("In is " + in);
-
-		// Banana - Strawberry
-		in = in.replace("b", "st");
-		in = in.replace("a", "ra");
-		in = in.replace("n", "wb");
-		in = in.replace("B", "er");
-		in = in.replace("A", "ry");
-		in = in.replace("N", "na");
-
-		// Kiwi - Orange
-		in = in.replace("k", "or");
-		in = in.replace("i", "an");
-		in = in.replace("w", "ge");
-		in = in.replace("K", "eg");
-		in = in.replace("I", "na");
-		in = in.replace("W", "pr");
-
-		in = in.replace("1", "@n");
-		in = in.replace("@", "6^");
-
-		System.out.println("In is now " + in);
-
-		in = String.format("%040x", new BigInteger(1, in.getBytes()).shiftLeft(4));
-
-		System.out.println("In is now: " + in);
-
+		
 		return in;
+//
+//		System.out.println("In is " + in);
+//
+//		// Banana - Strawberry
+//		in = in.replace("b", "st");
+//		in = in.replace("a", "ra");
+//		in = in.replace("n", "wb");
+//		in = in.replace("B", "er");
+//		in = in.replace("A", "ry");
+//		in = in.replace("N", "na");
+//
+//		// Kiwi - Orange
+//		in = in.replace("k", "or");
+//		in = in.replace("i", "an");
+//		in = in.replace("w", "ge");
+//		in = in.replace("K", "eg");
+//		in = in.replace("I", "na");
+//		in = in.replace("W", "pr");
+//
+//		in = in.replace("1", "@n");
+//		in = in.replace("@", "6^");
+//
+//		System.out.println("In is now " + in);
+//
+//		in = String.format("%040x",
+//				new BigInteger(1, in.getBytes()).shiftLeft(4));
+//
+//		System.out.println("In is now: " + in);
+//
+//		return in;
 	}
 
 	private void submitRegistration() {
@@ -373,13 +376,15 @@ public class LoginWindow implements ActionListener, KeyListener, SteamListener {
 			savedInfo.updateSavedLogin(loginName.getText(), new String(
 					loginPass.getPassword()));
 
-			User user = new User(loginName.getText(), bananaStrawberryEncryption(new String(
-					loginPass.getPassword())));
+			User user = new User(loginName.getText(),
+					bananaStrawberryEncryption(new String(
+							loginPass.getPassword())));
 
 			connection.getConnection().login(user.getName(), user.getPass());
 
-			user.setEmail(connection.getConnection().getAccountManager()
-					.getAccountAttribute("email"));
+//			user.setEmail(connection.getConnection().getAccountManager()
+//					.getAccountAttribute("email"));
+			user.setEmail("Temp");
 
 			Home home = new Home(user, connection);
 			home.show();

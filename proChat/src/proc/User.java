@@ -20,16 +20,23 @@ public class User {
 	String userName, userPass, email, avatarURL, steamStatus, game, status;
 	Type presence;
 	Mode mode;
+	public String nickname = "Cody Swendrowski";
 
 	public User(String name, String pass) {
 		userName = name;
 		userPass = pass;
+		
 		email = "";
 		game = "";
 		avatarURL = "";
 		steamStatus = "Offline";
 		presence = Presence.Type.unavailable;
 		mode = null;
+	}
+	
+	public void setNickname(String n) {
+		nickname = n;
+		//System.out.println("Nickname set to " + n);
 	}
 
 	/**

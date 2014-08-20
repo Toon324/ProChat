@@ -55,6 +55,7 @@ import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
+import org.jivesoftware.smackx.muc.HostedRoom;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 import steamWrapper.SteamEvent;
@@ -182,7 +183,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		// frame.pack();
 
 		// serverIP = "129.89.185.120";
-		serverName = "ip-172-31-27-244";
+		serverName = "chat.hipchat.com";
 		// port = 5222;
 		connection.setStatus(true, "");
 
@@ -355,6 +356,15 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 */
 	private void loadContacts() {
 		roster.reload();
+		try {
+			Collection<HostedRoom> rooms = MultiUserChat.getHostedRooms(connection.getConnection(), "conf.hipchat.com");
+			
+			for (HostedRoom r : rooms) 
+				System.out.println("Found room: " + r + " " + r.getName());
+		} catch (XMPPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		data = new User[roster.getEntryCount()];
 
 		ArrayList<User> avail = new ArrayList<User>();
@@ -367,15 +377,21 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		for (RosterEntry contact : roster.getEntries()) {
 			// Log.l("Found contact: " + contact);
 			String userContact = contact.getUser();
+			String nickname = contact.getName();
+			
+			//System.out.println("Contact: " + contact);
+			
 
 			if (userContact.contains("conference")) {
-
-				avail.add(new User(userContact, ""));
+				User u = new User(userContact, "");
+				u.setNickname(nickname);
+				avail.add(u);
 			} else {
 				if (userContact.indexOf("@") != -1)
 					userContact = userContact.substring(0,
 							userContact.indexOf("@"));
 				User toAdd = new User(userContact, "");
+				toAdd.setNickname(contact.getName());
 
 				Presence p = roster.getPresence(contact.getUser());
 				toAdd.copyPresenceInfo(p);
@@ -435,8 +451,10 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 * @param name
 	 */
 	private void joinGroup(String name) {
+//		MultiUserChat mu = new MultiUserChat(connection.getConnection(), name
+//				+ "@conference." + serverName);
 		MultiUserChat mu = new MultiUserChat(connection.getConnection(), name
-				+ "@conference." + serverName);
+				+ "@conf.hipchat.com");
 		boolean shouldJoin = true;
 		ChatWindow cw = new ChatWindow(user, mu);
 
@@ -465,7 +483,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			history.setSeconds(60 * 60 * 24); // Messages from the past day
 			// history.setMaxStanzas(150);
 			if (shouldJoin)
-				mu.join(user.userName, "", history,
+				mu.join(user.nickname, "", history,
 						SmackConfiguration.getPacketReplyTimeout());
 
 			connection.getConnection().getRoster()
@@ -513,7 +531,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				return;
 			}
 		}
-		Log.l("Msg: " + msg);
+		Log.l("Msg: " + msg + " from " + msg.getFrom());
 
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
 
@@ -551,11 +569,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		if (activeChat == null && !domain.equals("conference")) {
 			Log.l("Opening new chat with " + from);
 			ChatWindow c = openChat(from);
-			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
+			c.addToChatArea("<b>" + msg.getFrom().substring(msg.getFrom().indexOf("/"), msg.getFrom().length()) + "</b>: " + msg.getBody(), null);
 			currentChats.add(c);
 			// Log.l("Added chat: " + c.getFrom());
 		} else {
-			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(),
+			activeChat.addToChatArea("<b>" + msg.getFrom().substring(msg.getFrom().indexOf("/")+1, msg.getFrom().length()) + "</b>: " + msg.getBody(),
 					null);
 			if (!activeChat.frame.isVisible())
 				activeChat.frame.setVisible(true);
