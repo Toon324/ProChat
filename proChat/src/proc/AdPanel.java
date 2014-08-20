@@ -9,6 +9,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Random;
 import java.util.concurrent.Executors;
 
@@ -26,46 +27,32 @@ public class AdPanel extends JPanel implements MouseListener {
 	 */
 	private static final long serialVersionUID = -5913790930853170631L;
 
-	private final int ROTATE_TIME = 30000;
+	private final int LIFESPAN = 30000;
 	private final int AMT = 6;
 	private BufferedImage images[] = new BufferedImage[AMT];
 	private String urls[] = new String[AMT];
 	private int currentIndex;
 
 	public AdPanel() {
-		try {
-			images[0] = ImageIO.read(getClass().getResourceAsStream(
-					"testAd.png"));
-			images[1] = ImageIO.read(getClass().getResourceAsStream("ad1.png"));
-			urls[1] = "https://www.youtube.com/channel/UC-HlnqqvEHYZWJ6IGbDcuXQ";
-			images[2] = ImageIO.read(getClass().getResourceAsStream("ad2.png"));
-			urls[2] = "https://www.youtube.com/channel/UC-HlnqqvEHYZWJ6IGbDcuXQ";
-			images[3] = ImageIO.read(getClass().getResourceAsStream("ad3.png"));
-			urls[3] = "mailto:cody@swendrowski.us";
-			images[4] = ImageIO.read(getClass().getResourceAsStream("ad4.png"));
-			images[5] = ImageIO.read(getClass().getResourceAsStream("ad5.png"));
-			urls[5] = "http://www.reddit.com/r/onetruegod";
+		loadResources();
 
-			Random gen = new Random();
+		Random gen = new Random();
+		currentIndex = gen.nextInt(AMT);
 
-			currentIndex = gen.nextInt(AMT);
-			//Log.l("Now displaying ad " + currentIndex);
-			addMouseListener(this);
-			this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		addMouseListener(this);
 
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
+		this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		this.setMinimumSize(new Dimension(200, 150));
+
 		setSize(new Dimension(200, 150));
 
-		Executors.newCachedThreadPool().execute(new Runnable() {
+		ProChat.createNewThread(new Runnable() {
 
 			@Override
 			public synchronized void run() {
 				while (true) {
 					try {
-						this.wait(ROTATE_TIME);
+						this.wait(LIFESPAN);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -74,17 +61,36 @@ public class AdPanel extends JPanel implements MouseListener {
 			}
 
 		});
+
+	}
+
+	private void loadResources() {
+		images[0] = ProChat.loadImage("testAd.png");
+
+		images[1] = ProChat.loadImage("ad1.png");
+		urls[1] = "https://www.youtube.com/channel/UC-HlnqqvEHYZWJ6IGbDcuXQ";
+
+		images[2] = ProChat.loadImage("ad2.png");
+		urls[2] = "https://www.youtube.com/channel/UC-HlnqqvEHYZWJ6IGbDcuXQ";
+
+		images[3] = ProChat.loadImage("ad3.png");
+		urls[3] = "mailto:cody@swendrowski.us";
+
+		images[4] = ProChat.loadImage("ad4.png");
+
+		images[5] = ProChat.loadImage("ad5.png");
+		urls[5] = "http://www.reddit.com/r/onetruegod";
 	}
 
 	private void cycleAd() {
 		Random gen = new Random();
 
 		int temp = gen.nextInt(AMT);
-		 while (temp == currentIndex)
-		 temp = gen.nextInt(AMT);
+		while (temp == currentIndex)
+			temp = gen.nextInt(AMT);
 
 		currentIndex = temp;
-		//Log.l("Now displaying ad " + currentIndex);
+		// Log.l("Now displaying ad " + currentIndex);
 		this.repaint();
 	}
 
@@ -102,19 +108,24 @@ public class AdPanel extends JPanel implements MouseListener {
 	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
+
+		if (urls[currentIndex] == null)
+			return;
+
 		try {
-			if (urls[currentIndex] == null)
-				return;
-			
-			URI myURI = new URI(urls[currentIndex]);
-			if (urls[currentIndex].contains("mailto"))
-				Desktop.getDesktop().mail(myURI);
-			else
-				Desktop.getDesktop().browse(myURI);
+			handleClick();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 
+	}
+
+	private void handleClick() throws URISyntaxException, IOException {
+		URI myURI = new URI(urls[currentIndex]);
+		if (urls[currentIndex].contains("mailto"))
+			Desktop.getDesktop().mail(myURI);
+		else
+			Desktop.getDesktop().browse(myURI);
 	}
 
 	/*
