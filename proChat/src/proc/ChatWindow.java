@@ -484,14 +484,17 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 */
 	private String checkSpecialCases(String toAdd) {
 
-		if (toAdd.contains("{img}")) {
-			//Log.l("Enabled? " + imagesEnabled);
+		if (toAdd.matches("(.png) | (.jpg) | (.gif)")
+				|| toAdd.contains("{img}")) {
+			// Log.l("Enabled? " + imagesEnabled);
 			if (imagesEnabled) {
 				toAdd = convertImageURL(toAdd);
 				return ""; // This should always be a single line message, so
 							// don't check other cases.
 			} else {
-				toAdd.replace("{img}", ""); // will be hyperlinked like usual.
+				if (toAdd.contains("{img}"))
+					toAdd.replace("{img}", ""); // will be hyperlinked like
+												// usual.
 
 				return ""; // Still a single line message
 			}
@@ -549,7 +552,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 */
 	private String convertImageURL(String toAdd) {
 		// System.out.println("Input: " + toAdd);
-		toAdd = toAdd.substring(toAdd.indexOf("{img}") + 5, toAdd.length());
+		if (toAdd.contains("{img}"))
+			toAdd = toAdd.substring(toAdd.indexOf("{img}") + 5, toAdd.length());
 		// System.out.println("URL: " + toAdd);
 
 		try {
@@ -567,8 +571,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 					+ "\"><img src=\"" + toAdd + "\" width=\"" + x
 					+ "\" height=\"" + y + "\"></a>";
 
-			kit.insertHTML((HTMLDocument) chatArea.getDocument(), chatArea
-					.getDocument().getLength(), imageTag, 0, 0, null);
+			addTextToChat(imageTag);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
