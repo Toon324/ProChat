@@ -2,12 +2,15 @@ package proc.Voip;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -42,37 +45,29 @@ public class RelayHelper implements Runnable {
 		try {
 			BufferedReader input = new BufferedReader(new InputStreamReader(
 					client.getInputStream()));
-			DataOutputStream output = new DataOutputStream(
-					client.getOutputStream());
+			PrintWriter output = new PrintWriter(client.getOutputStream());
 
-			IPMap<String, String> map = server.getMap();
+			TreeMap<String, String> map = server.getMap();
+			TreeMap<String, String> searches = server.getSearches();
 
 			boolean shouldRun = true;
 			while (shouldRun) {
 				if (input.ready()) {
-					String otherIP = input.readLine();
-					String ownIP = client.getInetAddress().toString().replace("/", "");
-					ownIP = ownIP + ":" + client.getLocalPort();
+					String caller = input.readLine();
+					String callerIP = client.getInetAddress().toString().replace("/", "");
+					String reciever = input.readLine();
 					
-					String searchIP = "";
-					if (otherIP.contains(":"))
-						searchIP = otherIP.substring(0, otherIP.indexOf(":"));
-					else
-						searchIP = otherIP;
-
-					System.out.println(name + ": A (" + ownIP
-							+ ") is requesting connection to B (" + otherIP
-							+ ") (Search: " + searchIP + ")");
-
-					if (map.containsKey(searchIP)) {
-						String match = map.get(searchIP);
-						System.out.println(name
-								+ ": Map already had otherip. Matched IP: " + match);
-						sendInfo(ownIP, match);
-					} else {
-						map.put(ownIP, otherIP);
-						System.out.println(name + ": New entry created.");
+					//Add this Name-IP pairing to our "Phonebook"
+					map.put(caller, callerIP);
+					
+					if (searches.containsKey(reciever) && searches.get(reciever).equals(caller)) {
+						System.out.println("Found search match: " + reciever + " looking for " + searches.get(reciever));
+						shareInfo(caller, reciever);
+						output.write(map.get(reciever));
 					}
+					else
+						searches.put(caller, reciever);
+					
 					server.printMap();
 				}
 			}
@@ -82,6 +77,29 @@ public class RelayHelper implements Runnable {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * @param caller
+	 * @param reciever
+	 */
+	private void shareInfo(String caller, String reciever) {
+		// TODO Auto-generated method stub
+		try {
+			Socket sock = new Socket(server.getMap().get(reciever), 1324);
+			PrintWriter output = new PrintWriter(sock.getOutputStream());
+			output.write(server.getMap().get(caller));
+			
+			sock.close();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 	/**

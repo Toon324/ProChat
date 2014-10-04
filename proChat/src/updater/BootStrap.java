@@ -2,11 +2,15 @@ package updater;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
@@ -21,6 +25,8 @@ import javax.swing.JTextArea;
  */
 public class BootStrap {
 
+	private static final String IP = "54.245.236.86";
+	private static final int PORT = 1160;
 	static String version = "0.0.0";
 
 	/**
@@ -28,62 +34,63 @@ public class BootStrap {
 	 */
 	public static void main(String[] args) {
 		loadVersionData();
-		
+
 		JFrame frame = new JFrame();
 		JTextArea text = new JTextArea();
 		JScrollPane scroller = new JScrollPane(text);
-		
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(scroller);
-		frame.setSize(400,400);
+		frame.setSize(400, 400);
 		frame.setVisible(true);
-		
+
 		text.setText("Local version: " + version);
 
-		NetworkAdapter adapter = new NetworkAdapter();
 		try {
-			adapter.connect("129.89.185.223", 1160);
-			text.append("\nConnected to server at 129.89.185.223:1160.");
-			adapter.getOutputStream().writeInt(0); // Request for version
-			adapter.getOutputStream().flush();
+			System.out.println("Attempting connection to " + IP + ":" + PORT);
+			Socket server = new Socket(IP, PORT);
+			DataInputStream input = new DataInputStream(server.getInputStream());
+			PrintWriter output = new PrintWriter(server.getOutputStream());
+			text.append("\nConnected to server at " + IP + ":" + PORT);
+			output.write("VERSION\tProChatAlpha.jar\n"); // Request for version
+			output.flush();
 
 			String serverVersion = "no data";
 			while (serverVersion.equals("no data")) {
 				try {
-				System.out.println(serverVersion);
-				if (adapter.isDataAvailable()) {
-					text.append("\n Server version: " + serverVersion);
-					StringBuilder builder = new StringBuilder();
-					while (adapter.getInputStream().available() > 0)
-						builder.append(adapter.getInputStream().readChar());
-					
-					System.out.println("Appending: " + builder.toString());
-					serverVersion = builder.toString();
-					
-				}
-				Thread.sleep(100);
-				}
-				catch (Exception e) {
+					System.out.println(serverVersion);
+					if (input.available() > 0) {
+						text.append("\n Server version: " + serverVersion);
+						byte[] b = new byte[40];
+						input.read(b);
+						serverVersion = new String(b);
+
+					}
+					Thread.sleep(100);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 
 			text.append("\nServer Version: " + serverVersion);
 
+			// System.out.println(serverVersion.compareTo(version));
+
 			if (serverVersion.compareTo(version) > 0) {
 				text.append("\nUpdating from " + version + " to "
 						+ serverVersion);
-				adapter.getOutputStream().writeInt(1); // Request for updated
-														// jar
+				output.write("UPDATE\tProChatAlpha.jar\n"); // Request for
+															// updated
+				output.flush();
+				// jar
 
-				BufferedInputStream bufIn = new BufferedInputStream(
-						adapter.getInputStream());
+				BufferedInputStream bufIn = new BufferedInputStream(input);
 
 				File fileWrite = new File("ProChatAlpha.jar");
 				OutputStream out = new FileOutputStream(fileWrite);
 				BufferedOutputStream bufOut = new BufferedOutputStream(out);
 
-				byte buffer[] = new byte[adapter.getInputStream().readInt()];
+				byte buffer[] = new byte[input.readInt()];
 
 				text.append("\nRecieving file of size " + buffer.length);
 				boolean complete = false;
@@ -96,37 +103,44 @@ public class BootStrap {
 					}
 					bufOut.write(buffer, 0, nRead);
 					wrote += nRead;
-					//System.out.println("Total: " + wrote);
-					text.append("\n" + ((int)(100*(wrote/(double)buffer.length))) + "%");
+					// System.out.println("Total: " + wrote);
+					text.append("\n"
+							+ ((int) (100 * (wrote / (double) buffer.length)))
+							+ "%");
 					if (wrote == buffer.length)
 						complete = true;
 				}
+
+				output.write("CLOSE\n"); // Tell the server that the client is
+				// done with it
+				output.flush();
+
 				text.append("\nClosing resources..");
 				bufOut.flush();
 				out.close();
+				server.close();
 				text.append("\nFinished writing data.");
 
-				adapter.getOutputStream().writeInt(2); // Tell the server that
-														// the client is done
-														// with it
 				text.append("\nUpdating local info..");
 				updateVersionIDTo(serverVersion);
-				
+
 				text.append("\nUpdated. Now launching...");
 
-				Runtime.getRuntime().exec(
-						"java -jar ProChatAlpha.jar");
-				
+				Runtime.getRuntime().exec("java -jar ProChatAlpha.jar");
+
 				frame.dispose();
 			} else {
-				adapter.getOutputStream().writeInt(2);
+				output.write("CLOSE\n");
+				output.flush();
+				frame.dispose();
 				Runtime.getRuntime().exec("java -jar ProChatAlpha.jar");
 			}
 		} catch (IOException e) {
-			
+
 			text.append("\nERROR: Could not connect to server.");
 			text.append(e.getMessage());
 			try {
+				frame.dispose();
 				Runtime.getRuntime().exec("java -jar EmployeeEvalSystem.jar");
 			} catch (IOException e1) {
 				text.append("ERROR: Could not launch the program.");
@@ -153,7 +167,7 @@ public class BootStrap {
 			if (!file.exists()) { // If file doesn't exist, create one
 				file.createNewFile();
 				FileWriter writer = new FileWriter(file);
-				writer.write("0.0");
+				writer.write("0.0.0");
 				writer.close();
 			}
 

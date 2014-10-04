@@ -59,28 +59,31 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 
 import proc.Voip.VoiceCall;
 
+
+import steamWrapper.SteamEvent;
+import steamWrapper.SteamListener;
+import steamWrapper.SteamRegister;
+
 /**
  * @author Cody Swendrowski
  * 
  */
 public class Home implements ActionListener, MouseListener, KeyListener,
-		RosterListener {
+		RosterListener, SteamListener {
 
-	static JColorChooser chooser;
-	JFrame frame;
-	JMenuBar menuBar;
-	JMenu menu;
-	User user;
-	String serverName, serverIP;
-	// JTable contacts;
-	JList<User> contacts, activeChats;
-	XmppManager connection;
+	public static JColorChooser chooser;
+
+	private JFrame frame;
+	private JMenuBar menuBar;
+	private JMenu menu;
+	private User user;
+	private String serverName;
+	private JList<User> contacts;
+	private XmppManager connection;
 	int port;
-	ArrayList<ChatWindow> currentChats;
-	String[] names = { "Name", "Online" };
-	// Object[][] data = new Object[16][2];
-	User[] data = { new User("Jon Cena", ""), new User("Rob Stark", "") };
-	Roster roster;
+	private ArrayList<ChatWindow> currentChats;
+	private User[] data = { new User("Jon Cena", ""), new User("Rob Stark", "") };
+	private Roster roster;
 	private String color = "#E02424";
 	private static String IP;
 
@@ -100,9 +103,9 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		 */
 
 		frame = new JFrame();
-		frame.setLayout(new GridLayout(2,1));
+		frame.setLayout(new GridLayout(2, 1));
 		frame.setSize(400, 608);
-		frame.setTitle("ProChat v0.1.8 ALPHA");
+		frame.setTitle("ProChat v0.2.0 ALPHA");
 
 		contacts = new JList<User>(data);
 		ContactsCellRenderer cellRender = new ContactsCellRenderer();
@@ -140,29 +143,37 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		frame.setJMenuBar(menuBar);
 		// frame.add(masterPanel);
 		frame.add(scrollPane);
-		
+
 		scrollPane.setSize(400, 1000);
 		AdPanel image = new AdPanel();
-		
+
 		frame.add(image);
-//		image.setSize(image.getWidth(), 150);
+		// image.setSize(image.getWidth(), 150);
 		image.setMinimumSize(new Dimension(400, 150));
-		
-		 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(frame.getContentPane());
-	        frame.getContentPane().setLayout(layout);
-	        layout.setHorizontalGroup(
-	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-	            .addComponent(scrollPane)
-	            .addComponent(image, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-	        );
-	        layout.setVerticalGroup(
-	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGroup(layout.createSequentialGroup()
-	                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
-	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-	                .addComponent(image, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
-	        );
-	        
+
+		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(
+				frame.getContentPane());
+		frame.getContentPane().setLayout(layout);
+		layout.setHorizontalGroup(layout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+				.addComponent(scrollPane)
+				.addComponent(image, javax.swing.GroupLayout.Alignment.LEADING,
+						javax.swing.GroupLayout.DEFAULT_SIZE, 206,
+						Short.MAX_VALUE));
+		layout.setVerticalGroup(layout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(
+						layout.createSequentialGroup()
+								.addComponent(scrollPane,
+										javax.swing.GroupLayout.DEFAULT_SIZE,
+										287, Short.MAX_VALUE)
+								.addPreferredGap(
+										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+								.addComponent(image,
+										javax.swing.GroupLayout.PREFERRED_SIZE,
+										54,
+										javax.swing.GroupLayout.PREFERRED_SIZE)));
+
 		try {
 			frame.setIconImage(ImageIO.read(this.getClass()
 					.getResourceAsStream("logo.png")));
@@ -171,11 +182,11 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		}
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setLocation(300, 100);
-		//frame.pack();
+		// frame.pack();
 
-		serverIP = "129.89.185.120";
-		serverName = "127.0.0.1";
-		port = 5222;
+		// serverIP = "129.89.185.120";
+		serverName = "ip-172-31-27-244";
+		// port = 5222;
 		connection.setStatus(true, "");
 
 		PacketListener myListener = new PacketListener() {
@@ -199,7 +210,14 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 		// readSteamInfo("76561197998100303");
 		user.loadSteamInfo(user.getEmail());
 
-		connection.setPresence(true, "Free to chat", Mode.available);
+		connection.setPresence(true, SavedInfoLoader.getInstance().status,
+				Mode.available);
+
+		// Keep track of Toon324's steam profile
+		SteamRegister sr = new SteamRegister("76561197998100303");
+		sr.loadPlayerInfo();
+		sr.addListener(this);
+		sr.requestEventsFor(SteamRegister.PlayerValues.GAME_NAME);
 	}
 
 	/**
@@ -207,122 +225,132 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 */
 	private void buildMenu() {
 		// Menu
-				menuBar = new JMenuBar();
+		menuBar = new JMenuBar();
 
-				// Build the first menu.
-				menu = new JMenu("ProChat");
-				menu.getAccessibleContext().setAccessibleDescription(
-						"Menu that allows signing out or exitting the program.");
-				menuBar.add(menu);
+		// Build the first menu.
+		menu = new JMenu("ProChat");
+		menu.getAccessibleContext().setAccessibleDescription(
+				"Menu that allows signing out or exitting the program.");
+		menuBar.add(menu);
 
-				JMenuItem signOutItem = new JMenuItem("Sign Out", KeyEvent.VK_S);
-				menu.add(signOutItem);
-				signOutItem.addActionListener(this);
+		JMenuItem signOutItem = new JMenuItem("Sign Out", KeyEvent.VK_S);
+		menu.add(signOutItem);
+		signOutItem.addActionListener(this);
 
-				JMenuItem exitItem = new JMenuItem("Exit Program", KeyEvent.VK_E);
-				menu.add(exitItem);
-				exitItem.addActionListener(this);
+		JMenuItem exitItem = new JMenuItem("Exit Program", KeyEvent.VK_E);
+		menu.add(exitItem);
+		exitItem.addActionListener(this);
 
-				// Profile menu
-				JMenu profileMenu = new JMenu("Profile");
-				profileMenu.setMnemonic(KeyEvent.VK_P);
-				menuBar.add(profileMenu);
+		// Profile menu
+		JMenu profileMenu = new JMenu("Profile");
+		profileMenu.setMnemonic(KeyEvent.VK_P);
+		menuBar.add(profileMenu);
 
-				JMenuItem viewProfile = new JMenuItem("View Profile");
-				profileMenu.add(viewProfile);
-				viewProfile.addActionListener(this);
+		JMenuItem viewProfile = new JMenuItem("View Profile");
+		profileMenu.add(viewProfile);
+		viewProfile.addActionListener(this);
 
-				JMenuItem linkSteam = new JMenuItem("Link Steam x64 ID", KeyEvent.VK_L);
-				linkSteam.setActionCommand("Link");
-				profileMenu.add(linkSteam);
-				linkSteam.addActionListener(this);
+		JMenuItem linkSteam = new JMenuItem("Link Steam x64 ID", KeyEvent.VK_L);
+		linkSteam.setActionCommand("Link");
+		profileMenu.add(linkSteam);
+		linkSteam.addActionListener(this);
 
-				JMenuItem setStatus = new JMenuItem("Set Status");
-				profileMenu.add(setStatus);
-				setStatus.addActionListener(new ActionListener() {
+		JMenuItem setStatus = new JMenuItem("Set Status");
+		profileMenu.add(setStatus);
+		setStatus.addActionListener(new ActionListener() {
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						String s = JOptionPane.showInputDialog(
-								"What should your status be?", user.getStatus());
-						Presence p = connection.setStatus(true, s);
-						user.setStatus(p);
-					}
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String s = JOptionPane.showInputDialog(
+						"What should your status be?", user.getStatus());
+				Presence p = connection.setStatus(true, s);
+				user.setStatus(p);
+				SavedInfoLoader.getInstance().updateStatus(s);
+			}
 
-				});
+		});
 
-				// Status submenu
-				JMenu modeMenu = new JMenu("Set Mode");
-				profileMenu.add(modeMenu);
+		// Status submenu
+		JMenu modeMenu = new JMenu("Set Mode");
+		profileMenu.add(modeMenu);
 
-				JMenuItem available = new JMenuItem("Available");
-				modeMenu.add(available);
-				available.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						connection.setMode(true, Mode.available);
-					}
-				});
+		JMenuItem available = new JMenuItem("Available");
+		modeMenu.add(available);
+		available.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(true, Mode.available);
+			}
+		});
 
-				JMenuItem away = new JMenuItem("Away");
-				modeMenu.add(away);
-				away.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						connection.setMode(true, Mode.away);
-					}
-				});
+		JMenuItem away = new JMenuItem("Away");
+		modeMenu.add(away);
+		away.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(true, Mode.away);
+			}
+		});
 
-				JMenuItem busy = new JMenuItem("Busy");
-				modeMenu.add(busy);
-				busy.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						connection.setMode(true, Mode.dnd);
-					}
-				});
+		JMenuItem busy = new JMenuItem("Busy");
+		modeMenu.add(busy);
+		busy.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(true, Mode.dnd);
+			}
+		});
 
-				JMenuItem invisible = new JMenuItem("Appear Offline");
-				modeMenu.add(invisible);
-				invisible.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						connection.setMode(false, null);
-					}
-				});
+		JMenuItem ltp = new JMenuItem("Looking to play");
+		modeMenu.add(ltp);
+		ltp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(true, Mode.xa);
+			}
+		});
 
-				// Contacts menu
-				JMenu contactMenu = new JMenu("Contacts");
-				contactMenu.setMnemonic(KeyEvent.VK_C);
-				menuBar.add(contactMenu);
-				contactMenu.addActionListener(this);
+		JMenuItem invisible = new JMenuItem("Appear Offline");
+		modeMenu.add(invisible);
+		invisible.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				connection.setMode(false, null);
+			}
+		});
 
-				JMenuItem addContactItem = new JMenuItem("Add Contact");
-				contactMenu.add(addContactItem);
-				addContactItem.addActionListener(this);
+		// Contacts menu
+		JMenu contactMenu = new JMenu("Contacts");
+		contactMenu.setMnemonic(KeyEvent.VK_C);
+		menuBar.add(contactMenu);
+		contactMenu.addActionListener(this);
 
-				JMenuItem removeContactItem = new JMenuItem("Remove Contact");
-				contactMenu.add(removeContactItem);
-				removeContactItem.addActionListener(this);
+		JMenuItem addContactItem = new JMenuItem("Add Contact");
+		contactMenu.add(addContactItem);
+		addContactItem.addActionListener(this);
 
-				// Group menu
-				JMenu groupMenu = new JMenu("Groups");
-				groupMenu.setMnemonic(KeyEvent.VK_G);
-				menuBar.add(groupMenu);
+		JMenuItem removeContactItem = new JMenuItem("Remove Contact");
+		contactMenu.add(removeContactItem);
+		removeContactItem.addActionListener(this);
 
-				JMenuItem joinGroup = new JMenuItem("Join Group");
-				groupMenu.add(joinGroup);
-				joinGroup.addActionListener(this);
+		// Group menu
+		JMenu groupMenu = new JMenu("Groups");
+		groupMenu.setMnemonic(KeyEvent.VK_G);
+		menuBar.add(groupMenu);
 
-				// Help menu
-				JMenu helpMenu = new JMenu("Help");
-				helpMenu.setMnemonic(KeyEvent.VK_H);
-				menuBar.add(helpMenu);
+		JMenuItem joinGroup = new JMenuItem("Join Group");
+		groupMenu.add(joinGroup);
+		joinGroup.addActionListener(this);
 
-				JMenuItem showQuick = new JMenuItem("Quick Guide");
-				helpMenu.add(showQuick);
-				showQuick.addActionListener(this);
-		
+		// Help menu
+		JMenu helpMenu = new JMenu("Help");
+		helpMenu.setMnemonic(KeyEvent.VK_H);
+		menuBar.add(helpMenu);
+
+		JMenuItem showQuick = new JMenuItem("Quick Guide");
+		helpMenu.add(showQuick);
+		showQuick.addActionListener(this);
+
 	}
 
 	/**
@@ -331,15 +359,21 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	private void loadContacts() {
 		roster.reload();
 		data = new User[roster.getEntryCount()];
+
+		ArrayList<User> avail = new ArrayList<User>();
+		ArrayList<User> busy = new ArrayList<User>();
+		ArrayList<User> away = new ArrayList<User>();
+		ArrayList<User> ltp = new ArrayList<User>();
+		ArrayList<User> offline = new ArrayList<User>();
+
 		// ensureCapacity(roster.getEntryCount());
-		int x = 0;
 		for (RosterEntry contact : roster.getEntries()) {
 			// Log.l("Found contact: " + contact);
 			String userContact = contact.getUser();
 
 			if (userContact.contains("conference")) {
 
-				data[x] = new User(userContact, "");
+				avail.add(new User(userContact, ""));
 			} else {
 				if (userContact.indexOf("@") != -1)
 					userContact = userContact.substring(0,
@@ -349,10 +383,45 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				Presence p = roster.getPresence(contact.getUser());
 				toAdd.copyPresenceInfo(p);
 
+				if (p.getType() == Presence.Type.unavailable)
+					offline.add(toAdd);
+				else if (p.getMode() == null || p.getMode() == Mode.available)
+					avail.add(toAdd);
+				else if (p.getMode() == Mode.away)
+					away.add(toAdd);
+				else if (p.getMode() == Mode.dnd)
+					busy.add(toAdd);
+				else if (p.getMode() == Mode.xa)
+					ltp.add(toAdd);
+				else {
+					Log.l("Unknown mode: " + p.getMode());
+					offline.add(toAdd);
+				}
+
 				// if (userContact.contains("toon325"))
 				// Log.l(contact.getUser() + ": " + p.getMode());
-				data[x] = toAdd;
 			}
+		}
+		// Add in sorted stacks in the correct order
+		int x = 0;
+		for (User u : avail) {
+			data[x] = u;
+			x++;
+		}
+		for (User u : ltp) {
+			data[x] = u;
+			x++;
+		}
+		for (User u : busy) {
+			data[x] = u;
+			x++;
+		}
+		for (User u : away) {
+			data[x] = u;
+			x++;
+		}
+		for (User u : offline) {
+			data[x] = u;
 			x++;
 		}
 		// Reload table
@@ -447,14 +516,22 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				return;
 			}
 		}
+		Log.l("Msg: " + msg);
 
 		String from = msg.getFrom().substring(0, msg.getFrom().indexOf("@"));
-		String domain = msg.getFrom().substring(msg.getFrom().indexOf("@") + 1,
-				msg.getFrom().indexOf("."));
+
+		String domain = "";
+		if (msg.getFrom().contains("."))
+			domain = msg.getFrom().substring(msg.getFrom().indexOf("@") + 1,
+					msg.getFrom().indexOf("."));
+		else
+			domain = msg.getFrom().substring(msg.getFrom().indexOf("@") + 1,
+					msg.getFrom().length());
+		
 		// Log.l("Domain: " + domain);
 		ChatWindow activeChat = null;
-		
-		Log.l("Message from: " + from + " at domain " + domain);
+
+		// Log.l("Message from: " + from + " at domain " + domain);
 
 		if (domain.equals("conference")) {
 			if (msg.getFrom().indexOf("/") == -1) // Room message
@@ -462,7 +539,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 
 			from = msg.getFrom().substring(msg.getFrom().indexOf("/") + 1,
 					msg.getFrom().length());
-			 Log.l("Conference from: " + from);
+			// Log.l("Conference from: " + from);
 		}
 
 		for (ChatWindow c : currentChats) {
@@ -479,7 +556,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 			ChatWindow c = openChat(from);
 			c.addToChatArea("<b>" + from + "</b>: " + msg.getBody(), null);
 			currentChats.add(c);
-			Log.l("Added chat: " + c.getFrom());
+			// Log.l("Added chat: " + c.getFrom());
 		} else {
 			activeChat.addToChatArea("<b>" + from + "</b>: " + msg.getBody(),
 					null);
@@ -725,7 +802,7 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 */
 	private ChatWindow openChat(String connectTo) {
 		if (connectTo.equals("")) {
-			//Log.l("Fetching User from List..");
+			// Log.l("Fetching User from List..");
 			if (contacts.getSelectedIndex() == -1)
 				return null;
 			connectTo = ((User) contacts.getSelectedValue()).getName();
@@ -733,17 +810,17 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				return null;
 		}
 		try {
-			
+
 			for (ChatWindow c : currentChats) {
-				//Log.l("Comparing " + connectTo + " to " + c.getFrom());
+				// Log.l("Comparing " + connectTo + " to " + c.getFrom());
 				if (c.getFrom().equals(connectTo)) {
 					c.show();
-					//Log.l("Opening existing chat with " + connectTo);
+					// Log.l("Opening existing chat with " + connectTo);
 					return c;
 				}
 			}
-			
-			//Log.l("Creating connection to " + connectTo);
+
+			// Log.l("Creating connection to " + connectTo);
 
 			Chat c = connection.getChatManager().createChat(
 					connectTo + "@" + serverName, null);
@@ -766,7 +843,8 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				chat.addToChatArea("Could not find a reference to " + connectTo
 						+ " on the server.", null);
 			}
-			requestIP();
+			// requestIP();
+
 			chat.show();
 			return chat;
 		} catch (Exception e) {
@@ -828,9 +906,10 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 	 */
 	@Override
 	public void presenceChanged(Presence e) {
+		System.out.println("From: " + e.getFrom());
 		String fullFrom = e.getFrom().substring(0,
 				e.getFrom().indexOf("/Smack"));
-		//Log.l(fullFrom + " " + e);
+		// Log.l(fullFrom + " " + e);
 		// Send message of presence change to any chatwindows with that person
 		for (ChatWindow c : currentChats)
 			if (c.getFullFrom().equals(fullFrom)) {
@@ -966,6 +1045,28 @@ public class Home implements ActionListener, MouseListener, KeyListener,
 				e.printStackTrace();
 			}
 		return IP;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see steamWrapper.SteamListener#SteamUpdate(steamWrapper.SteamEvent)
+	 */
+	@Override
+	public void SteamUpdate(SteamEvent e) {
+		// Log.l("Steamupdate: " + e);
+		for (int x = 0; x < contacts.getModel().getSize(); x++) {
+			User u = contacts.getModel().getElementAt(x);
+			// Log.l("Comparing: " + u.getName() + " to " + e.getUsername() +
+			// " ? " + u.getName().equalsIgnoreCase(e.getUsername()));
+			if (u.getName().equalsIgnoreCase(e.getUsername())) {
+				u.setGame(e.getValue());
+				// Log.l("Set user " + u.getName() + " to be playing " +
+				// u.getGame());
+			}
+		}
+		contacts.repaint();
+
 	}
 
 }

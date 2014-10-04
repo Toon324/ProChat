@@ -47,6 +47,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -57,20 +58,20 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 public class ChatWindow implements ActionListener, KeyListener,
 		HyperlinkListener {
 
-	JFrame frame;
-	JEditorPane chatArea;
-	JTextField entry;
-	JButton send;
-	JLabel status;
-	User user;
-	String sendTo, serverName;
-	Chat chat;
-	MultiUserChat muc;
-	XmppManager connection;
-	HTMLEditorKit kit;
+	public JFrame frame;
+	
+	private JEditorPane chatArea;
+	private JTextField entry;
+	private JLabel status;
+	private User user;
+	private Chat chat;
+	private MultiUserChat muc;
+	private HTMLEditorKit kit;
+	
 	private String color = "000000";
-	private String font = "Arial";
 	private String previousColor = color;
+	private String font = "Arial";
+	
 	private String lastMessageFrom = "";
 	private boolean imagesEnabled = true;
 	private boolean customTextEnabled = true;
@@ -142,121 +143,8 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		// Menu
 		JMenuBar menuBar = new JMenuBar();
-
-		// Build the first menu.
-		JMenu menu = new JMenu("Insert");
-		menuBar.add(menu);
-
-		JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
-		menu.add(addImage);
-		addImage.addActionListener(this);
-
-		JMenu memes = new JMenu("Meme");
-		menu.add(memes);
-
-		JMenuItem noRead = new JMenuItem("Didn't Read");
-		memes.add(noRead);
-		noRead.addActionListener(this);
-
-		JMenuItem troll = new JMenuItem("Troll");
-		memes.add(troll);
-		troll.addActionListener(this);
-
-		JMenuItem desk = new JMenuItem("Desk Flip");
-		memes.add(desk);
-		desk.addActionListener(this);
-
-		JMenuItem no = new JMenuItem("NO.");
-		memes.add(no);
-		no.addActionListener(this);
-
-		JMenuItem lol = new JMenuItem("lol");
-		memes.add(lol);
-		lol.addActionListener(this);
-
-		JMenuItem suprised = new JMenuItem("Suprised");
-		memes.add(suprised);
-		suprised.addActionListener(this);
-
-		JMenuItem facepalm = new JMenuItem("Facepalm");
-		memes.add(facepalm);
-		facepalm.addActionListener(this);
-
-		JMenuItem gusta = new JMenuItem("Me Gusta");
-		memes.add(gusta);
-		gusta.addActionListener(this);
-
-		// HTML menu
-		JMenu html = new JMenu("HTML");
-		menuBar.add(html);
-
-		JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
-		html.add(setColor);
-		setColor.addActionListener(this);
-
-		JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
-		html.add(setFont);
-		setFont.addActionListener(this);
-
-		try {
-			BufferedImage toggleImagesIcon = ImageIO.read(getClass()
-					.getResourceAsStream("imageToggle.png"));
-			BufferedImage toggleTextIcon = ImageIO.read(getClass()
-					.getResourceAsStream("customText.png"));
-
-			final JButton toggleImages = new JButton(new ImageIcon(
-					toggleImagesIcon));
-			final JButton toggleText = new JButton(
-					new ImageIcon(toggleTextIcon));
-
-			toggleImages
-					.setToolTipText("Embedded images will be displayed in chat.");
-			toggleText.setToolTipText("Custom fonts and colors will be used.");
-
-			toggleImages.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if (imagesEnabled) {
-
-						toggleImages
-								.setToolTipText("Embedded images will be displayed as links.");
-						toggleImages.setBackground(Color.gray);
-					} else {
-						toggleImages
-								.setToolTipText("Embedded images will be displayed in chat.");
-						toggleImages.setBackground(null);
-					}
-					imagesEnabled = !imagesEnabled;
-				}
-
-			});
-
-			toggleText.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if (customTextEnabled) {
-
-						toggleText
-								.setToolTipText("Custom fonts and colors will not be used.");
-						toggleText.setBackground(Color.gray);
-					} else {
-						toggleText
-								.setToolTipText("Custom fonts and colors will be used.");
-						toggleText.setBackground(null);
-					}
-					customTextEnabled = !customTextEnabled;
-				}
-
-			});
-
-			menuBar.add(toggleImages);
-			menuBar.add(toggleText);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		
+		buildMenu(menuBar);
 
 		frame.setJMenuBar(menuBar);
 		frame.add(scroller);
@@ -270,6 +158,127 @@ public class ChatWindow implements ActionListener, KeyListener,
 		// frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		// frame.addWindowListener(this);
 
+	}
+
+	/**
+	 * @param menuBar
+	 */
+	private void buildMenu(JMenuBar menuBar) {
+		// Build the first menu.
+				JMenu menu = new JMenu("Insert");
+				menuBar.add(menu);
+
+				JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
+				menu.add(addImage);
+				addImage.addActionListener(this);
+
+				JMenu savedImages = new JMenu("Saved");
+				menu.add(savedImages);
+
+				JMenuItem noRead = new JMenuItem("Didn't Read");
+				savedImages.add(noRead);
+				noRead.addActionListener(this);
+
+				JMenuItem troll = new JMenuItem("Troll");
+				savedImages.add(troll);
+				troll.addActionListener(this);
+
+				JMenuItem desk = new JMenuItem("Desk Flip");
+				savedImages.add(desk);
+				desk.addActionListener(this);
+
+				JMenuItem no = new JMenuItem("NO.");
+				savedImages.add(no);
+				no.addActionListener(this);
+
+				JMenuItem lol = new JMenuItem("lol");
+				savedImages.add(lol);
+				lol.addActionListener(this);
+
+				JMenuItem suprised = new JMenuItem("Suprised");
+				savedImages.add(suprised);
+				suprised.addActionListener(this);
+
+				JMenuItem facepalm = new JMenuItem("Facepalm");
+				savedImages.add(facepalm);
+				facepalm.addActionListener(this);
+
+				JMenuItem gusta = new JMenuItem("Me Gusta");
+				savedImages.add(gusta);
+				gusta.addActionListener(this);
+
+				// HTML menu
+				JMenu html = new JMenu("HTML");
+				menuBar.add(html);
+
+				JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
+				html.add(setColor);
+				setColor.addActionListener(this);
+
+				JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
+				html.add(setFont);
+				setFont.addActionListener(this);
+
+				try {
+					BufferedImage toggleImagesIcon = ImageIO.read(getClass()
+							.getResourceAsStream("imageToggle.png"));
+					BufferedImage toggleTextIcon = ImageIO.read(getClass()
+							.getResourceAsStream("customText.png"));
+
+					final JButton toggleImages = new JButton(new ImageIcon(
+							toggleImagesIcon));
+					final JButton toggleText = new JButton(
+							new ImageIcon(toggleTextIcon));
+
+					toggleImages
+							.setToolTipText("Embedded images will be displayed in chat.");
+					toggleText.setToolTipText("Custom fonts and colors will be used.");
+
+					toggleImages.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							if (imagesEnabled) {
+
+								toggleImages
+										.setToolTipText("Embedded images will be displayed as links.");
+								toggleImages.setBackground(Color.gray);
+							} else {
+								toggleImages
+										.setToolTipText("Embedded images will be displayed in chat.");
+								toggleImages.setBackground(null);
+							}
+							imagesEnabled = !imagesEnabled;
+						}
+
+					});
+
+					toggleText.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							if (customTextEnabled) {
+
+								toggleText
+										.setToolTipText("Custom fonts and colors will not be used.");
+								toggleText.setBackground(Color.gray);
+							} else {
+								toggleText
+										.setToolTipText("Custom fonts and colors will be used.");
+								toggleText.setBackground(null);
+							}
+							customTextEnabled = !customTextEnabled;
+						}
+
+					});
+
+					menuBar.add(toggleImages);
+					menuBar.add(toggleText);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		
 	}
 
 	/**
@@ -313,64 +322,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 		// Menu
 		JMenuBar menuBar = new JMenuBar();
 
-		// Build the first menu.
-		JMenu menu = new JMenu("Insert");
-		menuBar.add(menu);
-
-		JMenuItem addImage = new JMenuItem("Image", KeyEvent.VK_I);
-		menu.add(addImage);
-		addImage.addActionListener(this);
-
-		JMenu memes = new JMenu("Meme");
-		menu.add(memes);
-
-		JMenuItem gay = new JMenuItem("Ultra Gay");
-		memes.add(gay);
-		gay.addActionListener(this);
-
-		JMenuItem noRead = new JMenuItem("Didn't Read");
-		memes.add(noRead);
-		noRead.addActionListener(this);
-
-		JMenuItem troll = new JMenuItem("Troll");
-		memes.add(troll);
-		troll.addActionListener(this);
-
-		JMenuItem desk = new JMenuItem("Desk Flip");
-		memes.add(desk);
-		desk.addActionListener(this);
-
-		JMenuItem no = new JMenuItem("NO.");
-		memes.add(no);
-		no.addActionListener(this);
-
-		JMenuItem lol = new JMenuItem("lol");
-		memes.add(lol);
-		lol.addActionListener(this);
-
-		JMenuItem suprised = new JMenuItem("Suprised");
-		memes.add(suprised);
-		suprised.addActionListener(this);
-
-		JMenuItem facepalm = new JMenuItem("Facepalm");
-		memes.add(facepalm);
-		facepalm.addActionListener(this);
-
-		JMenuItem gusta = new JMenuItem("Me Gusta");
-		memes.add(gusta);
-		gusta.addActionListener(this);
-
-		// HTML menu
-		JMenu html = new JMenu("HTML");
-		menuBar.add(html);
-
-		JMenuItem setColor = new JMenuItem("Text Color", KeyEvent.VK_T);
-		html.add(setColor);
-		setColor.addActionListener(this);
-
-		JMenuItem setFont = new JMenuItem("Font", KeyEvent.VK_F);
-		html.add(setFont);
-		setFont.addActionListener(this);
+		buildMenu(menuBar);
 
 		frame.setJMenuBar(menuBar);
 
@@ -470,24 +422,11 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		if (toAdd.equals(""))
 			return;
-
-		// Adds a timestamp
-		Calendar c = Calendar.getInstance();
-		int hour = c.get(Calendar.HOUR);
-		int minute = c.get(Calendar.MINUTE);
-
-		String minuteText = "" + minute;
-
-		if (hour == 0)
-			hour = 12;
-
-		if (minute < 10)
-			minuteText = "0" + minute;
+		
 
 		try {
-			String timeStamp = "[" + hour + ":" + minuteText + "] ";
 			
-			String addition = "\n" + timeStamp +  toAdd;
+			String addition = "\n" + generateTimeStamp() +  " " + toAdd;
 			
 			//System message
 			if (!addition.contains("<b>")) {
@@ -517,21 +456,48 @@ public class ChatWindow implements ActionListener, KeyListener,
 
 		caretFix();
 
-		if (!frame.isFocused()) {
-			try {
-				Clip clip = AudioSystem.getClip();
-				InputStream inputStream = getClass().getResourceAsStream(
-						"alert.wav");
-				InputStream buffedStream = new BufferedInputStream(inputStream);
-				clip.open(AudioSystem.getAudioInputStream(buffedStream));
-				clip.start();
-
-				frame.toFront(); // Flash icon
-			} catch (Exception e) {
-				Toolkit.getDefaultToolkit().beep();
-				e.printStackTrace();
-			}
+		if (!frame.isFocused() && user.getMode() != Mode.away && user.getMode() != Mode.dnd) {
+			playSound();
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void playSound() {
+		try {
+			Clip clip = AudioSystem.getClip();
+			InputStream inputStream = getClass().getResourceAsStream(
+					"alert.wav");
+			InputStream buffedStream = new BufferedInputStream(inputStream);
+			clip.open(AudioSystem.getAudioInputStream(buffedStream));
+			clip.start();
+
+			frame.toFront(); // Flash icon
+		} catch (Exception e) {
+			Toolkit.getDefaultToolkit().beep();
+			e.printStackTrace();
+		}
+		
+	}
+
+	/**
+	 * @return
+	 */
+	private String generateTimeStamp() {
+		Calendar c = Calendar.getInstance();
+		int hour = c.get(Calendar.HOUR);
+		int minute = c.get(Calendar.MINUTE);
+
+		String minuteText = "" + minute;
+
+		if (hour == 0)
+			hour = 12;
+
+		if (minute < 10)
+			minuteText = "0" + minute;
+		
+		return "[" + hour + ":" + minuteText + "]";
 	}
 
 	/**
@@ -903,7 +869,7 @@ public class ChatWindow implements ActionListener, KeyListener,
 	 * 
 	 */
 	public void disableInput() {
-		// entry.setEditable(false);
+		entry.setEditable(false);
 	}
 
 	/**
