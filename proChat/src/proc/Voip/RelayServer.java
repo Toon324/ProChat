@@ -94,6 +94,11 @@ public class RelayServer {
 	}
 	
 	public void resolveSocket(String ip) {
+		if (!sockets.containsKey(ip)) {
+			System.out.println("ERROR: No socket mapping with " + ip);
+			printMap();
+			return;
+		}
 		try {
 			if (sockets.get(ip).client != null)
 					sockets.get(ip).client.close();

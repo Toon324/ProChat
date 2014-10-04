@@ -77,7 +77,7 @@ public class RelayHelper implements Runnable {
 						output.close();
 						client.close();
 						
-						server.resolveSocket(client.getInetAddress() + ":" + client.g);
+						server.resolveSocket(client.getInetAddress() + ":" + client.getPort());
 
 						System.out.println("Shared recieverIP with caller.");
 						shareInfo(caller, reciever);
@@ -107,8 +107,16 @@ public class RelayHelper implements Runnable {
 					fullip.indexOf(":") + 1, fullip.length()));
 
 			System.out.println("Fetching socket for " + ip);
+			
+			fullip = "/" + fullip;
 
-			Socket sock = server.getSockets().get(ip).client;
+			if (!server.getSockets().containsKey(fullip)) {
+				System.out.println("ERROR: No socketmap for " + fullip);
+				server.printMap();
+				return;
+			}
+			
+			Socket sock = server.getSockets().get(fullip).client;
 
 			System.out.println("Complete.");
 
@@ -117,7 +125,7 @@ public class RelayHelper implements Runnable {
 			output.flush();
 			sock.close();
 			
-			server.resolveSocket(ip);
+			server.resolveSocket(fullip);
 
 			System.out.println("Shared Caller IP with reciever.");
 		} catch (UnknownHostException e) {
