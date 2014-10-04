@@ -26,11 +26,11 @@ public class UDPTester {
 				sock.getInputStream()));
 		PrintWriter output = new PrintWriter(sock.getOutputStream());
 		
-		output.write("Alice\n");
-		output.write("Bob\n");
-
-//		output.write("Bob\n");
 //		output.write("Alice\n");
+//		output.write("Bob\n");
+
+		output.write("Bob\n");
+		output.write("Alice\n");
 		
 		output.flush();
 		

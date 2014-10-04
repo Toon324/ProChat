@@ -21,7 +21,7 @@ import java.util.TreeMap;
 public class RelayHelper implements Runnable {
 
 	private RelayServer server;
-	private Socket client;
+	 Socket client;
 	private String name;
 
 	/**
@@ -54,25 +54,40 @@ public class RelayHelper implements Runnable {
 			while (shouldRun) {
 				if (input.ready()) {
 					String caller = input.readLine();
-					String callerIP = client.getInetAddress().toString().replace("/", "");
+					String callerIP = client.getInetAddress().toString()
+							.replace("/", "")
+							+ ":" + client.getPort();
 					String reciever = input.readLine();
-					
-					//Add this Name-IP pairing to our "Phonebook"
+
+					// Add this Name-IP pairing to our "Phonebook"
 					map.put(caller, callerIP);
-					
-					if (searches.containsKey(reciever) && searches.get(reciever).equals(caller)) {
-						System.out.println("Found search match: " + reciever + " looking for " + searches.get(reciever));
+
+					if (searches.containsKey(reciever)
+							&& searches.get(reciever).equals(caller)) {
+						System.out.println("Found search match: " + reciever
+								+ " looking for " + searches.get(reciever));
+						System.out.println(reciever + " has IP "
+								+ map.get(reciever) + " and " + caller
+								+ " has IP " + map.get(caller));
+
+						output.write(map.get(reciever) + "\n");
+						output.flush();
+
+						input.close();
+						output.close();
+						client.close();
+						
+						server.resolveSocket(client.getInetAddress() + ":" + client.g);
+
+						System.out.println("Shared recieverIP with caller.");
 						shareInfo(caller, reciever);
-						output.write(map.get(reciever));
-					}
-					else
+					} else
 						searches.put(caller, reciever);
-					
+
 					server.printMap();
 				}
 			}
-			input.close();
-			output.close();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -86,11 +101,25 @@ public class RelayHelper implements Runnable {
 	private void shareInfo(String caller, String reciever) {
 		// TODO Auto-generated method stub
 		try {
-			Socket sock = new Socket(server.getMap().get(reciever), 1324);
+			String fullip = server.getMap().get(reciever);
+			String ip = fullip.substring(0, fullip.indexOf(":"));
+			int port = Integer.valueOf(fullip.substring(
+					fullip.indexOf(":") + 1, fullip.length()));
+
+			System.out.println("Fetching socket for " + ip);
+
+			Socket sock = server.getSockets().get(ip).client;
+
+			System.out.println("Complete.");
+
 			PrintWriter output = new PrintWriter(sock.getOutputStream());
-			output.write(server.getMap().get(caller));
-			
+			output.write(server.getMap().get(caller) + "\n");
+			output.flush();
 			sock.close();
+			
+			server.resolveSocket(ip);
+
+			System.out.println("Shared Caller IP with reciever.");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -98,48 +127,6 @@ public class RelayHelper implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-	}
-
-	/**
-	 * @param e
-	 * @throws SocketException
-	 */
-	private void sendInfo(String A, String B) throws Exception {
-		byte[] toSend = new byte[50];
-		DatagramPacket packet = new DatagramPacket(toSend, toSend.length);
-		packet.setPort(1324);
-		DatagramSocket socket = new DatagramSocket();
-		
-		String ip1 = B;
-		String ip2 = A;
-		
-		if (ip1.contains(":"))
-			ip1 = ip1.substring(0, ip1.indexOf(":"));
-		
-		if (ip2.contains(":"))
-			ip2 = ip2.substring(0, ip2.indexOf(":"));
-
-		// Send IP2 (A) to IP1 (B)
-		toSend = A.getBytes();
-		packet.setData(toSend);
-		packet.setAddress(InetAddress.getByName(ip1));
-
-		socket.send(packet);
-		System.out.println("2->1: Sent " + new String(packet.getData())
-				+ " to " + packet.getAddress());
-
-		// Send IP1 to IP2
-		toSend = B.getBytes();
-		packet.setData(toSend);
-		packet.setAddress(InetAddress.getByName(ip2));
-		System.out.println("1->2: Sent " + new String(packet.getData())
-				+ " to " + packet.getAddress());
-
-		socket.send(packet);
-
-		socket.close();
 
 	}
 }

@@ -18,6 +18,8 @@ public class RelayServer {
 
 	private TreeMap<String, String> map = new TreeMap<String, String>();
 	private TreeMap<String, String> searches = new TreeMap<String, String>();
+	
+	private TreeMap<String, RelayHelper> sockets = new TreeMap<String, RelayHelper>();
 
 	public static void main(String[] args) {
 		RelayServer rs = new RelayServer();
@@ -51,7 +53,11 @@ public class RelayServer {
 				e.printStackTrace();
 			}
 			
-			threadPool.execute(new RelayHelper(this, client, "Helper" + cnt));
+			RelayHelper rh = new RelayHelper(this, client, "Helper" + cnt);
+			
+			sockets.put(client.getInetAddress().toString() + ":" + client.getPort(), rh);
+			
+			threadPool.execute(rh);
 			System.out.println("Created helper iteration " + cnt);
 			cnt++;
 			printMap();
@@ -68,7 +74,10 @@ public class RelayServer {
 			System.out.println("\nIP mapping found: " + e.getKey() + " "
 					+ e.getValue());
 		for (Entry<String, String> e : searches.entrySet())
-			System.out.println("Search found: " + e.getKey() + " "
+			System.out.println("Search map has: " + e.getKey() + " "
+					+ e.getValue());
+		for (Entry<String, RelayHelper> e : sockets.entrySet())
+			System.out.println("Sockets map has: " + e.getKey() + " "
 					+ e.getValue());
 	}
 	
@@ -78,5 +87,20 @@ public class RelayServer {
 
 	public TreeMap<String, String> getSearches() {
 		return searches;
+	}
+	
+	public TreeMap<String, RelayHelper> getSockets() {
+		return sockets;
+	}
+	
+	public void resolveSocket(String ip) {
+		try {
+			if (sockets.get(ip).client != null)
+					sockets.get(ip).client.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		sockets.remove(ip);
 	}
 }
