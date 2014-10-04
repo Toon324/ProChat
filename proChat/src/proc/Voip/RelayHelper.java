@@ -54,9 +54,11 @@ public class RelayHelper implements Runnable {
 			while (shouldRun) {
 				if (input.ready()) {
 					String caller = input.readLine();
+					int clientPort = client.getPort();
 					String callerIP = client.getInetAddress().toString()
 							.replace("/", "")
-							+ ":" + client.getPort();
+							+ ":" + clientPort;
+					
 					String reciever = input.readLine();
 
 					// Add this Name-IP pairing to our "Phonebook"
@@ -71,16 +73,20 @@ public class RelayHelper implements Runnable {
 								+ " has IP " + map.get(caller));
 
 						output.write(map.get(reciever) + "\n");
+						output.write(clientPort + "\n");
 						output.flush();
 
 						input.close();
 						output.close();
-						client.close();
+						
+						searches.remove(reciever);
 						
 						server.resolveSocket(client.getInetAddress() + ":" + client.getPort());
 
 						System.out.println("Shared recieverIP with caller.");
 						shareInfo(caller, reciever);
+						
+						shouldRun = false;
 					} else
 						searches.put(caller, reciever);
 
@@ -122,8 +128,8 @@ public class RelayHelper implements Runnable {
 
 			PrintWriter output = new PrintWriter(sock.getOutputStream());
 			output.write(server.getMap().get(caller) + "\n");
+			output.write(port + "\n");
 			output.flush();
-			sock.close();
 			
 			server.resolveSocket(fullip);
 
