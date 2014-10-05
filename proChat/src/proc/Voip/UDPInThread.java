@@ -10,20 +10,15 @@ import java.net.UnknownHostException;
  * 
  */
 public class UDPInThread implements Runnable {
-	static DatagramSocket sock;
 	byte[] inputData = new byte[VoiceCall.bufferSize];
 	DatagramPacket datagram;
 	RecieveAudio ra;
 
 	public UDPInThread(RecieveAudio r) {
 		ra = r;
-		try {
-			sock = new DatagramSocket(1324);
-			datagram = new DatagramPacket(inputData, inputData.length);
-			//RecieveAudio.text.append("\nSocket Created.");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
+		datagram = new DatagramPacket(inputData, inputData.length);
+		// RecieveAudio.text.append("\nSocket Created.");
 	}
 
 	/*
@@ -36,22 +31,23 @@ public class UDPInThread implements Runnable {
 		try {
 			RecieveAudio.text.append("\nWaiting on packet at "
 					+ InetAddress.getLocalHost().getHostAddress() + ":"
-					+ sock.getLocalPort() + "\n");
+					+ ra.socket.getLocalPort() + "\n");
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		while (true) {	
+		while (true) {
 			try {
-//				while (!sock.isConnected()) {
-//					//nothing
-//				}
-				
-				sock.receive(datagram);
+				// while (!sock.isConnected()) {
+				// //nothing
+				// }
+
+				ra.socket.receive(datagram);
 				RecieveAudio.text.append("\nConnection made.");
 				byte[] data = datagram.getData();
-				RecieveAudio.text.setText("\n" + data[0] + " " + data[1] + " " + data[2] + " " + data[3] + " " +data[4]);
-				//Log.l("waiting...");
+				RecieveAudio.text.setText("\n" + data[0] + " " + data[1] + " "
+						+ data[2] + " " + data[3] + " " + data[4]);
+				// Log.l("waiting...");
 				ra.recievePacket(data);
 			} catch (Exception e) {
 				e.printStackTrace();

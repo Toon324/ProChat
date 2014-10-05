@@ -1,7 +1,6 @@
 package proc.Voip;
 
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,21 +16,16 @@ import proc.Log;
  * 
  */
 public class RecieveAudio {
-	ServerSocket server;
-	Socket socket;
+	DatagramSocket socket;
 	static JTextArea text;
 	ExecutorService pool;
 
-	public static void main(String[] args) {
-		RecieveAudio ra = new RecieveAudio(Executors.newCachedThreadPool());
-		ra.playAudio();
-
-	}
-
-	public RecieveAudio(ExecutorService threadPool) {
+	public RecieveAudio(DatagramSocket comms, ExecutorService threadPool) {
 		pool = threadPool;
 		JFrame frame = new JFrame();
 		text = new JTextArea();
+		
+		socket = comms;
 		
 		JScrollPane scroller = new JScrollPane(text);
 		scroller.setAutoscrolls(true);

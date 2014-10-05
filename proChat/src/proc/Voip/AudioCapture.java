@@ -4,8 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
+import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -24,18 +24,13 @@ public class AudioCapture implements ActionListener {
 	TargetDataLine targetDataLine;
 	AudioInputStream audioInputStream;
 	SourceDataLine sourceDataLine;
-	String IP = "";
+	String IP;
 	JTextArea text;
 	JFrame frame;
 	ExecutorService pool;
 
-	public static void main(String[] args) {
-		new AudioCapture("129.89.185.120", Executors.newCachedThreadPool());
-	}
-
-	public AudioCapture(String ip, ExecutorService threadPool) {
+	public AudioCapture(DatagramSocket comms, String reciever, ExecutorService threadPool) {
 		pool = threadPool;
-		IP = ip;
 		frame = new JFrame();
 		text = new JTextArea();
 
@@ -56,24 +51,16 @@ public class AudioCapture implements ActionListener {
 		text.append("This IP: " + VoiceCall.fetchExternalIP());
 
 		frame.requestFocus();
-
+		pool.execute(new SendAudioThread(comms, reciever, text));
 	}
 
-	public void captureAudio() {
-		pool.execute(new SendAudioThread(IP, text));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Start"))
-			captureAudio();
-
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
