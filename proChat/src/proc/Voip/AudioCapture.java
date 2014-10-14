@@ -29,7 +29,7 @@ public class AudioCapture implements ActionListener {
 	JFrame frame;
 	ExecutorService pool;
 
-	public AudioCapture(DatagramSocket comms, String reciever, ExecutorService threadPool) {
+	public AudioCapture(VoiceCall vc, ExecutorService threadPool) {
 		pool = threadPool;
 		frame = new JFrame();
 		text = new JTextArea();
@@ -51,7 +51,7 @@ public class AudioCapture implements ActionListener {
 		text.append("This IP: " + VoiceCall.fetchExternalIP());
 
 		frame.requestFocus();
-		pool.execute(new SendAudioThread(comms, reciever, text));
+		pool.execute(new SendAudioThread(vc, text));
 	}
 
 	/* (non-Javadoc)
@@ -62,5 +62,7 @@ public class AudioCapture implements ActionListener {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 
 }

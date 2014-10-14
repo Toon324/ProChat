@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -23,10 +25,12 @@ public class VoiceCall {
 	AudioCapture ac;
 	RecieveAudio ra;
 	int externalPort = 0;
+	DatagramSocket comms;
+	DatagramPacket packet;
 
 	public static void main(String[] args) {
-		//new VoiceCall("Alice", "Bob");
-		new VoiceCall("Bob", "Alice");
+		new VoiceCall("Alice", "Bob");
+		//new VoiceCall("Bob", "Alice");
 	}
 
 	public VoiceCall(String caller, String recipient) {
@@ -39,15 +43,21 @@ public class VoiceCall {
 		try {
 			ip = fetchIP(caller, recipient);
 			
-			//String hostIP = ip.substring(0, ip.indexOf(":"));
-			//int port = Integer.valueOf(ip.substring(ip.indexOf(":") + 1, ip.length()));
+			String hostIP = ip.substring(0, ip.indexOf(":"));
+			int port = Integer.valueOf(ip.substring(ip.indexOf(":") + 1, ip.length()));
 			
-			DatagramSocket comms = new DatagramSocket(externalPort);
+			comms = new DatagramSocket(externalPort);
+			
+			packet = new DatagramPacket(null, bufferSize);
+			packet.setAddress(InetAddress.getByName(hostIP));
+			packet.setPort(port);
+			
+			
 			System.out.println("Opened datagram socket on port " + externalPort);
 			
-			ac = new AudioCapture(comms, ip, threadPool);
+			ac = new AudioCapture(this, threadPool);
 
-			ra = new RecieveAudio(comms, threadPool);
+			ra = new RecieveAudio(this, threadPool);
 			ra.playAudio(); // Listen for audio
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -133,6 +143,29 @@ public class VoiceCall {
 	 */
 	public RecieveAudio getRecieve() {
 		return ra;
+	}
+	
+	public void sendData(byte[] data) {
+		System.out.println("\nSending data to " + comms.getInetAddress() + ":"
+				+ comms.getPort());
+		packet.setData(data);
+		try {
+			comms.send(packet);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public byte[] recieveData() {
+		try {
+			comms.receive(packet);
+			return packet.getData();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

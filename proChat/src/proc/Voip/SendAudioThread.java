@@ -18,18 +18,11 @@ public class SendAudioThread extends Thread implements Runnable {
 	boolean shouldSend = true;
 	DatagramSocket comms;
 	String recieverIP;
+	VoiceCall call;
 	
-	public SendAudioThread(DatagramSocket sock, String reciever, JTextArea t) {
-		comms = sock;
+	public SendAudioThread(VoiceCall vc, JTextArea t) {
+		call = vc;
 		text = t;
-		recieverIP = reciever;
-		
-		try {
-			sock = new DatagramSocket();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 	}
 
@@ -37,10 +30,6 @@ public class SendAudioThread extends Thread implements Runnable {
 		byte[] data = new byte[VoiceCall.bufferSize];
 
 		try {
-			DatagramPacket toSend = new DatagramPacket(data, data.length);
-			System.out.println("Sending to " + recieverIP);
-			toSend.setAddress(InetAddress.getByName(recieverIP.substring(0, recieverIP.indexOf(":"))));
-			toSend.setPort(Integer.valueOf(recieverIP.substring(recieverIP.indexOf(":") + 1 , recieverIP.length())));
 			
 			//Start capturing audio
 			DataLine.Info dataLineInfo = new DataLine.Info(
@@ -49,9 +38,7 @@ public class SendAudioThread extends Thread implements Runnable {
 					.getLine(dataLineInfo);
 			targetDataLine.open(RecieveAudio.getAudioFormat());
 			targetDataLine.start();
-
-			text.append("\nSending data to " + toSend.getAddress() + ":"
-					+ toSend.getPort());
+			
 
 			while (shouldSend) {
 				targetDataLine.read(data, 0, data.length);
@@ -63,9 +50,7 @@ public class SendAudioThread extends Thread implements Runnable {
 				 data[3] = (byte) 6;
 				 data[4] = (byte) 7;
 				
-				 toSend.setData(data);
-
-				comms.send(toSend);
+				 call.sendData(data);
 			}
 			text.append("Socket closed.");
 			comms.close();

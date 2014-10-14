@@ -31,24 +31,20 @@ public class UDPInThread implements Runnable {
 		try {
 			RecieveAudio.text.append("\nWaiting on packet at "
 					+ InetAddress.getLocalHost().getHostAddress() + ":"
-					+ ra.socket.getLocalPort() + "\n");
+					+ ra.call.comms.getLocalPort() + "\n");
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		while (true) {
 			try {
-				// while (!sock.isConnected()) {
-				// //nothing
-				// }
-
-				ra.socket.receive(datagram);
 				RecieveAudio.text.append("\nConnection made.");
-				byte[] data = datagram.getData();
+				byte[] data = ra.call.recieveData();
+				
 				RecieveAudio.text.setText("\n" + data[0] + " " + data[1] + " "
 						+ data[2] + " " + data[3] + " " + data[4]);
 				// Log.l("waiting...");
-				ra.recievePacket(data);
+				ra.recievePacket(data); //Feed data into the sound player
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

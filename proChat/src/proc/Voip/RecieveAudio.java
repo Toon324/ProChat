@@ -16,16 +16,14 @@ import proc.Log;
  * 
  */
 public class RecieveAudio {
-	DatagramSocket socket;
 	static JTextArea text;
 	ExecutorService pool;
+	VoiceCall call;
 
-	public RecieveAudio(DatagramSocket comms, ExecutorService threadPool) {
+	public RecieveAudio(VoiceCall vc, ExecutorService threadPool) {
 		pool = threadPool;
 		JFrame frame = new JFrame();
 		text = new JTextArea();
-		
-		socket = comms;
 		
 		JScrollPane scroller = new JScrollPane(text);
 		scroller.setAutoscrolls(true);
